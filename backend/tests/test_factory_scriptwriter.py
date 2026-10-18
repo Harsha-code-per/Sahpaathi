@@ -1,9 +1,8 @@
 import json
-from contextlib import nullcontext
 from pathlib import Path
-from types import SimpleNamespace
 
 import pytest
+from stub_client import stub_client
 
 from app.factory.scriptwriter import District, Lesson, ScriptwriterError, write_episode
 
@@ -14,23 +13,9 @@ DISTRICT = District.model_validate_json((CONTENT / "districts/chennai-migrant.js
 
 
 def _client(*replies: tuple[str, str]):
-    """Stands in for anthropic.Anthropic: canned (text, stop_reason) replies; records requests."""
-    replies_left = list(replies)
-    requests: list[dict] = []
-
-    def stream(**kwargs):
-        requests.append({**kwargs, "messages": list(kwargs["messages"])})
-        text, stop = replies_left.pop(0)
-        message = SimpleNamespace(
-            model="stub",
-            usage=None,
-            stop_reason=stop,
-            content=[SimpleNamespace(type="text", text=text)],
-        )
-        return nullcontext(SimpleNamespace(get_final_message=lambda: message))
-
-    messages = SimpleNamespace(stream=stream)
-    return SimpleNamespace(beta=SimpleNamespace(messages=messages), requests=requests)
+    client = stub_client(writer=replies)
+    client.requests = client.requests["writer"]
+    return client
 
 
 def test_valid_episode_gets_deterministic_id_and_local_brief():
