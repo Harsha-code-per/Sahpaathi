@@ -1,15 +1,29 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app import auth, episodes
 from app.config import settings
+from app.db import SessionLocal
 
-app = FastAPI(title="Sahpaathi API", version="0.1.0")
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    with SessionLocal() as db:
+        episodes.fail_orphans(db)
+    yield
+
+
+app = FastAPI(title="Sahpaathi API", version="0.1.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.include_router(auth.router)
+app.include_router(episodes.router)
 
 
 @app.get("/health")
