@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState, type ChangeEvent } from 'react'
 import type { Episode } from '../lib/types'
+import { ClassroomSetup } from '../attendance/Attendance'
+import { getClassroom } from '../attendance/classroom'
 import { sharePack } from '../packs/share'
 import { deletePack, importPack, listPacks, loadPackFiles } from '../packs/store'
 import { PackError } from '../packs/verify'
-import type { StoredPack } from '../storage/db'
+import type { ClassroomRecord, StoredPack } from '../storage/db'
 import { samplePack } from './samplePack'
 
 export interface OpenLesson {
@@ -43,6 +45,8 @@ export default function Library({ onOpen }: { onOpen: (lesson: OpenLesson) => vo
   const [packs, setPacks] = useState<StoredPack[]>([])
   const [notice, setNotice] = useState<Notice | null>(null)
   const [busy, setBusy] = useState(false)
+  const [classroom, setClassroom] = useState<ClassroomRecord | null>(null)
+  const [editingClassroom, setEditingClassroom] = useState(false)
 
   const refresh = useCallback(
     () =>
@@ -55,6 +59,9 @@ export default function Library({ onOpen }: { onOpen: (lesson: OpenLesson) => vo
   useEffect(() => {
     refresh()
   }, [refresh])
+  useEffect(() => {
+    getClassroom().then(setClassroom, (e) => console.error('Could not read the classroom', e))
+  }, [])
 
   async function onFile(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -98,10 +105,31 @@ export default function Library({ onOpen }: { onOpen: (lesson: OpenLesson) => vo
 
   return (
     <main className="flex min-h-screen flex-col gap-5 bg-ink p-6 text-white">
-      <header>
-        <h1 className="text-3xl font-bold text-sun">Sahpaathi</h1>
-        <p className="mt-1 opacity-80">Choose today’s lesson</p>
+      <header className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-sun">Sahpaathi</h1>
+          <p className="mt-1 opacity-80">Choose today’s lesson</p>
+        </div>
+        <button className="min-h-14 rounded-xl px-3 text-center text-sm font-semibold opacity-80" onClick={() => setEditingClassroom((v) => !v)}>
+          ✏️ Change classroom
+        </button>
       </header>
+
+      {editingClassroom && (
+        <section className="flex flex-col gap-3">
+          <ClassroomSetup
+            classroom={classroom}
+            onSaved={(c) => {
+              setClassroom(c)
+              setEditingClassroom(false)
+              setNotice({ kind: 'ok', text: `Classroom set to ${c.classroom_id}.` })
+            }}
+          />
+          <button className="min-h-14 rounded-2xl bg-white/15 text-lg" onClick={() => setEditingClassroom(false)}>
+            Cancel
+          </button>
+        </section>
+      )}
 
       <label
         className={`flex min-h-16 items-center justify-center rounded-2xl border-2 border-dashed border-sun text-xl font-semibold text-sun ${busy ? 'opacity-60' : 'cursor-pointer'}`}
