@@ -61,10 +61,10 @@ Scopes: `factory` `guardrails` `studio` `content` `player` `pwa` `sync` `voice` 
 **TypeScript (app):** strict TS, `npm run lint` (oxlint). Components `PascalCase.tsx`. Episode types come only from `src/lib/types.ts`. Colours come from the Tailwind theme tokens in `src/index.css` (`ink`, `sun`, `leaf`, `clay`). Big tap targets (≥ 56 px): teachers tap mid-lesson.
 
 ## 7. Dependencies
-Need a new one? Ask the file owner (M4 for `backend/requirements.txt`, M2 for `app/package.json`). They add it in a tiny separate PR, so lockfile conflicts never happen in feature branches.
+Need a new one? Ask the file owner (M1 for `backend/requirements.txt`, M2 for `app/package.json`). They add it in a tiny separate PR, so lockfile conflicts never happen in feature branches.
 
 ## 8. Database changes
-Only **M4** changes models or writes Alembic migrations (avoids "multiple heads"). Need a column? Ask M4.
+Only **M1** changes models or writes Alembic migrations (avoids "multiple heads"). Need a column? Ask M1.
 
 ## 9. Secrets and people's data
 - Never commit `.env`, keys or tokens. Each service has its own `.env.example` (`backend/`, `app/`); copy it to `.env` in the same folder. Anything in `app/.env` ends up in the public JS bundle, so secrets only ever go in `backend/.env`. If a secret leaks, tell the team, rotate it, then remove it.

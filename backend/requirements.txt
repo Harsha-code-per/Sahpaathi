@@ -1,4 +1,4 @@
-# Owner: M4 (Cholan). Ask before adding; add in a tiny separate PR.
+# Owner: M1 (backend core). Ask before adding; add in a tiny separate PR.
 fastapi==0.143.3
 uvicorn[standard]==0.54.0
 pydantic-settings==2.16.0
@@ -6,5 +6,6 @@ sqlalchemy==2.1.5
 psycopg[binary]==3.3.6
 alembic==1.20.0
 python-multipart==0.0.32
+pyjwt==2.15.1          # login tokens
 anthropic==1.15.0      # factory (M1)
 cryptography==50.0.2   # pack signing, Ed25519 (M3)

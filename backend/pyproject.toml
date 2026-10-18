@@ -5,5 +5,8 @@ target-version = "py312"
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
 
+[tool.ruff.lint.per-file-ignores]
+"alembic/versions/*" = ["E501"]  # generated: long SQL in constraint strings
+
 [tool.pytest.ini_options]
 pythonpath = ["."]
