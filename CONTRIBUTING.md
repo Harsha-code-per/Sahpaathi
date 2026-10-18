@@ -67,5 +67,5 @@ Need a new one? Ask the file owner (M4 for `backend/requirements.txt`, M2 for `a
 Only **M4** changes models or writes Alembic migrations (avoids "multiple heads"). Need a column? Ask M4.
 
 ## 9. Secrets and people's data
-- Never commit `.env`, keys or tokens. Copy `.env.example` → `backend/.env`. If a secret leaks, tell the team, rotate it, then remove it.
+- Never commit `.env`, keys or tokens. Each service has its own `.env.example` (`backend/`, `app/`); copy it to `.env` in the same folder. Anything in `app/.env` ends up in the public JS bundle, so secrets only ever go in `backend/.env`. If a secret leaks, tell the team, rotate it, then remove it.
 - **Never commit real children's or teachers' names, phone numbers, photos or voice recordings.** Field-test notes in `docs/TESTING_LOG.md` use roles only ("Grade 2 teacher, Tamil-medium school"). Santali seed recordings go into `content/voices/` only with the speaker's written consent.

@@ -7,7 +7,6 @@
 # M4 Cholan: backend core, DB, auth, sync, IVR, dashboard, deploy, CI
 /backend/                           @Cholan-kinnera
 /docker-compose.yml                 @Cholan-kinnera
-/.env.example                       @Cholan-kinnera
 /.github/workflows/                 @Cholan-kinnera
 /docs/API.md                        @Cholan-kinnera
 
