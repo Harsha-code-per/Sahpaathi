@@ -16,6 +16,7 @@ Auth: `POST /auth/login` returns a JWT (12 h); send `Authorization: Bearer <toke
 | POST | `/episodes/{id}/pack` | admin | Voice (Sarvam; Santali from the phrase bank) and sign the pack of an **approved** episode → **202** pack summary with `status: "building"`. 404 unknown episode, 409 not approved or a build already running. Takes a few minutes; poll `/packs` |
 | GET | `/packs?district_id&grade` | teacher, reviewer, admin | `[{id, episode_id, status, error, size_bytes, title, grade, district_id, created_at}]`, newest first. Teachers see only `ready` packs; reviewers and admins also see `building` and `failed` (with `error`) |
 | GET | `/packs/{id}` | teacher, reviewer, admin | The `.sahpaathi` file (`application/octet-stream`). Supports `Range: bytes=a-b`, `a-` and `-n` (206 + `Content-Range`; 416 when outside the file) so a dropped 2G download resumes. 404 unless `ready` |
+| POST | `/sync` | open (the player has no login yet) | `{events: [...]}`, at most 200. Each event: `{kind: "tap", event_id, episode_id, segment_id, tap: few\|some\|most, auto, at}` (`at` ISO 8601 with timezone). Always **200** with `{accepted, duplicates, rejected: [{event_id, reason}]}`: duplicates are counted once, and one bad event is reported instead of failing the batch, so the player's queue always drains. 422 only for a malformed body or more than 200 events |
 
 Pack status: `building → ready`, or `building → failed` (with `error`; missing `TTS_API_KEY` or `PACK_SIGNING_KEY` on the server is the usual cause). A restart marks unfinished builds `failed`. The pack file is stored in the `packs` table (under 2 MB each), so it survives Render redeploys without extra storage; move it to R2 if packs outgrow Postgres.
 
@@ -24,6 +25,5 @@ Episode status: `generating → in_review → approved | rejected`, or `generati
 ## Planned
 | Method | Path | Role | Purpose | Owner |
 |---|---|---|---|---|
-| POST | `/sync` | teacher | `{events: [{event_id, kind, at, ...}]}` from the player's outbox. Must be **idempotent by `event_id`**: a duplicate gets 2xx, never a 4xx for the whole batch, or the player's queue can never drain | M4 |
 | POST | `/ivr/calls/run` · `/ivr/webhook` | admin · provider | Absentee catch-up calls + DTMF 1/2/3 | M4 |
 | GET | `/dashboard` | admin | Usage, % "Most got it", catch-up completion | M4 |
