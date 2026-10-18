@@ -42,6 +42,10 @@ cp ../.env.example .env                        # fill in keys (see below)
 uvicorn app.main:app --reload
 pytest -q
 
+# generate one episode (needs ANTHROPIC_API_KEY in backend/.env)
+python -m app.factory.scriptwriter ../content/curriculum/g1-numbers-to-20.json \
+  ../content/districts/chennai-migrant.json > /tmp/episode.json
+
 # app → http://localhost:5173/teacher
 cd app
 npm install
