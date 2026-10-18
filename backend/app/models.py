@@ -90,6 +90,9 @@ class PackRecord(Base):
     error: Mapped[str | None] = mapped_column(Text)
     size_bytes: Mapped[int | None] = mapped_column(Integer)
     data: Mapped[bytes | None] = mapped_column(LargeBinary, deferred=True)
+    # The absentee call: a recap of the episode and the press-1/2/3 menu, both opus.
+    recap: Mapped[bytes | None] = mapped_column(LargeBinary, deferred=True)
+    menu: Mapped[bytes | None] = mapped_column(LargeBinary, deferred=True)
     created_by_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(

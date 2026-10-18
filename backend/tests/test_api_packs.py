@@ -148,3 +148,18 @@ def test_one_build_at_a_time_and_restart_clears_orphans(api):
         packs.fail_orphans(db)
         pack = db.query(PackRecord).one()
         assert pack.status == "failed" and "restarted" in pack.error
+
+
+@needs_ffmpeg
+def test_admin_can_fetch_the_absentee_call_audio_of_a_ready_pack(api, voiced):
+    api.post(f"/api/v1/episodes/{make_episode()}/pack", headers=auth(api, "admin"))
+    admin = auth(api, "admin")
+    pid = api.get("/api/v1/packs", headers=admin).json()[0]["id"]
+    for name in ("recap", "menu"):
+        res = api.get(f"/api/v1/packs/{pid}/ivr/{name}", headers=admin)
+        assert res.status_code == 200 and res.content.startswith(b"OggS")
+        assert res.headers["content-type"] == "audio/ogg"
+    assert api.get(f"/api/v1/packs/{pid}/ivr/other", headers=admin).status_code == 422
+    assert api.get("/api/v1/packs/999/ivr/recap", headers=admin).status_code == 404
+    teacher = auth(api, "teacher")
+    assert api.get(f"/api/v1/packs/{pid}/ivr/recap", headers=teacher).status_code == 403

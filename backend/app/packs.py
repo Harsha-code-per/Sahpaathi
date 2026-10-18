@@ -9,7 +9,7 @@ import re
 import tempfile
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException, Response, status
 from pydantic import BaseModel
@@ -52,13 +52,18 @@ def run_pack_build(pack_id: int) -> None:
                 raise RuntimeError("TTS_API_KEY and PACK_SIGNING_KEY must be set on the server")
             episode = Episode.model_validate(rec.episode)
             with tempfile.TemporaryDirectory() as tmp:
+                ivr = Path(tmp, "ivr")
+                ivr.mkdir()
                 out = build_episode_pack(
                     episode,
                     make_voice(episode, cfg),
                     cfg.pack_signing_key,
                     Path(tmp, "p.sahpaathi"),
+                    ivr_dir=ivr,
                 )
                 pack.data = out.read_bytes()
+                pack.recap = (ivr / "recap.opus").read_bytes()
+                pack.menu = (ivr / "menu.opus").read_bytes()
             pack.size_bytes, pack.status = len(pack.data), "ready"
         except Exception as e:  # any failure must end the job, or it shows "building" forever
             log.exception("pack build %s failed", pack_id)
@@ -184,3 +189,14 @@ def download_pack(pack_id: int, _: Anyone, db: DB, range: Annotated[str | None, 
         media_type="application/octet-stream",
         headers=headers,
     )
+
+
+@router.get("/packs/{pack_id}/ivr/{name}")
+def ivr_audio(pack_id: int, name: Literal["recap", "menu"], _: Admin, db: DB) -> Response:
+    """The absentee-call audio of a pack: `recap` (the lesson summary) or `menu` (press 1, 2, 3)."""
+    column = getattr(PackRecord, name)
+    pack = db.scalar(select(PackRecord).options(undefer(column)).where(PackRecord.id == pack_id))
+    data = getattr(pack, name) if pack is not None and pack.status == "ready" else None
+    if data is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No such audio.")
+    return Response(data, media_type="audio/ogg")
