@@ -134,7 +134,8 @@ export default function Dashboard({ onSignedOut }: { onSignedOut: () => void }) 
           episodes
         </p>
         <p>
-          <span className="block text-2xl font-bold text-slate-400">Soon</span> catch-up call results, once the IVR is live
+          <span className="block text-2xl font-bold">{pct(data.catchup_calls.pct_answered)}</span> of finished catch-up calls answered
+          {data.catchup_calls.help > 0 && <span className="block text-clay">{data.catchup_calls.help} families asked for help</span>}
         </p>
       </section>
     </>

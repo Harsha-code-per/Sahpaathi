@@ -81,6 +81,7 @@ def test_build_list_and_download_a_verifiable_pack(api, voiced, tmp_path):
     listed = api.get("/api/v1/packs", headers=teacher).json()
     assert len(listed) == 1 and listed[0]["status"] == "ready"
     assert listed[0]["grade"] == EPISODE.grade and listed[0]["district_id"] == "chennai-migrant"
+    assert listed[0]["episode_slug"] == EPISODE.id
     assert api.get("/api/v1/packs?district_id=madurai-tamil", headers=teacher).json() == []
     assert api.get(f"/api/v1/packs?grade={EPISODE.grade + 1}", headers=teacher).json() == []
 

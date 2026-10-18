@@ -1,5 +1,5 @@
 import type { Summary } from '../studio/api'
-import type { Day, PackStatus, PackSummary } from './api'
+import type { CallOutcome, CallStatus, Day, PackStatus, PackSummary } from './api'
 
 // Pure helpers for the Admin screens (tested in view.test.ts).
 
@@ -48,4 +48,48 @@ export const anyBuilding = (packs: PackSummary[]) => packs.some((p) => p.status 
 export function packFilename(disposition: string | null, packId: number) {
   const name = /filename="([a-z0-9][a-z0-9-]*\.sahpaathi)"/.exec(disposition ?? '')?.[1]
   return name ?? `pack-${packId}.sahpaathi`
+}
+
+export const CALL_STATUS: Record<CallStatus, { label: string; tone: string }> = {
+  queued: { label: 'Waiting to call', tone: 'bg-slate-200 text-ink' },
+  in_progress: { label: 'On the phone', tone: 'bg-sun/30 text-ink' },
+  completed: { label: 'Answered', tone: 'bg-leaf/15 text-leaf' },
+  no_response: { label: 'No answer', tone: 'bg-clay/15 text-clay' },
+}
+
+export const OUTCOME: Record<CallOutcome, { label: string; tone: string }> = {
+  understood: { label: 'Child understood', tone: 'bg-leaf/15 text-leaf' },
+  help: { label: 'Needs help', tone: 'bg-clay/15 text-clay' },
+}
+
+/** A phone's keypad, row by row. */
+export const KEYPAD = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9'], ['*', '0', '#']]
+
+/** Seconds a parent has to press a key before the menu repeats. */
+export const KEY_WAIT_SEC = 8
+
+/** What to tell the admin when a call has ended. */
+export function endMessage(status: CallStatus, outcome: CallOutcome | null) {
+  if (status === 'completed' && outcome === 'help') return 'The family asked for help. Ask the teacher to follow up.'
+  if (status === 'completed') return 'The family says the child understood.'
+  return 'Nobody pressed a key, so the call ended without an answer.'
+}
+
+export interface CallableEpisode {
+  slug: string
+  title: string
+}
+
+/** Episodes that have a ready pack (so a call has audio), once each, newest first. */
+export function callableEpisodes(packs: PackSummary[]): CallableEpisode[] {
+  const seen = new Set<string>()
+  return packs
+    .filter((p) => p.status === 'ready' && p.episode_slug)
+    .sort((a, b) => b.id - a.id)
+    .flatMap((p) => {
+      const slug = p.episode_slug as string
+      if (seen.has(slug)) return []
+      seen.add(slug)
+      return [{ slug, title: p.title ?? slug }]
+    })
 }
