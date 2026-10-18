@@ -25,7 +25,7 @@
           "speaker": "guide",
           "lang": "hi",
           "text": "नमस्ते बच्चो! तीन कंकड़ उठाओ।",
-          "pause_after_sec": 5,
+          "pause_after_sec": 5.0,
           "cue": "Children pick up 3 pebbles"
         },
         {
@@ -33,14 +33,15 @@
           "speaker": "guide",
           "lang": "hi",
           "text": "एक, दो, तीन।",
-          "pause_after_sec": 1
+          "pause_after_sec": 1.0,
+          "cue": null
         },
         {
           "id": "s1-t3",
           "speaker": "guide",
           "lang": "ta",
           "text": "ஒன்று, இரண்டு, மூன்று. என்னுடன் சேர்ந்து சொல்லுங்கள்!",
-          "pause_after_sec": 4,
+          "pause_after_sec": 4.0,
           "cue": "Children repeat aloud"
         }
       ],
@@ -51,14 +52,16 @@
           "speaker": "guide",
           "lang": "hi",
           "text": "चलो फिर से। एक... दो।",
-          "pause_after_sec": 3
+          "pause_after_sec": 3.0,
+          "cue": null
         },
         {
           "id": "s1-e2",
           "speaker": "guide",
           "lang": "ta",
           "text": "ஒன்று... இரண்டு.",
-          "pause_after_sec": 3
+          "pause_after_sec": 3.0,
+          "cue": null
         }
       ],
       "core": [
@@ -67,7 +70,8 @@
           "speaker": "guide",
           "lang": "ta",
           "text": "மீண்டும்: ஒன்று, இரண்டு, மூன்று!",
-          "pause_after_sec": 4
+          "pause_after_sec": 4.0,
+          "cue": null
         }
       ],
       "stretch": [
@@ -76,7 +80,7 @@
           "speaker": "guide",
           "lang": "ta",
           "text": "இன்னும் இரண்டு கற்களை எடுங்கள். ஒன்று, இரண்டு, மூன்று, நான்கு, ஐந்து!",
-          "pause_after_sec": 6,
+          "pause_after_sec": 6.0,
           "cue": "Children add 2 pebbles"
         }
       ],
@@ -101,14 +105,15 @@
           "speaker": "guide",
           "lang": "hi",
           "text": "चार, पाँच।",
-          "pause_after_sec": 2
+          "pause_after_sec": 2.0,
+          "cue": null
         },
         {
           "id": "s2-t2",
           "speaker": "guide",
           "lang": "ta",
           "text": "இப்போது தமிழில்: நான்கு, ஐந்து. என்னுடன் சொல்லுங்கள்!",
-          "pause_after_sec": 4,
+          "pause_after_sec": 4.0,
           "cue": "குழந்தைகள் சேர்ந்து சொல்கிறார்கள்"
         },
         {
@@ -116,7 +121,8 @@
           "speaker": "song",
           "lang": "ta",
           "text": "ஒன்று, இரண்டு, மூன்று, நான்கு, ஐந்து!",
-          "pause_after_sec": 5
+          "pause_after_sec": 5.0,
+          "cue": null
         }
       ],
       "checkpoint": "பெரும்பாலான குழந்தைகள் ஐந்து வரை தமிழில் எண்ணுகிறார்களா?",
@@ -126,7 +132,8 @@
           "speaker": "guide",
           "lang": "ta",
           "text": "மெதுவாக: நான்கு... ஐந்து.",
-          "pause_after_sec": 3
+          "pause_after_sec": 3.0,
+          "cue": null
         }
       ],
       "core": [
@@ -135,7 +142,8 @@
           "speaker": "guide",
           "lang": "ta",
           "text": "மீண்டும் ஐந்து வரை எண்ணுங்கள்!",
-          "pause_after_sec": 6
+          "pause_after_sec": 6.0,
+          "cue": null
         }
       ],
       "stretch": [
@@ -144,7 +152,8 @@
           "speaker": "guide",
           "lang": "ta",
           "text": "ஐந்து கற்களில் ஒன்றை எடுங்கள். எத்தனை? நான்கு!",
-          "pause_after_sec": 6
+          "pause_after_sec": 6.0,
+          "cue": null
         }
       ],
       "math_checks": [
@@ -161,7 +170,8 @@
       "speaker": "guide",
       "lang": "hi",
       "text": "अम्मा तीन रोटी बनाती है: एक, दो, तीन।",
-      "pause_after_sec": 2
+      "pause_after_sec": 2.0,
+      "cue": null
     }
   ],
   "ivr_recap": [
@@ -170,14 +180,16 @@
       "speaker": "guide",
       "lang": "hi",
       "text": "आज हमने तीन तक गिनना सीखा। एक, दो, तीन।",
-      "pause_after_sec": 2
+      "pause_after_sec": 2.0,
+      "cue": null
     },
     {
       "id": "r2",
       "speaker": "guide",
       "lang": "ta",
       "text": "ஒன்று, இரண்டு, மூன்று.",
-      "pause_after_sec": 2
+      "pause_after_sec": 2.0,
+      "cue": null
     }
   ]
 }
