@@ -1,12 +1,23 @@
 from datetime import datetime
 
-from sqlalchemy import JSON, CheckConstraint, DateTime, ForeignKey, String, Text, func
+from sqlalchemy import (
+    JSON,
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    Integer,
+    LargeBinary,
+    String,
+    Text,
+    func,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
 
 ROLES = ("teacher", "reviewer", "admin")
 STATUSES = ("generating", "failed", "in_review", "approved", "rejected")
+PACK_STATUSES = ("building", "ready", "failed")
 
 
 def _in(column: str, values: tuple[str, ...]) -> str:
@@ -52,6 +63,33 @@ class EpisodeRecord(Base):
     review_notes: Mapped[str | None] = mapped_column(Text)
     created_by_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     reviewed_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+
+class PackRecord(Base):
+    """A voiced, signed .sahpaathi pack of one approved episode.
+
+    The file lives in the database (a pack is under 2 MB): Render's disk is wiped on every deploy,
+    and this needs no storage account. ponytail: move `data` to R2 when packs outgrow Postgres.
+    """
+
+    __tablename__ = "packs"
+    __table_args__ = (
+        CheckConstraint(_in("status", PACK_STATUSES), name="status_known"),
+        CheckConstraint("status != 'ready' OR data IS NOT NULL", name="ready_has_data"),
+        CheckConstraint("status != 'failed' OR error IS NOT NULL", name="failure_has_error"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    episode_id: Mapped[int] = mapped_column(ForeignKey("episodes.id"))
+    status: Mapped[str] = mapped_column(String(20), default="building")
+    error: Mapped[str | None] = mapped_column(Text)
+    size_bytes: Mapped[int | None] = mapped_column(Integer)
+    data: Mapped[bytes | None] = mapped_column(LargeBinary, deferred=True)
+    created_by_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()

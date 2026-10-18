@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app import auth, episodes
+from app import auth, episodes, packs
 from app.config import settings
 from app.db import SessionLocal
 
@@ -12,6 +12,7 @@ from app.db import SessionLocal
 async def lifespan(_: FastAPI):
     with SessionLocal() as db:
         episodes.fail_orphans(db)
+        packs.fail_orphans(db)
     yield
 
 
@@ -24,6 +25,7 @@ app.add_middleware(
 )
 app.include_router(auth.router)
 app.include_router(episodes.router)
+app.include_router(packs.router)
 
 
 @app.get("/health")

@@ -61,7 +61,7 @@ npm run dev
 |---|---|---|---|
 | Anthropic Claude Sonnet 5.5 (`claude-sonnet-5-5`) | Writes the IRI episode script and branches as structured JSON | `backend/app/factory/` | `ANTHROPIC_API_KEY` |
 | Anthropic Claude Haiku 5.5 (`claude-haiku-5-5`) | Blind English back-translation of every line, then a six-criterion rubric review (pedagogy, age fit, accuracy, language bridge, localisation, safety) | `backend/app/factory/` | `ANTHROPIC_API_KEY` |
-| Indic TTS (provider TBD Day 2) | Tamil / Hindi / Odia voices, generated in the cloud before packing (never in class) | `backend/app/voice/` | `TTS_API_KEY` |
+| Sarvam AI Bulbul v3 (`bulbul:v3`) | Tamil / Hindi / Odia / English voices, generated in the cloud before packing (never in class). Santali is spliced from consented recordings instead | `backend/app/voice/` | `TTS_API_KEY` |
 | Exotel / Twilio | Absentee catch-up call + DTMF keypad branching | `backend/app/ivr/` | `TELEPHONY_*` |
 
 Nothing above runs in the classroom. The teacher player works with **zero connectivity** once a weekly pack is on the phone.
