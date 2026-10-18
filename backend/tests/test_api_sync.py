@@ -86,3 +86,65 @@ def test_empty_batch_and_oversized_batch(api):
 def test_malformed_body_is_a_422_not_a_crash(api):
     assert api.post("/api/v1/sync", json={"events": "nope"}).status_code == 422
     assert api.post("/api/v1/sync", json={}).status_code == 422
+
+
+def attendance(n: int = 1, absent=("12", "7"), **over) -> dict:
+    return {
+        "kind": "attendance",
+        "event_id": f"7a1d4e22-0000-4000-8000-{n:012d}",
+        "classroom_id": "CHN-04",
+        "episode_id": "g1-numbers-to-20-chennai-migrant",
+        "absent": list(absent),
+        "at": "2026-10-19T04:30:00.000Z",
+        **over,
+    }
+
+
+def calls() -> list[tuple[str, str, str, str]]:
+    from app.models import CatchupCall
+
+    with SessionLocal() as db:
+        rows = db.scalars(select(CatchupCall).order_by(CatchupCall.student_ref))
+        return [(c.classroom_id, c.student_ref, c.episode_slug, c.status) for c in rows]
+
+
+def test_absent_children_each_get_one_queued_call(api):
+    out = post(api, attendance(1))
+    assert out == {"accepted": 1, "duplicates": 0, "rejected": []}
+    slug = "g1-numbers-to-20-chennai-migrant"
+    assert calls() == [("CHN-04", "12", slug, "queued"), ("CHN-04", "7", slug, "queued")]
+
+
+def test_a_retried_or_overlapping_attendance_never_queues_a_family_twice(api):
+    post(api, attendance(1))
+    again = post(api, attendance(1), attendance(2, absent=("7", "12")))  # same children, new event
+    assert again == {"accepted": 0, "duplicates": 2, "rejected": []}
+    assert len(calls()) == 2
+    more = post(api, attendance(3, absent=("12", "30")))  # one old child, one new
+    assert more["accepted"] == 1 and len(calls()) == 3
+
+
+def test_a_day_with_nobody_absent_is_accepted_and_queues_nothing(api):
+    assert post(api, attendance(1, absent=()))["accepted"] == 1
+    assert calls() == []
+
+
+def test_taps_and_attendance_can_share_a_batch(api):
+    out = post(api, tap(1), attendance(1), tap(1))
+    assert out == {"accepted": 2, "duplicates": 1, "rejected": []}
+    assert stored() == 1 and len(calls()) == 2
+
+
+def test_children_must_be_opaque_codes_not_names_or_phone_numbers(api):
+    out = post(
+        api,
+        attendance(1, absent=("Asha Kumar",)),
+        attendance(2, absent=("+919876543210",)),
+        attendance(3, classroom_id="St Mary's School"),
+        attendance(4, absent=("1",) * 101),
+        attendance(5, extra="x"),
+        {"kind": "mystery", "event_id": "abcdefgh-1234"},
+    )
+    assert out["accepted"] == 0 and len(out["rejected"]) == 6
+    assert out["rejected"][5]["reason"] == "kind: must be tap or attendance"
+    assert calls() == []

@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 
 from app import db as database
 from app.auth import require
-from app.models import EpisodeRecord, PackRecord, SyncEvent, User
+from app.models import CatchupCall, EpisodeRecord, PackRecord, SyncEvent, User
 
 router = APIRouter(prefix="/api/v1", tags=["dashboard"])
 Admin = Annotated[User, Depends(require("admin"))]
@@ -44,6 +44,17 @@ class Day(BaseModel):
     taps: int
 
 
+class CatchupStats(BaseModel):
+    total: int
+    queued: int
+    in_progress: int
+    completed: int  # a parent pressed 2 or 3
+    no_response: int  # the call ended with no answer
+    understood: int  # pressed 2
+    help: int  # pressed 3: the teacher should follow up
+    pct_answered: float | None  # completed of the finished calls; None until one has finished
+
+
 class Dashboard(BaseModel):
     overall: Understanding
     auto_fallbacks: int
@@ -51,7 +62,31 @@ class Dashboard(BaseModel):
     last_days: list[Day]  # DAYS days ending today (UTC), oldest first, zeros included
     episodes_by_status: dict[str, int]
     packs_ready: int
-    catchup_calls: None = None  # arrives with the IVR work
+    catchup_calls: CatchupStats
+
+
+def _catchup(db: Session) -> CatchupStats:
+    by_status = dict(
+        db.execute(select(CatchupCall.status, func.count()).group_by(CatchupCall.status)).all()
+    )
+    outcomes = dict(
+        db.execute(
+            select(CatchupCall.outcome, func.count())
+            .where(CatchupCall.outcome.is_not(None))
+            .group_by(CatchupCall.outcome)
+        ).all()
+    )
+    done = by_status.get("completed", 0) + by_status.get("no_response", 0)
+    return CatchupStats(
+        total=sum(by_status.values()),
+        queued=by_status.get("queued", 0),
+        in_progress=by_status.get("in_progress", 0),
+        completed=by_status.get("completed", 0),
+        no_response=by_status.get("no_response", 0),
+        understood=outcomes.get("understood", 0),
+        help=outcomes.get("help", 0),
+        pct_answered=round(100 * by_status.get("completed", 0) / done, 1) if done else None,
+    )
 
 
 def _understanding(c: Counter) -> Understanding:
@@ -113,4 +148,5 @@ def dashboard(_: Admin, db: DB) -> Dashboard:
             ).all()
         ),
         packs_ready=db.scalar(select(func.count()).where(PackRecord.status == "ready")) or 0,
+        catchup_calls=_catchup(db),
     )
