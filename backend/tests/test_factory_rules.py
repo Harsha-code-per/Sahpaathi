@@ -18,7 +18,7 @@ def test_first_generated_episode_fails_bridge_handover():
     # Real Sonnet output before the bridge rule existed: Hindi never handed over to Tamil.
     fixture = Path(__file__).parent / "fixtures/g1-unbridged-episode.json"
     problems = rules.check_bridge(Episode.model_validate_json(fixture.read_text()))
-    assert any("last segment must be at least 60%" in p for p in problems)
+    assert any("last segment must be at least 50%" in p for p in problems)  # Grade 1
     assert any("drops from segment 3 to 4" in p for p in problems)
 
 
@@ -45,3 +45,13 @@ def test_math_checks_catch_wrong_answers_and_unsafe_exprs():
     assert "only integers" in problems[1]
     assert "exact division" in problems[2]
     assert len(problems) == 3
+
+
+def test_grade_3_handover_target_is_higher():
+    ep = _load("g1-counting-hi-ta")  # last segment is 75% school language
+    for line in ep.segments[-1].teach + ep.segments[-1].core:
+        line.lang = "ta" if line.id.endswith(("t2", "t3")) else "hi"
+    assert rules.school_shares(ep)[-1] == 0.5
+    assert rules.check_bridge(ep) == []  # Grade 1: 50% is enough
+    grade3 = ep.model_copy(update={"grade": 3})
+    assert any("at least 60%" in p for p in rules.check_bridge(grade3))

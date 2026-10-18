@@ -12,7 +12,15 @@ from app.factory.schema import Episode
 # Mother tongue first, then hand over: share of lines in each segment's teach + core.
 # Lines, not characters: Tamil words run ~3x longer than Hindi ones, so characters skew the share.
 FIRST_SEGMENT_MIN_HOME = 0.5
-LAST_SEGMENT_MIN_SCHOOL = 0.6
+# Grades 1-2 are still new to the school language, so the handover ends at half; Grade 3+ goes on.
+LAST_SEGMENT_MIN_SCHOOL = {1: 0.5, 2: 0.5}
+LAST_SEGMENT_MIN_SCHOOL_DEFAULT = 0.6
+
+
+def last_segment_min_school(grade: int) -> float:
+    return LAST_SEGMENT_MIN_SCHOOL.get(grade, LAST_SEGMENT_MIN_SCHOOL_DEFAULT)
+
+
 STEP_TOLERANCE = 0.1  # a segment may dip this much below the previous one's school share
 
 _OPS = {ast.Add: operator.add, ast.Sub: operator.sub, ast.Mult: operator.mul}
@@ -71,9 +79,10 @@ def check_bridge(episode: Episode) -> list[str]:
             f"Segment 1 must be at least {FIRST_SEGMENT_MIN_HOME:.0%} home language "
             f"(school-language share per segment is now {pct})."
         )
-    if shares[-1] < LAST_SEGMENT_MIN_SCHOOL:
+    target = last_segment_min_school(episode.grade)
+    if shares[-1] < target:
         problems.append(
-            f"The last segment must be at least {LAST_SEGMENT_MIN_SCHOOL:.0%} school language "
+            f"The last segment must be at least {target:.0%} school language "
             f"(school-language share per segment is now {pct}). Move more lines to the school "
             "language in later segments, keeping home-language support for new words."
         )

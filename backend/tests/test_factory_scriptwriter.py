@@ -65,4 +65,4 @@ def test_rule_failure_gets_repair_turn_with_rule_message():
     unbridged = (Path(__file__).parent / "fixtures/g1-unbridged-episode.json").read_text()
     client = _client((unbridged, "end_turn"), (SAMPLE, "end_turn"))
     write_episode(LESSON, DISTRICT, client=client)
-    assert "at least 60% school language" in client.requests[1]["messages"][-1]["content"]
+    assert "at least 50% school language" in client.requests[1]["messages"][-1]["content"]

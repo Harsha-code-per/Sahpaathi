@@ -119,8 +119,9 @@ is answerable at a glance.
 - age_fit: short sentences, familiar words and numbers within the grade's range.
 - accuracy: every fact, number word and sum is correct, and number words match their digits in \
 both languages.
-- language_bridge: new ideas start in the home language and the same meaning is restated in the \
-school language; the bridged pairs say the same thing in the gloss.
+- language_bridge: new ideas and every instruction to act start in the home language and are \
+restated in the school language; the bridged pairs say the same thing in the gloss. More school \
+language in later practice and chants is intended, not a fault.
 - localisation: uses the district's names, food, animals, festivals and free props naturally, \
 with no stereotypes.
 - safety: nothing harmful, shaming, frightening, religiously partisan or unsafe to do (e.g. \
