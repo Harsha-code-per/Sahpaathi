@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto'
 import { IDBFactory } from 'fake-indexeddb'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { closeDB } from './db'
+import { closeDB } from '../storage/db'
 import { pendingCount, pendingEvents, recordTap, removeEvents } from './outbox'
 
 beforeEach(async () => {

@@ -68,12 +68,12 @@ describe('verifyPack', () => {
     expect([...pack.audio[lineId]]).toEqual([79, 103, 103, 83, 1, 2, 3])
   })
 
-  it('uses manifest.audio when the pack provides one', async () => {
+  it('ignores the unsigned manifest.audio map, so lines cannot be remapped to other clips', async () => {
     const zip = await makePack({
-      files: { 'episode.json': JSON.stringify(sample), 'voice/first.opus': new Uint8Array([1]) },
-      manifest: { audio: { [lineId]: 'voice/first.opus' } },
+      files: { 'episode.json': JSON.stringify(sample), 'sketch.svg': sample.chalk_sketch_svg, [`audio/${lineId}.opus`]: new Uint8Array([7]) },
+      manifest: { audio: { [lineId]: 'sketch.svg' } },
     })
-    expect(Object.keys((await verifyPack(zip, publicKey)).audio)).toEqual([lineId])
+    expect([...(await verifyPack(zip, publicKey)).audio[lineId]]).toEqual([7])
   })
 
   it('accepts a pack with no audio (text-only lesson)', async () => {
@@ -149,10 +149,6 @@ describe('verifyPack', () => {
     await rejects(zip, /audio for "nope", which is not a line/)
   })
 
-  it('refuses manifest.audio pointing at a file that is not there', async () => {
-    const zip = await makePack({ files: { 'episode.json': JSON.stringify(sample) }, manifest: { audio: { [lineId]: 'audio/missing.opus' } } })
-    await rejects(zip, new RegExp(`audio for "${lineId}" is missing`))
-  })
 
   it('refuses packs that unzip to more than the size cap', async () => {
     const big = new Uint8Array(MAX_PACK_BYTES + 1)

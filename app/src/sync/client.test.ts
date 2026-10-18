@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto'
 import { IDBFactory } from 'fake-indexeddb'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { SYNC_BATCH, flushOutbox } from './client'
-import { closeDB, type OutboxEvent } from './db'
+import { closeDB, type OutboxEvent } from '../storage/db'
 import { pendingCount, recordTap } from './outbox'
 
 const API = 'https://api.example.test/'
