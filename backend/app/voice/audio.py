@@ -40,19 +40,21 @@ def _measure(src: Path) -> dict[str, str]:
 
 
 def normalize_to_opus(src: Path, dst: Path) -> Path:
-    """Two-pass loudnorm so the result lands on -16 LUFS, then opus mono at 16 kbps."""
+    """Gain to exactly -16 LUFS, a limiter for peaks, then opus mono at 16 kbps.
+
+    loudnorm's own linear mode refuses to apply the gain when it would break the true-peak limit,
+    which left short, peaky TTS lines up to 4 LU too quiet. Measuring once and applying the gain
+    ourselves, with a limiter catching only the peaks, keeps every line close to the target.
+    """
     m = _measure(src)
     if m["input_i"] in ("-inf", "inf"):
         raise AudioError(f"{src.name} is silent")
-    measured = (
-        f":measured_I={m['input_i']}:measured_TP={m['input_tp']}"
-        f":measured_LRA={m['input_lra']}:measured_thresh={m['input_thresh']}"
-        f":offset={m['target_offset']}:linear=true"
-    )
+    gain = TARGET_LUFS - float(m["input_i"])
+    ceiling = 10 ** (TRUE_PEAK_DB / 20)
     dst.parent.mkdir(parents=True, exist_ok=True)
     _ffmpeg(
         "-i", str(src),
-        "-af", _loudnorm(measured),
+        "-af", f"volume={gain:.2f}dB,alimiter=limit={ceiling:.3f}:level=disabled",
         "-ac", "1", "-ar", str(SAMPLE_RATE),
         "-c:a", "libopus", "-b:a", BITRATE, "-application", "voip",
         str(dst),
