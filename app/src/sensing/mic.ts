@@ -50,6 +50,12 @@ export class ChoralMic {
     this.timer = undefined
   }
 
+  /** Drops the frames gathered so far and stops listening; used when a new segment starts. */
+  resetAnswer(): void {
+    this.stopAnswer()
+    this.answer = []
+  }
+
   /** Suggests a tap from the answer frames gathered since the last call (null if unsure), then resets. */
   takeHint(): Hint {
     this.stopAnswer()

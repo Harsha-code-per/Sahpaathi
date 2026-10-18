@@ -1,7 +1,17 @@
+import type { ReactNode } from 'react'
 import type { Episode } from '../lib/types'
 
 /** Before-class screen: what to gather and what to draw on the blackboard, then Start. */
-export default function LessonPrep({ episode, onStart }: { episode: Episode; onStart: () => void }) {
+export default function LessonPrep({
+  episode,
+  onStart,
+  beforeStart,
+}: {
+  episode: Episode
+  onStart: () => void
+  /** Rendered just above Start (e.g. the choral mic toggle), so it is seen before the lesson begins. */
+  beforeStart?: ReactNode
+}) {
   // <img> rather than inline markup: an SVG loaded as an image can't run scripts.
   const sketch = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(episode.chalk_sketch_svg)}`
 
@@ -24,6 +34,8 @@ export default function LessonPrep({ episode, onStart }: { episode: Episode; onS
           </ul>
         </div>
       )}
+
+      {beforeStart}
 
       <button className="mt-auto min-h-20 rounded-2xl bg-leaf text-2xl font-bold" onClick={onStart}>
         ▶ Start lesson
