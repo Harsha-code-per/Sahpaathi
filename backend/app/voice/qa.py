@@ -48,6 +48,8 @@ def _seconds(path: Path) -> float:
 
 def inspect_pack(pack: Path) -> PackReport:
     """Measure every `audio/*.opus` in the pack. Does not check the signature (use verify_pack)."""
+    if not pack.is_file():
+        raise AudioError(f"no such pack: {pack}")
     report = PackReport(size_kb=pack.stat().st_size / 1024, lines=[])
     with tempfile.TemporaryDirectory() as tmp, zipfile.ZipFile(pack) as zf:
         for name in sorted(n for n in zf.namelist() if n.startswith("audio/")):
