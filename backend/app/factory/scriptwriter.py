@@ -7,6 +7,7 @@ CLI: python -m app.factory.scriptwriter <lesson.json> <district.json> [phrase_ba
 import json
 import logging
 import sys
+from collections.abc import Callable
 from pathlib import Path
 
 import anthropic
@@ -154,12 +155,17 @@ def write_episode(
     district: District,
     phrase_bank: list[str] | None = None,
     client: anthropic.Anthropic | None = None,
+    feedback: Callable[[Episode], list[str]] | None = None,
 ) -> Episode:
-    """One generation, plus one repair turn if it breaks the contract or a tier-1 rule."""
+    """One generation, plus one repair turn if it breaks the contract or a tier-1 rule.
+
+    `feedback` is a soft check (the LLM judge): its problems earn the repair turn, but after the
+    repair the episode is returned anyway, because a human reviewer decides next.
+    """
     client = client or anthropic.Anthropic(api_key=settings.anthropic_api_key or None)
     messages: list = [{"role": "user", "content": _brief(lesson, district, phrase_bank)}]
     error = ""
-    for _ in range(2):
+    for attempt in range(2):
         with client.beta.messages.stream(
             model=MODEL,
             max_tokens=64000,
@@ -182,6 +188,9 @@ def write_episode(
             error = "\n".join(rules.check(episode))
         except ValidationError as e:
             error = str(e)
+        if not error and feedback:
+            soft = feedback(episode)  # always run, so the caller has the final episode's review
+            error = "\n".join(soft) if attempt == 0 else ""
         if not error:
             return episode.model_copy(update={"id": f"g{lesson.grade}-{lesson.id}-{district.id}"})
         log.info("repair needed: %s", error)
