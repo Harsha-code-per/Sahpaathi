@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { Line, Tap } from '../lib/types'
+import LessonPrep from './LessonPrep'
 import { CHECKPOINT_TIMEOUT_SEC, advance, currentLine, start, tap, type Phase } from './player'
 import { samplePack } from './samplePack'
 
@@ -97,11 +98,7 @@ export default function Teacher() {
         )}
       </header>
 
-      {phase.kind === 'idle' && (
-        <button className="min-h-20 rounded-2xl bg-leaf text-2xl font-bold" onClick={() => setPhase(start(episode))}>
-          ▶ Start lesson
-        </button>
-      )}
+      {phase.kind === 'idle' && <LessonPrep episode={episode} onStart={() => setPhase(start(episode))} />}
 
       {phase.kind === 'line' && line && (
         <section className="flex flex-1 flex-col gap-4">
