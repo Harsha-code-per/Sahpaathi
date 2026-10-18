@@ -39,9 +39,10 @@ def build_pack(
 
     files = {f"audio/{i}.opus": audio[i].read_bytes() for i in sorted(ids)}
     files["sketch.svg"] = episode.chalk_sketch_svg.encode()
+    # The episode is a signed file, not part of manifest.json: the signature only covers `sha256`.
+    files["episode.json"] = episode.model_dump_json().encode()
     hashes = {name: _sha256(data) for name, data in files.items()}
     manifest = {
-        "episode": episode.model_dump(mode="json"),
         "audio": {i: f"audio/{i}.opus" for i in sorted(ids)},
         "sha256": hashes,
         "signature": signing.sign(hashes, private_key_b64),
@@ -72,7 +73,9 @@ def verify_pack(path: Path, public_key_b64: str) -> Episode:
             raise PackError("signature does not match: pack was not made by Sahpaathi")
         if set(zf.namelist()) - {"manifest.json"} != set(hashes):
             raise PackError("pack files do not match the signed list")
+        if "episode.json" not in hashes:
+            raise PackError("pack has no signed episode.json")
         for name, expected in hashes.items():
             if _sha256(zf.read(name)) != expected:
                 raise PackError(f"{name} was changed after signing")
-    return Episode.model_validate(manifest["episode"])
+        return Episode.model_validate_json(zf.read("episode.json"))
