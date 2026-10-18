@@ -42,3 +42,10 @@ export function packRows(episodes: Summary[], packs: PackSummary[]): PackRow[] {
 }
 
 export const anyBuilding = (packs: PackSummary[]) => packs.some((p) => p.status === 'building')
+
+/** The server names the file after the episode slug. Anything else (a title with a colon or Tamil
+ * letters) breaks on Windows and Android, so only a plain slug is trusted. */
+export function packFilename(disposition: string | null, packId: number) {
+  const name = /filename="([a-z0-9][a-z0-9-]*\.sahpaathi)"/.exec(disposition ?? '')?.[1]
+  return name ?? `pack-${packId}.sahpaathi`
+}

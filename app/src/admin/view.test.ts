@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest'
 import type { Summary } from '../studio/api'
 import type { PackSummary } from './api'
-import { anyBuilding, dayBars, formatSize, packRows, pct } from './view'
+import { anyBuilding, dayBars, formatSize, packFilename, packRows, pct } from './view'
 
 const ep = (id: number, status: Summary['status']): Summary => ({
   id, lesson_id: 'l', district_id: 'd', status, title: `Episode ${id}`, passed: true, scores: null, error: null,
@@ -45,4 +45,11 @@ test('only approved episodes get a row, newest first, with their latest and down
 test('polling is needed only while a pack is building', () => {
   expect(anyBuilding([pack(1, 1, 'ready'), pack(2, 1, 'building')])).toBe(true)
   expect(anyBuilding([pack(1, 1, 'ready'), pack(2, 1, 'failed')])).toBe(false)
+})
+
+test('the download is named after the episode slug, and nothing unsafe is trusted', () => {
+  expect(packFilename('attachment; filename="g1-numbers-to-20.sahpaathi"', 7)).toBe('g1-numbers-to-20.sahpaathi')
+  expect(packFilename(null, 7)).toBe('pack-7.sahpaathi')
+  expect(packFilename('attachment; filename="கூழாங்கல்: ஒன்று.sahpaathi"', 7)).toBe('pack-7.sahpaathi')
+  expect(packFilename('attachment; filename="../../x.sahpaathi"', 7)).toBe('pack-7.sahpaathi')
 })

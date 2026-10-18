@@ -71,23 +71,23 @@ export default function Admin() {
 
   return (
     <div className="min-h-screen bg-slate-100 text-ink">
-      <header className="flex flex-wrap items-center justify-between gap-2 bg-ink px-4 py-3 text-white">
-        <h1 className="text-lg font-bold">
+      <header className="flex items-center justify-between gap-1 bg-ink px-3 py-3 text-white sm:px-4">
+        <h1 className="shrink-0 text-base font-bold sm:text-lg">
           Sahpaathi <span className="font-normal text-sun">Admin</span>
         </h1>
-        <nav className="flex gap-1" aria-label="Admin sections">
+        <nav className="flex gap-0.5 sm:gap-1" aria-label="Admin sections">
           {TABS.map((t) => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
               aria-current={tab === t.id ? 'page' : undefined}
-              className={`rounded-lg px-3 py-1 text-sm font-semibold focus-visible:ring-2 focus-visible:ring-sun focus-visible:outline-none ${tab === t.id ? 'bg-white/20' : 'hover:bg-white/10'}`}
+              className={`rounded-lg px-2 py-1 text-sm font-semibold sm:px-3 focus-visible:ring-2 focus-visible:ring-sun focus-visible:outline-none ${tab === t.id ? 'bg-white/20' : 'hover:bg-white/10'}`}
             >
               {t.label}
             </button>
           ))}
         </nav>
-        <button onClick={logout} className="rounded-lg px-3 py-1 text-sm hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-sun focus-visible:outline-none">
+        <button onClick={logout} className="shrink-0 rounded-lg px-2 py-1 text-sm hover:bg-white/10 sm:px-3 focus-visible:ring-2 focus-visible:ring-sun focus-visible:outline-none">
           Log out
         </button>
       </header>

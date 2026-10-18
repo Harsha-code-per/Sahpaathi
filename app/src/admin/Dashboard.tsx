@@ -5,11 +5,11 @@ import { dayBars, pct } from './view'
 const card = 'rounded-2xl bg-white p-4 shadow-sm'
 
 function Split({ u }: { u: Understanding }) {
-  // The same colours as the player's buttons: Few clay, Some sun, Most leaf.
+  // Same order as the numbers above it (Most, Some, Few) and the player's button colours.
   const parts = [
-    { key: 'few', label: 'Few', n: u.few, colour: 'bg-clay' },
-    { key: 'some', label: 'Some', n: u.some, colour: 'bg-sun' },
     { key: 'most', label: 'Most', n: u.most, colour: 'bg-leaf' },
+    { key: 'some', label: 'Some', n: u.some, colour: 'bg-sun' },
+    { key: 'few', label: 'Few', n: u.few, colour: 'bg-clay' },
   ]
   if (!u.taps) return <p className="text-slate-500">No taps yet.</p>
   return (
@@ -33,7 +33,7 @@ export default function Dashboard({ onSignedOut }: { onSignedOut: () => void }) 
     adminApi.dashboard().then(
       (d) => (setData(d), setError('')),
       (err) => {
-        if (err instanceof ApiError && err.status === 401) return onSignedOut()
+        if (err instanceof ApiError && (err.status === 401 || err.status === 403)) return onSignedOut()
         setError(err instanceof ApiError ? err.message : 'Could not load the dashboard.')
       },
     )
@@ -111,7 +111,7 @@ export default function Dashboard({ onSignedOut }: { onSignedOut: () => void }) 
               <tbody>
                 {data.episodes.map((e) => (
                   <tr key={e.episode_id} className="border-t border-slate-100">
-                    <td className="py-2 pr-3 font-medium">{e.episode_id}</td>
+                    <td className="py-2 pr-3 font-medium whitespace-nowrap">{e.episode_id}</td>
                     <td className="px-3">{e.taps}</td>
                     <td className="px-3 text-leaf">{pct(e.pct_most)}</td>
                     <td className="px-3">{pct(e.pct_some)}</td>

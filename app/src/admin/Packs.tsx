@@ -16,7 +16,7 @@ export default function Packs({ onSignedOut }: { onSignedOut: () => void }) {
 
   const handle = useCallback(
     (err: unknown) => {
-      if (err instanceof ApiError && err.status === 401) return onSignedOut()
+      if (err instanceof ApiError && (err.status === 401 || err.status === 403)) return onSignedOut()
       setError(err instanceof ApiError ? err.message : 'Something went wrong.')
     },
     [onSignedOut],
