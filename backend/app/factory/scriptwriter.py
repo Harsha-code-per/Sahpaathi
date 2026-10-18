@@ -5,6 +5,7 @@ CLI: python -m app.factory.scriptwriter <lesson.json> <district.json> [phrase_ba
 """
 
 import json
+import logging
 import sys
 from pathlib import Path
 
@@ -15,6 +16,7 @@ from app.config import settings
 from app.factory.schema import Episode, Lang
 
 MODEL = "claude-sonnet-5-5"
+log = logging.getLogger(__name__)
 LANG_NAMES = {
     "ta": "Tamil",
     "hi": "Hindi",
@@ -167,6 +169,7 @@ def write_episode(
             fallbacks="default",
         ) as stream:
             message = stream.get_final_message()
+        log.info("%s %s usage=%s", message.model, message.stop_reason, message.usage)
         if message.stop_reason in ("refusal", "max_tokens"):
             raise ScriptwriterError(f"generation stopped: {message.stop_reason}")
         text = next(b.text for b in message.content if b.type == "text")
@@ -188,6 +191,7 @@ def write_episode(
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, stream=sys.stderr)
     lesson = Lesson.model_validate_json(Path(sys.argv[1]).read_text())
     district = District.model_validate_json(Path(sys.argv[2]).read_text())
     bank = json.loads(Path(sys.argv[3]).read_text()) if len(sys.argv) > 3 else None

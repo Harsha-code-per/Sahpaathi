@@ -22,7 +22,10 @@ def _client(*replies: tuple[str, str]):
         requests.append({**kwargs, "messages": list(kwargs["messages"])})
         text, stop = replies_left.pop(0)
         message = SimpleNamespace(
-            stop_reason=stop, content=[SimpleNamespace(type="text", text=text)]
+            model="stub",
+            usage=None,
+            stop_reason=stop,
+            content=[SimpleNamespace(type="text", text=text)],
         )
         return nullcontext(SimpleNamespace(get_final_message=lambda: message))
 
