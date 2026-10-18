@@ -4,11 +4,8 @@
 # Default + docs + content: M1 Harshavardhan (lead)
 *                                   @Harsha-code-per
 
-# M4 Cholan: backend core, DB, auth, sync, IVR, dashboard, deploy, CI
-/backend/                           @Cholan-kinnera
-/docker-compose.yml                 @Cholan-kinnera
-/.github/workflows/                 @Cholan-kinnera
-/docs/API.md                        @Cholan-kinnera
+# Backend core (DB, models, migrations, auth, Studio API, deploy, CI): M1 Harshavardhan,
+# covered by the default owner above. Changed 2026-10-18 so the Studio was not blocked.
 
 # M2 Sanjjith: PWA shell, teacher player, offline storage, sync client
 /app/                               @Sanjjith27
@@ -26,5 +23,11 @@
 /app/src/sensing/                   @loktrishal-05
 /content/voices/                    @loktrishal-05
 
-# M4 slices inside other areas
+# M4 Cholan: sync API, IVR catch-up calls, CRP dashboard (on top of the backend core)
+/backend/app/sync.py                @Cholan-kinnera
+/backend/app/ivr/                   @Cholan-kinnera
+/backend/app/dashboard.py           @Cholan-kinnera
+/backend/tests/test_sync*.py        @Cholan-kinnera
+/backend/tests/test_ivr*.py         @Cholan-kinnera
+/backend/tests/test_dashboard*.py   @Cholan-kinnera
 /app/src/admin/                     @Cholan-kinnera

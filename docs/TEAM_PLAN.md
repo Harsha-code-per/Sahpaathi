@@ -14,10 +14,12 @@ Evaluation (2–9 Nov) uses the repo and deployment as they are at the deadline.
 ## Ownership
 | Member | GitHub | Owns |
 |---|---|---|
-| **M1 Harshavardhan K** (lead) | @Harsha-code-per | `backend/app/factory/` (Claude scriptwriter, 4-tier guardrails), `app/src/studio/`, `app/src/lib/types.ts`, `content/` (curriculum, districts, samples), `docs/` |
+| **M1 Harshavardhan K** (lead) | @Harsha-code-per | `backend/app/factory/` (Claude scriptwriter, 4-tier guardrails), **backend core** (DB models + migrations, auth/roles, Studio API, Docker/Render deploy, CI), `app/src/studio/`, `app/src/lib/types.ts`, `content/`, `docs/` |
 | **M2 Sanjjith B** | @Sanjjith27 | `app/` shell + PWA config, `app/src/teacher/` player, offline storage, pack import/share, attendance, sync client, `app/package.json` |
 | **M3 Loktrishal K** | @loktrishal-05 | `backend/app/voice/` (TTS, Santali splicer, loudnorm + opus, pack builder, Ed25519), `app/src/sensing/` (choral mic), `content/voices/` |
-| **M4 Cholan Kinnera** | @Cholan-kinnera | `backend/` core (models, migrations, auth/roles, routes, sync, `ivr/`, dashboard), `app/src/admin/`, deploy, CI, `backend/requirements.txt`, release tags |
+| **M4 Cholan Kinnera** | @Cholan-kinnera | `POST /api/v1/sync` (`backend/app/sync.py`), IVR catch-up calls (`backend/app/ivr/`), CRP dashboard API + `app/src/admin/`, release tags. Builds on the backend core (auth, DB, deploy) that M1 set up on 18 Oct |
+
+Ask **M1** for new DB columns or migrations (only one person writes migrations, so there's never "multiple heads").
 
 The single shared contract is the **episode JSON** ([EPISODE_SCHEMA.md](EPISODE_SCHEMA.md)). It is frozen from end of Day 2.
 

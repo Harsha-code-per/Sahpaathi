@@ -39,8 +39,10 @@ cd backend
 python -m venv .venv && . .venv/bin/activate   # fish: . .venv/bin/activate.fish
 pip install -r requirements-dev.txt
 cp .env.example .env                           # fill in keys (see below)
+alembic upgrade head                           # create tables
+python -m app.seed                             # demo accounts (needs DEMO_PASSWORD in .env)
 uvicorn app.main:app --reload
-pytest -q
+pytest -q                                      # SQLite by default; set DATABASE_URL to test on Postgres
 
 # generate + check + review one episode (needs ANTHROPIC_API_KEY in backend/.env)
 python -m app.factory.judge ../content/curriculum/g1-numbers-to-20.json \
@@ -63,6 +65,11 @@ npm run dev
 | Exotel / Twilio | Absentee catch-up call + DTMF keypad branching | `backend/app/ivr/` | `TELEPHONY_*` |
 
 Nothing above runs in the classroom. The teacher player works with **zero connectivity** once a weekly pack is on the phone.
+
+## Deploy (free tiers)
+- **Database: Neon.** Create a project and copy its `postgresql://...` connection string.
+- **Backend: Render.** New → Blueprint → this repo (`render.yaml`). Paste `DATABASE_URL`, `ANTHROPIC_API_KEY`, `DEMO_PASSWORD`, `CORS_ORIGINS` (the app's URL as a JSON list), `TTS_API_KEY`, `PACK_SIGNING_KEY`. `JWT_SECRET` is generated. Each start runs migrations and refreshes the demo accounts.
+- **App: Vercel.** Import the repo with root directory `app/`, and set `VITE_API_URL` (the Render URL) and `VITE_PACK_PUBLIC_KEY`.
 
 ## Test credentials and sample inputs
 Added before submission (see [docs/SUBMISSION.md](docs/SUBMISSION.md)).
