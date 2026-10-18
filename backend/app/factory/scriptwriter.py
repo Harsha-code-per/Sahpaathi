@@ -79,10 +79,14 @@ ask the teacher for help during a segment.
 Language bridge (NEP 2020 mother tongue first):
 - Introduce each new idea in the home language, then say the key words again in the school \
 language. Always give number words in both languages.
+- Every instruction that tells children what to do (pick up, count, say, show, find a partner) \
+is said first in the home language, then repeated in the school language, as two lines. Children \
+must never have to act on words they do not understand yet. Practice, chants and praise are where \
+the school language takes over.
 - Hand over to the school language segment by segment. Counting the lines in each segment's \
 `teach` + `core`: segment 1 is about 70% home-language lines, each later segment has more \
-school-language lines than the one before, and the last segment is at least 60% school-language \
-lines. Keep a short home-language line for any new word. Code checks these numbers.
+school-language lines than the one before, and the last segment reaches the school-language share \
+given in the brief. Code checks these numbers.
 - Write each line in exactly one language and set `lang` to it. Use the native script.
 - Teacher-facing text (episode title, materials, every `cue`, every `checkpoint`) is in the school \
 language, because that is what the teacher reads.
@@ -123,6 +127,7 @@ def _brief(lesson: Lesson, district: District, phrase_bank: list[str] | None) ->
 
 Learning outcome (NIPUN Bharat): {lesson.nipun_lo}
 Grade: {lesson.grade} | Subject: {lesson.subject} | Target duration: {lesson.duration_min} minutes
+Last segment: at least {rules.last_segment_min_school(lesson.grade):.0%} school-language lines
 Chapter: {lesson.chapter}
 What the chapter teaches:
 {lesson.notes}
