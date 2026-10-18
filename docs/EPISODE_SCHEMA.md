@@ -41,9 +41,11 @@ Line
 ## Pack (`.sahpaathi`, built by `voice/`)
 One zip file:
 ```
-manifest.json   { episode: Episode, audio: { <line_id>: "audio/<line_id>.opus" },
+manifest.json   { audio: { <line_id>: "audio/<line_id>.opus" },
                   sha256: { <path>: <hex> }, signature: <base64 Ed25519 over sha256 map> }
+episode.json    the Episode (signed: listed in sha256)
 audio/*.opus    16 kbps mono, loudness-normalised to −16 LUFS
 sketch.svg
 ```
+The signature covers the `sha256` map as JSON with sorted keys and no whitespace, and the map covers every file except `manifest.json`. The episode lives in `episode.json` (not inside the manifest) so it is signed too.
 The player verifies the signature (WebCrypto Ed25519) before importing. A pack that fails verification is rejected with a clear message.
