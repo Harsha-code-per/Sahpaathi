@@ -1,5 +1,6 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import type { Episode, Line, Tap } from '../lib/types'
+import Attendance from './Attendance'
 import LessonPrep from './LessonPrep'
 import { CHECKPOINT_TIMEOUT_SEC, advance, analogy, currentLine, start, tap, type Phase } from './player'
 import { recordTap } from '../sync/outbox'
@@ -184,6 +185,8 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
           episode={episode}
           onStart={() => setPhase(start(episode))}
           beforeStart={
+            <>
+            <Attendance episodeId={episode.id} onSaved={onTapRecorded} />
             <button
               className="min-h-14 rounded-2xl border-2 border-white/40 text-xl font-semibold disabled:opacity-60"
               disabled={choral.state === 'starting' || choral.state === 'on'}
@@ -191,6 +194,7 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
             >
               {{ off: '🎤 Let the speaker listen (optional)', starting: '🎤 Listening to the room…', on: '🎤 Listening: on ✓', denied: '🎤 Mic blocked. Tap to try again' }[choral.state]}
             </button>
+            </>
           }
         />
       )}

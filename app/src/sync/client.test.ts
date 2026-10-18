@@ -5,6 +5,9 @@ import { SYNC_BATCH, flushOutbox } from './client'
 import { closeDB, type OutboxEvent } from '../storage/db'
 import { pendingCount, recordTap } from './outbox'
 
+/** Taps are told apart by segment; any other event by its kind. */
+const segmentOf = (e: OutboxEvent) => (e.kind === 'tap' ? e.segment_id : e.kind)
+
 const API = 'https://api.example.test/'
 
 beforeEach(async () => {
@@ -31,7 +34,7 @@ describe('flushOutbox', () => {
     const [url, init] = f.mock.calls[0]
     expect(url).toBe('https://api.example.test/api/v1/sync')
     expect(init).toMatchObject({ method: 'POST', headers: { 'Content-Type': 'application/json' } })
-    expect(sentEvents(f).map((e) => e.segment_id)).toEqual(['s0', 's1', 's2'])
+    expect(sentEvents(f).map(segmentOf)).toEqual(['s0', 's1', 's2'])
     expect(await pendingCount()).toBe(0)
   })
 
@@ -68,7 +71,7 @@ describe('flushOutbox', () => {
       .mockRejectedValueOnce(new TypeError('Failed to fetch'))
     expect(await flushOutbox(API, f)).toMatchObject({ sent: SYNC_BATCH, pending: 5, error: 'offline' })
     expect(sentEvents(f, 0)).toHaveLength(SYNC_BATCH)
-    expect(sentEvents(f, 1).map((e) => e.segment_id)).toEqual(['s100', 's101', 's102', 's103', 's104'])
+    expect(sentEvents(f, 1).map(segmentOf)).toEqual(['s100', 's101', 's102', 's103', 's104'])
   })
 
   it('shares one run between concurrent calls', async () => {
@@ -86,6 +89,6 @@ describe('flushOutbox', () => {
       return new Response(null, { status: 200 })
     })
     expect(await flushOutbox(API, f)).toEqual({ sent: 2, pending: 0 })
-    expect(sentEvents(f, 1).map((e) => e.segment_id)).toEqual(['late'])
+    expect(sentEvents(f, 1).map(segmentOf)).toEqual(['late'])
   })
 })

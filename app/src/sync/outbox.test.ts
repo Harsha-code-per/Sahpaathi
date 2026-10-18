@@ -1,8 +1,11 @@
 import 'fake-indexeddb/auto'
 import { IDBFactory } from 'fake-indexeddb'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { closeDB } from '../storage/db'
-import { pendingCount, pendingEvents, recordTap, removeEvents } from './outbox'
+import { closeDB, type OutboxEvent } from '../storage/db'
+import { pendingCount, pendingEvents, recordAttendance, recordTap, removeEvents } from './outbox'
+
+/** Taps are told apart by segment; any other event by its kind. */
+const segmentOf = (e: OutboxEvent) => (e.kind === 'tap' ? e.segment_id : e.kind)
 
 beforeEach(async () => {
   await closeDB()
@@ -30,14 +33,30 @@ describe('outbox', () => {
     await tapAt('2026-10-19T04:32:00Z', 's3')
     await tapAt('2026-10-19T04:30:00Z', 's1')
     await tapAt('2026-10-19T04:31:00Z', 's2')
-    expect((await pendingEvents()).map((e) => e.segment_id)).toEqual(['s1', 's2', 's3'])
-    expect((await pendingEvents(2)).map((e) => e.segment_id)).toEqual(['s1', 's2'])
+    expect((await pendingEvents()).map(segmentOf)).toEqual(['s1', 's2', 's3'])
+    expect((await pendingEvents(2)).map(segmentOf)).toEqual(['s1', 's2'])
   })
 
   it('removes only the given events', async () => {
     const a = await tapAt('2026-10-19T04:30:00Z', 's1')
     await tapAt('2026-10-19T04:31:00Z', 's2')
     await removeEvents([a.event_id, 'not-there'])
-    expect((await pendingEvents()).map((e) => e.segment_id)).toEqual(['s2'])
+    expect((await pendingEvents()).map(segmentOf)).toEqual(['s2'])
+  })
+
+  it('stores attendance with an id, timestamp and roll numbers as strings', async () => {
+    const e = await recordAttendance(
+      { classroom_id: 'CLASS-1', episode_id: 'ep1', absent: ['7', '12'] },
+      new Date('2026-10-19T04:30:00Z'),
+    )
+    expect(e).toMatchObject({ kind: 'attendance', classroom_id: 'CLASS-1', episode_id: 'ep1', absent: ['7', '12'], at: '2026-10-19T04:30:00.000Z' })
+    expect(e.event_id).toMatch(/^[0-9a-f-]{36}$/)
+    expect(await pendingEvents()).toEqual([e])
+  })
+
+  it('queues attendance with taps in time order, so one sync sends them together', async () => {
+    await tapAt('2026-10-19T04:31:00Z', 's2')
+    await recordAttendance({ classroom_id: 'CLASS-1', episode_id: 'ep1', absent: [] }, new Date('2026-10-19T04:30:00Z'))
+    expect((await pendingEvents()).map(segmentOf)).toEqual(['attendance', 's2'])
   })
 })

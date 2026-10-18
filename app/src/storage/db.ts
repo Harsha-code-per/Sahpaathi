@@ -14,8 +14,23 @@ export interface TapEvent {
   at: string
 }
 
-// Attendance events join this union when attendance lands.
-export type OutboxEvent = TapEvent
+/**
+ * Who was absent from a lesson. Children are opaque roll numbers inside a class code (never names or
+ * phone numbers); the server queues one catch-up call per absent child and episode, however often
+ * this is sent.
+ */
+export interface AttendanceEvent {
+  kind: 'attendance'
+  event_id: string
+  classroom_id: string
+  episode_id: string
+  /** Roll numbers as strings, e.g. ["7", "12"]. Empty when everyone came. */
+  absent: string[]
+  /** ISO 8601, device clock. */
+  at: string
+}
+
+export type OutboxEvent = TapEvent | AttendanceEvent
 
 /** What the lesson list needs; kept apart from the audio so listing lessons stays cheap. */
 export interface StoredPack {
