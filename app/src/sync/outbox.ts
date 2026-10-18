@@ -1,4 +1,4 @@
-import { getDB, type OutboxEvent, type TapEvent } from './db'
+import { getDB, type OutboxEvent, type TapEvent } from '../storage/db'
 
 // Everything the classroom produces is written here first and only leaves the device via flushOutbox (client.ts).
 
