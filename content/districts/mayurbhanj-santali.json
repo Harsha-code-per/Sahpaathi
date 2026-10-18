@@ -1,0 +1,13 @@
+{
+  "id": "mayurbhanj-santali",
+  "name": "Mayurbhanj",
+  "state": "Odisha",
+  "home_lang": "sat",
+  "school_lang": "or",
+  "names": ["Dulari", "Budhan", "Sumi", "Lakhan", "Sona", "Raghu"],
+  "crops": ["paddy", "mahua", "ragi", "jackfruit"],
+  "festivals": ["Sohrai", "Baha", "Makar Parab"],
+  "fauna": ["elephant", "peacock", "goat", "hen"],
+  "props": ["sal leaves", "tamarind seeds", "pebbles", "slate and chalk", "fingers"],
+  "notes": "Santali-speaking tribal block; Odia-medium single-teacher school, Grades 1-3 in one room. No mobile signal at school."
+}
