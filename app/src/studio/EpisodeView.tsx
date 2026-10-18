@@ -231,7 +231,8 @@ export default function EpisodeView(props: {
         </div>
         {ep && (
           <p className="mt-1 text-slate-600">
-            Grade {ep.grade} in {ep.district}, from {LANG_NAMES[ep.home_lang]} to {LANG_NAMES[ep.school_lang]}. About{' '}
+            Grade {ep.grade} in {ep.district},{' '}
+            {ep.home_lang === ep.school_lang ? `in ${LANG_NAMES[ep.school_lang]}` : `from ${LANG_NAMES[ep.home_lang]} to ${LANG_NAMES[ep.school_lang]}`}. About{' '}
             {Math.round(minutes(main))} minutes on the main path.
           </p>
         )}

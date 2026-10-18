@@ -135,7 +135,12 @@ export default function Studio() {
   const [signedIn, setSignedIn] = useState(() => session.get() !== null)
   const [catalog, setCatalog] = useState<Catalog | null>(null)
   const [items, setItems] = useState<Summary[]>([])
-  const [selected, setSelected] = useState<number | null>(null)
+  // The open episode lives in the URL (?episode=12), so a reload or a shared link lands on it.
+  const [selected, setSelectedState] = useState<number | null>(() => Number(new URLSearchParams(location.search).get('episode')) || null)
+  const setSelected = useCallback((id: number | null) => {
+    setSelectedState(id)
+    history.replaceState(null, '', id === null ? location.pathname : `?episode=${id}`)
+  }, [])
   const [error, setError] = useState('')
 
   const logout = useCallback(() => {
