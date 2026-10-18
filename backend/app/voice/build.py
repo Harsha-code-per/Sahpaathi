@@ -25,6 +25,8 @@ from app.voice.settings import VoiceSettings
 from app.voice.splicer import SantaliVoice
 from app.voice.tts import FakeTTS, TTSError, TTSProvider, synthesize_episode
 
+# Synthesised lines are kept here (outside the repo) so a failed or repeated run never pays twice.
+CACHE_DIR = Path.home() / ".cache" / "sahpaathi-tts"
 SANTALI_DIR = Path(__file__).parents[3] / "content/voices/santali"
 
 
@@ -60,7 +62,7 @@ def build_episode_pack(
 
 
 def _voice(fake: bool, santali_dir: Path | None, api_key: str) -> TTSProvider:
-    providers: list[TTSProvider] = [FakeTTS() if fake else SarvamTTS(api_key)]
+    providers: list[TTSProvider] = [FakeTTS() if fake else SarvamTTS(api_key, cache_dir=CACHE_DIR)]
     if santali_dir is not None:
         providers.append(SantaliVoice(santali_dir))
     return MultiVoice(*providers)
@@ -81,7 +83,11 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
 
     if args.cmd == "qa":
-        report = inspect_pack(args.pack)
+        try:
+            report = inspect_pack(args.pack)
+        except AudioError as e:
+            print(f"qa failed: {e}", file=sys.stderr)
+            return 1
         print(format_report(report))
         return 1 if report.problems else 0
 

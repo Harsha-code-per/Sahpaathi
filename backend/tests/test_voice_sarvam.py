@@ -33,9 +33,9 @@ def test_request_shape_and_output(tmp_path):
         "ஒன்று இரண்டு", "ta", "guide", tmp_path / "a" / "x.wav"
     )
     call = post.calls[0]
-    assert (call["target_language_code"], call["speaker"], call["key"]) == (
+    assert (call["language_code"], call["speaker"], call["key"]) == (
         "ta-IN",
-        "anushka",
+        "ritu",
         "secret",
     )
     assert call["speech_sample_rate"] == 24000
@@ -46,9 +46,9 @@ def test_request_shape_and_output(tmp_path):
 def test_odia_uses_od_in_and_child_gets_the_other_voice(tmp_path):
     post = FakePost()
     SarvamTTS("k", post).synthesize("ଏକ", "or", "child", tmp_path / "x.wav")
-    assert (post.calls[0]["target_language_code"], post.calls[0]["speaker"]) == (
+    assert (post.calls[0]["language_code"], post.calls[0]["speaker"]) == (
         "od-IN",
-        "abhilash",
+        "shubh",
     )
 
 
@@ -78,3 +78,39 @@ def test_missing_key_santali_and_empty_reply_are_errors(tmp_path):
         SarvamTTS("k", lambda p, k: {"audios": []}).synthesize(
             "x", "hi", "guide", tmp_path / "x.wav"
         )
+
+
+def test_rate_limit_is_retried_with_backoff_then_gives_up(tmp_path):
+    from app.voice.sarvam import RETRIES, Transient
+
+    waits: list[float] = []
+    calls = {"n": 0}
+
+    def flaky(payload, key):
+        calls["n"] += 1
+        if calls["n"] < 3:
+            raise Transient("HTTP 429", retry_after=7 if calls["n"] == 1 else None)
+        return {"audios": [_wav_b64(10)]}
+
+    SarvamTTS("k", flaky, sleep=waits.append).synthesize("x", "hi", "guide", tmp_path / "x.wav")
+    assert waits == [7, 4]  # Retry-After is honoured, otherwise it doubles
+
+    def always(payload, key):
+        raise Transient("HTTP 429")
+
+    with pytest.raises(TTSError, match="after 6 tries"):
+        SarvamTTS("k", always, sleep=lambda s: None).synthesize(
+            "x", "hi", "guide", tmp_path / "y.wav"
+        )
+    assert RETRIES == 6
+
+
+def test_cache_means_a_second_run_costs_nothing(tmp_path):
+    post = FakePost()
+    tts = SarvamTTS("k", post, cache_dir=tmp_path / "cache")
+    tts.synthesize("एक दो", "hi", "guide", tmp_path / "a.wav")
+    tts.synthesize("एक दो", "hi", "guide", tmp_path / "b.wav")
+    assert len(post.calls) == 1
+    tts.synthesize("एक दो", "hi", "child", tmp_path / "c.wav")  # another voice is a new request
+    assert len(post.calls) == 2
+    assert (tmp_path / "a.wav").read_bytes() == (tmp_path / "b.wav").read_bytes()
