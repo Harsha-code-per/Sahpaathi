@@ -1,0 +1,24 @@
+# Render Blueprint: New > Blueprint > pick this repo. Secrets marked sync: false are typed in once.
+services:
+  - type: web
+    name: sahpaathi-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL # Neon: the "postgresql://..." connection string (normalised in config.py)
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGINS # JSON list, e.g. ["https://sahpaathi.vercel.app"]
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: DEMO_PASSWORD # password of the three demo accounts in the README
+        sync: false
+      - key: TTS_API_KEY
+        sync: false
+      - key: PACK_SIGNING_KEY
+        sync: false
