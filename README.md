@@ -38,7 +38,7 @@ docker compose up -d
 cd backend
 python -m venv .venv && . .venv/bin/activate   # fish: . .venv/bin/activate.fish
 pip install -r requirements-dev.txt
-cp ../.env.example .env                        # fill in keys (see below)
+cp .env.example .env                           # fill in keys (see below)
 uvicorn app.main:app --reload
 pytest -q
 
@@ -47,7 +47,8 @@ python -m app.factory.scriptwriter ../content/curriculum/g1-numbers-to-20.json \
   ../content/districts/chennai-migrant.json > /tmp/episode.json
 
 # app → http://localhost:5173/teacher
-cd app
+cd ../app
+cp .env.example .env                           # API URL only; never secrets
 npm install
 npm run dev
 ```

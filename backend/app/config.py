@@ -1,8 +1,11 @@
+from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    # Real env vars win over the file; the file is only for local dev (absent in production).
+    model_config = SettingsConfigDict(env_file=Path(__file__).parents[1] / ".env", extra="ignore")
 
     database_url: str = "postgresql+psycopg://sahpaathi:sahpaathi@localhost:5432/sahpaathi"
     jwt_secret: str = "dev-only-change-me"

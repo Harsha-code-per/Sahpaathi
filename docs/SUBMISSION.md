@@ -16,7 +16,7 @@ Due **Sun 1 Nov 2026, 23:59 IST** on Hack2Skill. Target: **Sat 31 Oct, 18:00 IST
 
 ## 2. Source code
 - [ ] Repo public (open source = +$250 credits) or read access for the Tech4Dev evaluator IDs (M1)
-- [ ] README: setup, run locally, `.env.example`, **list of every external AI service/model and where keys are needed** (M1)
+- [ ] README: setup, run locally, `backend/.env.example` + `app/.env.example`, **list of every external AI service/model and where keys are needed** (M1)
 - [ ] No secrets in git history (`git log -p | grep -iE "sk-ant|api_key="` is clean) (M4)
 - [ ] No real users' personal data (names, phones, photos, voices without consent) (all)
 - [ ] No commits after the deadline (all)
