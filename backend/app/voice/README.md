@@ -52,3 +52,13 @@ pack before it goes to a classroom: it exits non-zero for a pack over 2 MB, a li
 | `voice failed: line 'x': provider has no 'sat' voice` | pass `--santali <dir>`; Santali is never synthesised |
 | `not in the phrase bank, starting at ...` | the line uses words nobody recorded; record them or regenerate the episode with the bank |
 | App says "pack signing key invalid / signature not valid" | `VITE_PACK_PUBLIC_KEY` does not match the key that signed the pack |
+
+## Speaker intelligibility test (3 m, with the real ₹500 speaker)
+Needs the phone, the Bluetooth speaker and 3 or more listeners (adults are fine for the first round). Roles only in the log, no names.
+1. Build a pack of a real episode with the real voices and run `qa` on it (it must pass).
+2. Pair the phone with the speaker. Set the phone volume to 70% and note the speaker's own volume setting.
+3. Put listeners 3 m from the speaker in a quiet room, then repeat in a room with fan or street noise.
+4. Play 10 short guide lines (numbers and instructions, in the home language and in the school language). Each listener writes what they heard.
+5. Score: lines understood word for word, out of 10, per listener, per room. **Target: 9 out of 10 or better in the quiet room, 8 out of 10 in the noisy room.**
+6. Log one row in `docs/TESTING_LOG.md`: date, speaker model, volume, room, listeners (roles), score, what was misheard.
+7. For every misheard line, check whether it is a voice problem (change `pace`/voice in `sarvam.py`), a loudness problem (re-run `qa`), or a wording problem (tell M1: shorter, simpler words).
