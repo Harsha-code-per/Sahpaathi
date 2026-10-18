@@ -8,6 +8,7 @@ export type Phase =
   | { kind: 'idle' }
   | { kind: 'line'; seg: number; part: Part; line: number }
   | { kind: 'checkpoint'; seg: number }
+  | { kind: 'analogy'; line: number; resume: Phase }
   | { kind: 'done' }
 
 export const BRANCH: Record<Tap, Part> = { few: 'easier', some: 'core', most: 'stretch' }
@@ -29,7 +30,14 @@ export function start(ep: Episode): Phase {
 
 /** Call when the current line (audio + pause) has finished. */
 export function advance(ep: Episode, p: Phase): Phase {
+  if (p.kind === 'analogy') return p.line + 1 < ep.analogy.length ? { ...p, line: p.line + 1 } : p.resume
   return p.kind === 'line' ? enter(ep, p.seg, p.part, p.line + 1) : p
+}
+
+/** "Need a simpler analogy": play `analogy`, then go back to where we were (the interrupted line restarts). */
+export function analogy(ep: Episode, p: Phase): Phase {
+  const canPause = p.kind === 'line' || p.kind === 'checkpoint'
+  return canPause && ep.analogy.length > 0 ? { kind: 'analogy', line: 0, resume: p } : p
 }
 
 export function tap(ep: Episode, p: Phase, t: Tap): Phase {
@@ -37,5 +45,6 @@ export function tap(ep: Episode, p: Phase, t: Tap): Phase {
 }
 
 export function currentLine(ep: Episode, p: Phase): Line | null {
+  if (p.kind === 'analogy') return ep.analogy[p.line]
   return p.kind === 'line' ? ep.segments[p.seg][p.part][p.line] : null
 }

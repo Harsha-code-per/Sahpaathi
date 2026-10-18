@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { Line, Tap } from '../lib/types'
 import LessonPrep from './LessonPrep'
-import { CHECKPOINT_TIMEOUT_SEC, advance, currentLine, start, tap, type Phase } from './player'
+import { CHECKPOINT_TIMEOUT_SEC, advance, analogy, currentLine, start, tap, type Phase } from './player'
 import { samplePack } from './samplePack'
 
 const { episode, audio } = samplePack
@@ -100,9 +100,11 @@ export default function Teacher() {
 
       {phase.kind === 'idle' && <LessonPrep episode={episode} onStart={() => setPhase(start(episode))} />}
 
-      {phase.kind === 'line' && line && (
+      {(phase.kind === 'line' || phase.kind === 'analogy') && line && (
         <section className="flex flex-1 flex-col gap-4">
-          <span className="w-fit rounded-full bg-white/15 px-3 py-1 text-sm">{PART_LABEL[phase.part]}</span>
+          <span className="w-fit rounded-full bg-white/15 px-3 py-1 text-sm">
+            {phase.kind === 'analogy' ? 'Analogy' : PART_LABEL[phase.part]}
+          </span>
           <p lang={line.lang} className="text-4xl leading-snug font-semibold">
             {line.text}
           </p>
@@ -112,6 +114,15 @@ export default function Teacher() {
 
       {phase.kind === 'checkpoint' && segment && (
         <Checkpoint key={phase.seg} question={segment.checkpoint} onTap={onTap} />
+      )}
+
+      {(phase.kind === 'line' || phase.kind === 'checkpoint') && episode.analogy.length > 0 && (
+        <button
+          className="min-h-14 rounded-2xl border-2 border-sun text-xl font-semibold text-sun"
+          onClick={() => setPhase((p) => analogy(episode, p))}
+        >
+          💡 Need a simpler analogy
+        </button>
       )}
 
       {phase.kind === 'done' && (
