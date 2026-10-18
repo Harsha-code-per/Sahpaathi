@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import type { Line, Tap } from '../lib/types'
 import LessonPrep from './LessonPrep'
 import { CHECKPOINT_TIMEOUT_SEC, advance, analogy, currentLine, start, tap, type Phase } from './player'
 import { samplePack } from './samplePack'
+import { recordTap } from '../sync/outbox'
+import { useSync } from '../sync/useSync'
 
 const { episode, audio } = samplePack
 
@@ -43,9 +45,16 @@ const TAPS: { tap: Tap; label: string; colour: string }[] = [
 
 const PART_LABEL = { teach: 'Teach', easier: 'Easier', core: 'Core', stretch: 'Stretch' }
 
-/** Three big tap buttons; mounted fresh per segment so the 10 s countdown restarts. */
-function Checkpoint({ question, onTap }: { question: string; onTap: (t: Tap) => void }) {
+/** Three big tap buttons; mounted fresh per segment so the 10 s countdown restarts. Answers at most once. */
+function Checkpoint({ question, onTap }: { question: string; onTap: (t: Tap, auto: boolean) => void }) {
   const [secondsLeft, setSecondsLeft] = useState(CHECKPOINT_TIMEOUT_SEC)
+  const answered = useRef(false)
+  const answer = (t: Tap, auto: boolean) => {
+    if (answered.current) return
+    answered.current = true
+    onTap(t, auto)
+  }
+  const fallback = useEffectEvent(() => answer('some', true))
 
   useEffect(() => {
     const deadline = Date.now() + CHECKPOINT_TIMEOUT_SEC * 1000
@@ -53,16 +62,16 @@ function Checkpoint({ question, onTap }: { question: string; onTap: (t: Tap) => 
       const left = Math.ceil((deadline - Date.now()) / 1000)
       if (left > 0) return setSecondsLeft(left)
       clearInterval(id)
-      onTap('some')
+      fallback()
     }, 250)
     return () => clearInterval(id)
-  }, [onTap])
+  }, [])
 
   return (
     <section className="flex flex-1 flex-col gap-4">
       <p className="text-3xl font-semibold">{question}</p>
       {TAPS.map((t) => (
-        <button key={t.tap} className={`min-h-20 rounded-2xl text-2xl font-bold ${t.colour}`} onClick={() => onTap(t.tap)}>
+        <button key={t.tap} className={`min-h-20 rounded-2xl text-2xl font-bold ${t.colour}`} onClick={() => answer(t.tap, false)}>
           {t.label}
         </button>
       ))}
@@ -80,7 +89,15 @@ export default function Teacher() {
     return playLine(line, audio[line.id], () => setPhase((p) => advance(episode, p)))
   }, [line])
 
-  const onTap = useCallback((t: Tap) => setPhase((p) => tap(episode, p, t)), [])
+  const { pending, sync } = useSync()
+
+  const onTap = (segmentId: string, t: Tap, auto: boolean) => {
+    setPhase((p) => tap(episode, p, t))
+    // The lesson never waits on storage: a failed write is logged, not shown mid-class.
+    recordTap({ episode_id: episode.id, segment_id: segmentId, tap: t, auto }).then(sync, (e) =>
+      console.error('Could not queue tap', e),
+    )
+  }
 
   const segment = phase.kind === 'line' || phase.kind === 'checkpoint' ? episode.segments[phase.seg] : null
 
@@ -90,6 +107,7 @@ export default function Teacher() {
         <h1 className="text-3xl font-bold text-sun">{episode.title}</h1>
         <p className="mt-1 opacity-80">
           Grade {episode.grade} · {episode.district} · {episode.duration_min} min
+          {!!pending && <span className="ml-2 text-sm">· ⏳ {pending} to sync</span>}
         </p>
         {segment && (
           <p className="mt-3 text-lg">
@@ -113,7 +131,11 @@ export default function Teacher() {
       )}
 
       {phase.kind === 'checkpoint' && segment && (
-        <Checkpoint key={phase.seg} question={segment.checkpoint} onTap={onTap} />
+        <Checkpoint
+          key={phase.seg}
+          question={segment.checkpoint}
+          onTap={(t, auto) => onTap(segment.id, t, auto)}
+        />
       )}
 
       {(phase.kind === 'line' || phase.kind === 'checkpoint') && episode.analogy.length > 0 && (
