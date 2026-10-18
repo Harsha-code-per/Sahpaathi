@@ -42,9 +42,10 @@ cp .env.example .env                           # fill in keys (see below)
 uvicorn app.main:app --reload
 pytest -q
 
-# generate one episode (needs ANTHROPIC_API_KEY in backend/.env)
-python -m app.factory.scriptwriter ../content/curriculum/g1-numbers-to-20.json \
+# generate + check + review one episode (needs ANTHROPIC_API_KEY in backend/.env)
+python -m app.factory.judge ../content/curriculum/g1-numbers-to-20.json \
   ../content/districts/chennai-migrant.json > /tmp/episode.json
+# review an existing episode only: add its path as a third argument
 
 # app → http://localhost:5173/teacher
 cd ../app
@@ -57,7 +58,7 @@ npm run dev
 | Service | What it does | Where it is called | Key |
 |---|---|---|---|
 | Anthropic Claude Sonnet 5.5 (`claude-sonnet-5-5`) | Writes the IRI episode script and branches as structured JSON | `backend/app/factory/` | `ANTHROPIC_API_KEY` |
-| Anthropic Claude Haiku 5.5 (`claude-haiku-5-5`) | Rubric judge (pedagogy, age-fit, accuracy, safety) and back-translation check | `backend/app/factory/` | `ANTHROPIC_API_KEY` |
+| Anthropic Claude Haiku 5.5 (`claude-haiku-5-5`) | Blind English back-translation of every line, then a six-criterion rubric review (pedagogy, age fit, accuracy, language bridge, localisation, safety) | `backend/app/factory/` | `ANTHROPIC_API_KEY` |
 | Indic TTS (provider TBD Day 2) | Tamil / Hindi / Odia voices, generated in the cloud before packing (never in class) | `backend/app/voice/` | `TTS_API_KEY` |
 | Exotel / Twilio | Absentee catch-up call + DTMF keypad branching | `backend/app/ivr/` | `TELEPHONY_*` |
 

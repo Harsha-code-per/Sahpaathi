@@ -1,0 +1,499 @@
+{
+  "model": "claude-haiku-5-5",
+  "rubric": {
+    "scores": {
+      "pedagogy": {
+        "score": 3,
+        "reason": "The sequence is mostly step by step, but the s1 checkpoint asks about seven pebbles that are never taught, the pair comparison gives its answer before children count, and one stretch step needs more materials than the list provides."
+      },
+      "age_fit": {
+        "score": 3,
+        "reason": "Most sentences are short and within 1-20, but subtraction appears in a grade 1 episode whose goal covers counting and number names only."
+      },
+      "accuracy": {
+        "score": 4,
+        "reason": "All number names and sums checked (10 to 20 in Hindi and Tamil, 8-5, 12-9) are correct, with only minor wording and scope issues."
+      },
+      "language_bridge": {
+        "score": 3,
+        "reason": "Several new ideas (ten and four, ten and five, subtraction, pairing instructions) are given in Tamil only with no Hindi restatement, which breaks the home-language-first rule."
+      },
+      "localisation": {
+        "score": 4,
+        "reason": "The episode uses idli, bananas, tamarind seeds, pebbles, squirrel and local children's names naturally without stereotypes."
+      },
+      "safety": {
+        "score": 3,
+        "reason": "The mouth-safety reminder covers only pebbles, while tamarind seeds, which are also a choking hazard, are handed out in the more-and-fewer segment without a warning."
+      }
+    },
+    "issues": [
+      {
+        "line_id": "s4-t3",
+        "criterion": "safety",
+        "problem": "Tamarind seeds are handed out with no reminder not to put them in the mouth; the only reminders mention stones.",
+        "fix": "Add a Hindi and Tamil reminder before the seeds are handed out, for example: seeds mouth-il podakudathu, or put the seeds in the mouth never."
+      },
+      {
+        "line_id": "s3-x1",
+        "criterion": "pedagogy",
+        "problem": "Taking another ten pebbles requires 20 pebbles per child, but the materials list gives a maximum of 15 pebbles per child.",
+        "fix": "Change the materials to 20 pebbles per child, or replace this step with bottle caps or fingers so the total stays within what is provided."
+      },
+      {
+        "line_id": "s4-c3",
+        "criterion": "age_fit",
+        "problem": "Subtraction (eight minus five is three) is outside the grade 1 goal of counting and number names up to 20.",
+        "fix": "Replace with a counting comparison: count the extra pebbles left over after pairing and say how many there are."
+      },
+      {
+        "line_id": "s4-x4",
+        "criterion": "age_fit",
+        "problem": "Subtraction (twelve minus nine is three) is outside the chapter scope, and the step does not connect to the counting taught.",
+        "fix": "Replace with: count the extra pebbles left after pairing and say that number, without naming a subtraction sentence."
+      },
+      {
+        "line_id": "s4-t6",
+        "criterion": "pedagogy",
+        "problem": "The teacher states which group is more before children have counted, so the checkpoint question is answered by the guide rather than by the children.",
+        "fix": "Pause after s4-t5 and ask which group is more; let children answer before giving the comparison."
+      },
+      {
+        "line_id": "s3-c1",
+        "criterion": "language_bridge",
+        "problem": "The new step of adding four to ten is given only in Tamil, with no Hindi restatement of the idea.",
+        "fix": "Add a Hindi line before it, for example: दस कंकड़ के साथ चार और रखो।"
+      },
+      {
+        "line_id": "s3-c5",
+        "criterion": "language_bridge",
+        "problem": "The new idea that ten and five make fifteen is stated only in Tamil.",
+        "fix": "Add a Hindi line stating that ten and five together make fifteen before the Tamil line."
+      },
+      {
+        "line_id": "s4-c2",
+        "criterion": "language_bridge",
+        "problem": "The instruction to place pebbles opposite seeds in pairs is given in Tamil only, and the new pairing idea has no home-language restatement.",
+        "fix": "Add a Hindi line before it, for example: हर कंकड़ के सामने एक बीज रखो।"
+      },
+      {
+        "line_id": "s1-checkpoint",
+        "criterion": "pedagogy",
+        "problem": "The checkpoint asks whether children count seven pebbles, but the teaching only covers five pebbles and seven appears only in the core branch.",
+        "fix": "Change the checkpoint to ask whether children count five pebbles one by one, or add a seven-pebble counting step before the checkpoint."
+      },
+      {
+        "line_id": "r2",
+        "criterion": "pedagogy",
+        "problem": "The recap asks for five stones, but r7 asks children to count from one to ten by touching stones.",
+        "fix": "Change r2 to ask for ten stones or fingers so the recap matches r7."
+      }
+    ]
+  },
+  "gloss": [
+    {
+      "line_id": "a1",
+      "english": "Listen to a story. Meena's mother sells bananas in the market."
+    },
+    {
+      "line_id": "a2",
+      "english": "Meena counts the bananas. She touches each banana once."
+    },
+    {
+      "line_id": "a3",
+      "english": "One banana, two bananas, three bananas, four bananas, five bananas."
+    },
+    {
+      "line_id": "a4",
+      "english": "The last count was five. So total five bananas!"
+    },
+    {
+      "line_id": "a5",
+      "english": "If you touch one banana twice, the count gets messed up."
+    },
+    {
+      "line_id": "a6",
+      "english": "Touch each banana once. The last number is the total."
+    },
+    {
+      "line_id": "a7",
+      "english": "Now count with pebbles and see. Touch and say."
+    },
+    {
+      "line_id": "a8",
+      "english": "Five bananas. Five!"
+    },
+    {
+      "line_id": "r1",
+      "english": "Hello! I am your counting didi. Listen to today's class."
+    },
+    {
+      "line_id": "r2",
+      "english": "Bring some small stones. If you don't have them, your fingers will work."
+    },
+    {
+      "line_id": "r3",
+      "english": "Don't put stones in your mouth. Place five stones in front of you."
+    },
+    {
+      "line_id": "r4",
+      "english": "Touch each stone once. One, two, three, four, five."
+    },
+    {
+      "line_id": "r5",
+      "english": "The last count tells how many there are. Five!"
+    },
+    {
+      "line_id": "r6",
+      "english": "One, two, three, four, five. Five stones."
+    },
+    {
+      "line_id": "r7",
+      "english": "Now count from one to ten. Count by touching."
+    },
+    {
+      "line_id": "r8",
+      "english": "Six, seven, eight, nine, ten."
+    },
+    {
+      "line_id": "r9",
+      "english": "Put three more with ten stones. Ten and three, thirteen."
+    },
+    {
+      "line_id": "r10",
+      "english": "When ten and three join together, it is thirteen."
+    },
+    {
+      "line_id": "r11",
+      "english": "Eleven, twelve, thirteen. Count."
+    },
+    {
+      "line_id": "r12",
+      "english": "Now make two piles. Eight in one, five in the other."
+    },
+    {
+      "line_id": "r13",
+      "english": "Eight is more. Five is less."
+    },
+    {
+      "line_id": "r14",
+      "english": "Well done! Today you learned a lot."
+    },
+    {
+      "line_id": "r15",
+      "english": "Well done! Tomorrow we can count again."
+    },
+    {
+      "line_id": "s1-t1",
+      "english": "Hello Pooja, Raju and all children! Today we will learn counting."
+    },
+    {
+      "line_id": "s1-t2",
+      "english": "Pick up five pebbles. Place them in front one by one."
+    },
+    {
+      "line_id": "s1-t3",
+      "english": "Don't put pebbles in your mouth. Touch each pebble once."
+    },
+    {
+      "line_id": "s1-t4",
+      "english": "While touching, count: one, two, three, four, five."
+    },
+    {
+      "line_id": "s1-t5",
+      "english": "The last count tells how many there are. Five pebbles!"
+    },
+    {
+      "line_id": "s1-t6",
+      "english": "One, two, three, four, five. Five pebbles!"
+    },
+    {
+      "line_id": "s1-e1",
+      "english": "No problem! Just take three pebbles."
+    },
+    {
+      "line_id": "s1-e2",
+      "english": "Touch one pebble, say: one. Then two, then three."
+    },
+    {
+      "line_id": "s1-e3",
+      "english": "One, two, three. Three pebbles."
+    },
+    {
+      "line_id": "s1-e4",
+      "english": "Very good! There are three pebbles. Count once more."
+    },
+    {
+      "line_id": "s1-c1",
+      "english": "Now take seven pebbles. Count by touching."
+    },
+    {
+      "line_id": "s1-c2",
+      "english": "Count from one to seven in Tamil."
+    },
+    {
+      "line_id": "s1-c3",
+      "english": "The last count is seven. There are seven pebbles!"
+    },
+    {
+      "line_id": "s1-c4",
+      "english": "Seven pebbles. Well done Amit, Kavya!"
+    },
+    {
+      "line_id": "s1-x1",
+      "english": "Now take ten pebbles. Count by touching."
+    },
+    {
+      "line_id": "s1-x2",
+      "english": "Move the pebbles around. Count again. The same number will come out!"
+    },
+    {
+      "line_id": "s1-x3",
+      "english": "Same number. Ten!"
+    },
+    {
+      "line_id": "s2-t1",
+      "english": "Now we will sing a counting song. Clap!"
+    },
+    {
+      "line_id": "s2-t2",
+      "english": "One, two, three, four, five. Six, seven, eight, nine, ten."
+    },
+    {
+      "line_id": "s2-t3",
+      "english": "There are ten fingers. Ten means ten!"
+    },
+    {
+      "line_id": "s2-t4",
+      "english": "Now in Tamil. One, two, three, four, five."
+    },
+    {
+      "line_id": "s2-t5",
+      "english": "Six, seven, eight, nine, ten."
+    },
+    {
+      "line_id": "s2-t6",
+      "english": "Ten fingers. Ten!"
+    },
+    {
+      "line_id": "s2-t7",
+      "english": "Now we will count backwards. From ten to one!"
+    },
+    {
+      "line_id": "s2-e1",
+      "english": "Show only five fingers. One, two, three, four, five."
+    },
+    {
+      "line_id": "s2-e2",
+      "english": "One, two, three, four, five."
+    },
+    {
+      "line_id": "s2-e3",
+      "english": "Now backwards: five, four, three, two, one."
+    },
+    {
+      "line_id": "s2-e4",
+      "english": "Five, four, three, two, one."
+    },
+    {
+      "line_id": "s2-c1",
+      "english": "Count backwards from ten to one: ten, nine, eight, seven, six."
+    },
+    {
+      "line_id": "s2-c2",
+      "english": "Five, four, three, two, one!"
+    },
+    {
+      "line_id": "s2-c3",
+      "english": "Count backwards from ten to one."
+    },
+    {
+      "line_id": "s2-c4",
+      "english": "Wow! The squirrel also clapped. Well done Kavin and Meena!"
+    },
+    {
+      "line_id": "s2-c5",
+      "english": "Sing the song again: one to ten."
+    },
+    {
+      "line_id": "s2-x1",
+      "english": "After ten comes eleven."
+    },
+    {
+      "line_id": "s2-x2",
+      "english": "Eleven, twelve, thirteen, fourteen, fifteen. Sixteen, seventeen, eighteen, nineteen, twenty."
+    },
+    {
+      "line_id": "s2-x3",
+      "english": "Eleven, twelve, thirteen, fourteen, fifteen."
+    },
+    {
+      "line_id": "s2-x4",
+      "english": "Sixteen, seventeen, eighteen, nineteen, twenty."
+    },
+    {
+      "line_id": "s3-t1",
+      "english": "Count ten pebbles and place them in one row."
+    },
+    {
+      "line_id": "s3-t2",
+      "english": "Ten pebbles. Count from one to ten."
+    },
+    {
+      "line_id": "s3-t3",
+      "english": "Now put three pebbles aside. Like three idlis!"
+    },
+    {
+      "line_id": "s3-t4",
+      "english": "Ten and three together make thirteen."
+    },
+    {
+      "line_id": "s3-t5",
+      "english": "When ten and three join together, it is thirteen."
+    },
+    {
+      "line_id": "s3-t6",
+      "english": "Count: eleven, twelve, thirteen."
+    },
+    {
+      "line_id": "s3-t7",
+      "english": "Thirteen pebbles! Say: thirteen!"
+    },
+    {
+      "line_id": "s3-e1",
+      "english": "First count ten pebbles. In one row."
+    },
+    {
+      "line_id": "s3-e2",
+      "english": "Place one more pebble. Ten and one, eleven."
+    },
+    {
+      "line_id": "s3-e3",
+      "english": "When ten and one join, it is eleven."
+    },
+    {
+      "line_id": "s3-e4",
+      "english": "Now place two more. Ten and two, twelve."
+    },
+    {
+      "line_id": "s3-e5",
+      "english": "When ten and two join, it is twelve."
+    },
+    {
+      "line_id": "s3-c1",
+      "english": "Now add four to the ten pebbles."
+    },
+    {
+      "line_id": "s3-c2",
+      "english": "When ten and four join, it is fourteen."
+    },
+    {
+      "line_id": "s3-c3",
+      "english": "Eleven, twelve, thirteen, fourteen. Count!"
+    },
+    {
+      "line_id": "s3-c4",
+      "english": "Fourteen pebbles! Well done Arun and Kavya!"
+    },
+    {
+      "line_id": "s3-c5",
+      "english": "When ten and five join, it is fifteen. Count adding five."
+    },
+    {
+      "line_id": "s3-x1",
+      "english": "Take out another ten pebbles and place them."
+    },
+    {
+      "line_id": "s3-x2",
+      "english": "Ten and ten join, it is twenty."
+    },
+    {
+      "line_id": "s3-x3",
+      "english": "Ten and ten together make twenty."
+    },
+    {
+      "line_id": "s3-x4",
+      "english": "Count from eleven to twenty."
+    },
+    {
+      "line_id": "s4-t1",
+      "english": "Now we will look at two piles. Which one is more?"
+    },
+    {
+      "line_id": "s4-t2",
+      "english": "More means lots. Less means few."
+    },
+    {
+      "line_id": "s4-t3",
+      "english": "One person take eight pebbles. The other take five tamarind seeds."
+    },
+    {
+      "line_id": "s4-t4",
+      "english": "Count both groups. Touch each one once."
+    },
+    {
+      "line_id": "s4-t5",
+      "english": "Eight pebbles. Five seeds."
+    },
+    {
+      "line_id": "s4-t6",
+      "english": "Pebbles are more, seeds are less. Eight more, five less."
+    },
+    {
+      "line_id": "s4-e1",
+      "english": "Take four pebbles and two tamarind seeds."
+    },
+    {
+      "line_id": "s4-e2",
+      "english": "Make pairs: one pebble, one seed. Seeds finished!"
+    },
+    {
+      "line_id": "s4-e3",
+      "english": "Four pebbles more. Two seeds less."
+    },
+    {
+      "line_id": "s4-e4",
+      "english": "Four is more, two is less. Say!"
+    },
+    {
+      "line_id": "s4-c1",
+      "english": "Pebbles more. Seeds less. Say!"
+    },
+    {
+      "line_id": "s4-c2",
+      "english": "Place pebbles in pairs opposite the seeds."
+    },
+    {
+      "line_id": "s4-c3",
+      "english": "Eight minus five is three. Three pebbles more."
+    },
+    {
+      "line_id": "s4-c4",
+      "english": "Switch places. One person six seeds, other four pebbles."
+    },
+    {
+      "line_id": "s4-c5",
+      "english": "Which is more? Tell your partner."
+    },
+    {
+      "line_id": "s4-c6",
+      "english": "Six seeds more. Four pebbles less. Well done!"
+    },
+    {
+      "line_id": "s4-x1",
+      "english": "One person take twelve pebbles. The other nine seeds."
+    },
+    {
+      "line_id": "s4-x2",
+      "english": "Count both. Which is more?"
+    },
+    {
+      "line_id": "s4-x3",
+      "english": "Twelve is more. Nine is less. How much more?"
+    },
+    {
+      "line_id": "s4-x4",
+      "english": "Twelve minus nine is three."
+    }
+  ]
+}
