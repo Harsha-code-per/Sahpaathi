@@ -13,6 +13,7 @@ import anthropic
 from pydantic import BaseModel, ValidationError
 
 from app.config import settings
+from app.factory import rules
 from app.factory.schema import Episode, Lang
 
 MODEL = "claude-sonnet-5-5"
@@ -76,8 +77,11 @@ ask the teacher for help during a segment.
 
 Language bridge (NEP 2020 mother tongue first):
 - Introduce each new idea in the home language, then say the key words again in the school \
-language. Move gradually from mostly home language early in the episode to mostly school language \
-by the end. Always give number words in both languages.
+language. Always give number words in both languages.
+- Hand over to the school language segment by segment. Counting the lines in each segment's \
+`teach` + `core`: segment 1 is about 70% home-language lines, each later segment has more \
+school-language lines than the one before, and the last segment is at least 60% school-language \
+lines. Keep a short home-language line for any new word. Code checks these numbers.
 - Write each line in exactly one language and set `lang` to it. Use the native script.
 - Teacher-facing text (episode title, materials, every `cue`, every `checkpoint`) is in the school \
 language, because that is what the teacher reads.
@@ -151,7 +155,7 @@ def write_episode(
     phrase_bank: list[str] | None = None,
     client: anthropic.Anthropic | None = None,
 ) -> Episode:
-    """One generation, plus one repair turn if the output breaks the contract."""
+    """One generation, plus one repair turn if it breaks the contract or a tier-1 rule."""
     client = client or anthropic.Anthropic(api_key=settings.anthropic_api_key or None)
     messages: list = [{"role": "user", "content": _brief(lesson, district, phrase_bank)}]
     error = ""
@@ -175,18 +179,20 @@ def write_episode(
         text = next(b.text for b in message.content if b.type == "text")
         try:
             episode = Episode.model_validate_json(text)
+            error = "\n".join(rules.check(episode))
         except ValidationError as e:
             error = str(e)
-            messages += [
-                {"role": "assistant", "content": message.content},
-                {
-                    "role": "user",
-                    "content": "The episode failed validation. Return the complete corrected "
-                    f"episode.\n{error}",
-                },
-            ]
-            continue
-        return episode.model_copy(update={"id": f"g{lesson.grade}-{lesson.id}-{district.id}"})
+        if not error:
+            return episode.model_copy(update={"id": f"g{lesson.grade}-{lesson.id}-{district.id}"})
+        log.info("repair needed: %s", error)
+        messages += [
+            {"role": "assistant", "content": message.content},
+            {
+                "role": "user",
+                "content": f"The episode failed these checks. Return the complete corrected "
+                f"episode.\n{error}",
+            },
+        ]
     raise ScriptwriterError(f"episode still invalid after repair: {error}")
 
 
