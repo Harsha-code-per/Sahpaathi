@@ -1,0 +1,31 @@
+# One owner per path. Later lines win, so this file goes from generic to specific.
+# PRs touching a path auto-request its owner's review. Ownership map: docs/TEAM_PLAN.md
+
+# Default + docs + content: M1 Harshavardhan (lead)
+*                                   @Harsha-code-per
+
+# M4 Cholan: backend core, DB, auth, sync, IVR, dashboard, deploy, CI
+/backend/                           @Cholan-kinnera
+/docker-compose.yml                 @Cholan-kinnera
+/.env.example                       @Cholan-kinnera
+/.github/workflows/                 @Cholan-kinnera
+/docs/API.md                        @Cholan-kinnera
+
+# M2 Sanjjith: PWA shell, teacher player, offline storage, sync client
+/app/                               @Sanjjith27
+/.github/workflows/app.yml          @Sanjjith27
+
+# M1 Harshavardhan: content factory, guardrails, Studio, the episode contract
+/backend/app/factory/               @Harsha-code-per
+/backend/tests/test_factory*.py     @Harsha-code-per
+/app/src/studio/                    @Harsha-code-per
+/app/src/lib/types.ts               @Harsha-code-per
+
+# M3 Loktrishal: voice, Santali splicer, opus, packs, choral mic
+/backend/app/voice/                 @loktrishal-05
+/backend/tests/test_voice*.py       @loktrishal-05
+/app/src/sensing/                   @loktrishal-05
+/content/voices/                    @loktrishal-05
+
+# M4 slices inside other areas
+/app/src/admin/                     @Cholan-kinnera
