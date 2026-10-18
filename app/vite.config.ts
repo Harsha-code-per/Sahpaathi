@@ -26,4 +26,6 @@ export default defineConfig({
       workbox: { navigateFallback: '/index.html' },
     }),
   ],
+  // The bundled sample episode lives in ../content (owned by M1).
+  server: { fs: { allow: ['.', '../content'] } },
 })
