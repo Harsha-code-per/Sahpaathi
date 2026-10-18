@@ -35,7 +35,8 @@ export function useChoralHint() {
 
   const startAnswer = useCallback(() => mic.current?.startAnswer(), [])
   const stopAnswer = useCallback(() => mic.current?.stopAnswer(), [])
+  const resetAnswer = useCallback(() => mic.current?.resetAnswer(), [])
   const takeHint = useCallback((): Tap | null => mic.current?.takeHint()?.tap ?? null, [])
 
-  return { state, enable, startAnswer, stopAnswer, takeHint }
+  return { state, enable, startAnswer, stopAnswer, resetAnswer, takeHint }
 }

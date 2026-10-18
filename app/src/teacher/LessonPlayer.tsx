@@ -116,7 +116,7 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
   const [phase, setPhase] = useState<Phase>({ kind: 'idle' })
   const line = currentLine(episode, phase)
   const choral = useChoralHint()
-  const { startAnswer, stopAnswer, takeHint } = choral
+  const { startAnswer, stopAnswer, resetAnswer, takeHint } = choral
   const [suggested, setSuggested] = useState<Tap | null>(null)
 
   useEffect(() => {
@@ -125,13 +125,31 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
     return playLine(line, audio[line.id], () => setPhase((p) => advance(episode, p)), onPause)
   }, [line, audio, episode, startAnswer, stopAnswer])
 
-  // Ask the mic once per checkpoint; the suggestion is cleared as soon as the lesson moves on.
-  const checkpointSeg = phase.kind === 'checkpoint' ? phase.seg : null
+  // A new segment starts with empty ears: pauses from the previous segment's easier/core/stretch
+  // lines must not colour this segment's hint.
+  const teachStartSeg = phase.kind === 'line' && phase.part === 'teach' && phase.line === 0 ? phase.seg : null
   useEffect(() => {
+    if (teachStartSeg !== null) resetAnswer()
+  }, [teachStartSeg, resetAnswer])
+
+  // Ask the mic once per checkpoint; the suggestion is cleared as soon as the lesson moves on.
+  // Opening the analogy and coming back keeps the hint shown before: the analogy's own pauses
+  // are not an answer to the checkpoint question.
+  const checkpointSeg = phase.kind === 'checkpoint' ? phase.seg : null
+  const hintTakenFor = useRef<number | null>(null)
+  useEffect(() => {
+    if (phase.kind === 'analogy') return
+    if (checkpointSeg === null) {
+      hintTakenFor.current = null
+      // oxlint-disable-next-line react/set-state-in-effect
+      return setSuggested(null)
+    }
+    if (hintTakenFor.current === checkpointSeg) return
+    hintTakenFor.current = checkpointSeg
     // Reading the mic buffer consumes it, so this must run once per checkpoint, not during render.
     // oxlint-disable-next-line react/set-state-in-effect
-    setSuggested(checkpointSeg === null ? null : takeHint())
-  }, [checkpointSeg, takeHint])
+    setSuggested(takeHint())
+  }, [phase.kind, checkpointSeg, takeHint])
 
   const onTap = (segmentId: string, t: Tap, auto: boolean) => {
     setPhase((p) => tap(episode, p, t))
@@ -161,16 +179,20 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
         )}
       </header>
 
-      {phase.kind === 'idle' && <LessonPrep episode={episode} onStart={() => setPhase(start(episode))} />}
-
       {phase.kind === 'idle' && (
-        <button
-          className="min-h-14 rounded-2xl border-2 border-white/40 text-xl font-semibold disabled:opacity-60"
-          disabled={choral.state === 'starting' || choral.state === 'on'}
-          onClick={choral.enable}
-        >
-          {{ off: '🎤 Let the speaker listen (optional)', starting: '🎤 Listening to the room…', on: '🎤 Listening: on ✓', denied: '🎤 Mic blocked. Tap to try again' }[choral.state]}
-        </button>
+        <LessonPrep
+          episode={episode}
+          onStart={() => setPhase(start(episode))}
+          beforeStart={
+            <button
+              className="min-h-14 rounded-2xl border-2 border-white/40 text-xl font-semibold disabled:opacity-60"
+              disabled={choral.state === 'starting' || choral.state === 'on'}
+              onClick={choral.enable}
+            >
+              {{ off: '🎤 Let the speaker listen (optional)', starting: '🎤 Listening to the room…', on: '🎤 Listening: on ✓', denied: '🎤 Mic blocked. Tap to try again' }[choral.state]}
+            </button>
+          }
+        />
       )}
 
       {(phase.kind === 'line' || phase.kind === 'analogy') && line && (

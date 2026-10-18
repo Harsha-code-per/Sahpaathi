@@ -67,6 +67,19 @@ test('frames are only collected between startAnswer and stopAnswer', async () =>
   expect(mic.takeHint()?.tap).toBe('most')
 })
 
+test('resetAnswer drops frames from the previous segment, so they cannot colour the next hint', async () => {
+  const mic = await openAndCalibrate()
+  amplitude = 0.1 // segment 1's stretch lines: loud answers
+  mic.startAnswer()
+  await vi.advanceTimersByTimeAsync(3000)
+  mic.resetAnswer() // segment 2's teach part starts
+  expect(mic.takeHint()).toBeNull() // the buffer was emptied, nothing carried over
+  amplitude = 0.003 // this time the children really are quiet
+  mic.startAnswer()
+  await vi.advanceTimersByTimeAsync(3000)
+  expect(mic.takeHint()?.tap).toBe('few') // not pushed to "most" by segment 1's loud lines
+})
+
 test('a quiet reply to a calibrated room suggests few', async () => {
   const mic = await openAndCalibrate()
   amplitude = 0.003
