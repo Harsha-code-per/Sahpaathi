@@ -4,6 +4,8 @@ Source of truth: [`backend/app/factory/schema.py`](../backend/app/factory/schema
 Change all three in one PR.
 
 ## Shape
+Exported episodes and packs always contain **every key** (written with `model_dump_json`), so `cue` is `null` rather than missing. That is why `types.ts` has no optional fields. Hand-written files must be normalised through the schema first.
+
 ```
 Episode
   id, title, grade (1–5), subject (numeracy|literacy), nipun_lo
