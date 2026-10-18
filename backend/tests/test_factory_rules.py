@@ -16,7 +16,8 @@ def test_fixture_passes_all_rules():
 
 def test_first_generated_episode_fails_bridge_handover():
     # Real Sonnet output before the bridge rule existed: Hindi never handed over to Tamil.
-    problems = rules.check_bridge(_load("g1-numbers-to-20-chennai-migrant"))
+    fixture = Path(__file__).parent / "fixtures/g1-unbridged-episode.json"
+    problems = rules.check_bridge(Episode.model_validate_json(fixture.read_text()))
     assert any("last segment must be at least 60%" in p for p in problems)
     assert any("drops from segment 3 to 4" in p for p in problems)
 

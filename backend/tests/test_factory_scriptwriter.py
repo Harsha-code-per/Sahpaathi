@@ -77,7 +77,7 @@ def test_all_content_inputs_parse():
 
 
 def test_rule_failure_gets_repair_turn_with_rule_message():
-    unbridged = (CONTENT / "samples/g1-numbers-to-20-chennai-migrant.json").read_text()
+    unbridged = (Path(__file__).parent / "fixtures/g1-unbridged-episode.json").read_text()
     client = _client((unbridged, "end_turn"), (SAMPLE, "end_turn"))
     write_episode(LESSON, DISTRICT, client=client)
     assert "at least 60% school language" in client.requests[1]["messages"][-1]["content"]
