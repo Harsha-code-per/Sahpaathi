@@ -13,14 +13,17 @@ Auth: `POST /auth/login` returns a JWT (12 h); send `Authorization: Bearer <toke
 | GET | `/episodes` | reviewer, admin | Summaries, newest first: `{id, lesson_id, district_id, status, title, passed, scores{criterion: 1-5}, error, created_at}` |
 | GET | `/episodes/{id}` | reviewer, admin | Summary + `episode` (the contract in EPISODE_SCHEMA.md), `review` (`{model, rubric{scores, issues}, gloss[{line_id, english}]}`), `review_notes`, `reviewed_by` |
 | POST | `/episodes/{id}/review` | reviewer, admin | `{decision: "approve" \| "reject", notes}`. Only from `in_review` (else 409); rejecting needs notes (else 422) |
+| POST | `/episodes/{id}/pack` | admin | Voice (Sarvam; Santali from the phrase bank) and sign the pack of an **approved** episode → **202** pack summary with `status: "building"`. 404 unknown episode, 409 not approved or a build already running. Takes a few minutes; poll `/packs` |
+| GET | `/packs?district_id&grade` | teacher, reviewer, admin | `[{id, episode_id, status, error, size_bytes, title, grade, district_id, created_at}]`, newest first. Teachers see only `ready` packs; reviewers and admins also see `building` and `failed` (with `error`) |
+| GET | `/packs/{id}` | teacher, reviewer, admin | The `.sahpaathi` file (`application/octet-stream`). Supports `Range: bytes=a-b`, `a-` and `-n` (206 + `Content-Range`; 416 when outside the file) so a dropped 2G download resumes. 404 unless `ready` |
+
+Pack status: `building → ready`, or `building → failed` (with `error`; missing `TTS_API_KEY` or `PACK_SIGNING_KEY` on the server is the usual cause). A restart marks unfinished builds `failed`. The pack file is stored in the `packs` table (under 2 MB each), so it survives Render redeploys without extra storage; move it to R2 if packs outgrow Postgres.
 
 Episode status: `generating → in_review → approved | rejected`, or `generating → failed` (with `error`). A server restart marks unfinished generations `failed`. The database enforces these rules with check constraints, not just the API.
 
 ## Planned
 | Method | Path | Role | Purpose | Owner |
 |---|---|---|---|---|
-| POST | `/episodes/{id}/pack` | admin | Voice + build the signed `.sahpaathi` pack of an approved episode | M3 + M1 |
-| GET | `/packs?district_id&grade` · `/packs/{id}` | teacher | List / download packs (HTTP Range for resumable 2G downloads) | M1 |
 | POST | `/sync` | teacher | `{events: [{event_id, kind, at, ...}]}` from the player's outbox. Must be **idempotent by `event_id`**: a duplicate gets 2xx, never a 4xx for the whole batch, or the player's queue can never drain | M4 |
 | POST | `/ivr/calls/run` · `/ivr/webhook` | admin · provider | Absentee catch-up calls + DTMF 1/2/3 | M4 |
 | GET | `/dashboard` | admin | Usage, % "Most got it", catch-up completion | M4 |
