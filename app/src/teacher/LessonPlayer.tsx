@@ -1,5 +1,6 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import type { Episode, Line, Tap } from '../lib/types'
+import Attendance from '../attendance/Attendance'
 import LessonPrep from './LessonPrep'
 import { CHECKPOINT_TIMEOUT_SEC, advance, analogy, currentLine, start, tap, type Phase } from './player'
 import { recordTap } from '../sync/outbox'
@@ -228,6 +229,7 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
       {phase.kind === 'done' && (
         <section className="flex flex-1 flex-col gap-4">
           <p className="text-3xl font-semibold text-leaf">Lesson finished 🎉</p>
+          <Attendance episodeId={episode.id} onSaved={onTapRecorded} />
           <button className="min-h-20 rounded-2xl bg-white/15 text-2xl font-bold" onClick={() => setPhase(start(episode))}>
             ↺ Play again
           </button>

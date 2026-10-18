@@ -18,7 +18,26 @@ it('upgrades a version 1 database without losing queued taps', async () => {
   v1.close()
 
   const db = await getDB()
-  expect(db.version).toBe(2)
-  expect([...db.objectStoreNames].sort()).toEqual(['outbox', 'pack_files', 'packs'])
+  expect(db.version).toBe(3)
+  expect([...db.objectStoreNames].sort()).toEqual(['classroom', 'outbox', 'pack_files', 'packs'])
   expect((await db.getAll('outbox')).map((e) => e.event_id)).toEqual(['e1'])
+})
+
+it('upgrades a version 2 database, keeping the queue and adding the classroom store', async () => {
+  // A phone running the previous release: taps, packs and files, but no attendance setup yet.
+  const v2 = await openDB('sahpaathi', 2, {
+    upgrade: (d) => {
+      d.createObjectStore('outbox', { keyPath: 'event_id' }).createIndex('at', 'at')
+      d.createObjectStore('packs', { keyPath: 'id' })
+      d.createObjectStore('pack_files', { keyPath: 'id' })
+    },
+  })
+  await v2.add('outbox', { kind: 'tap', event_id: 'e2', episode_id: 'ep', segment_id: 's1', tap: 'some', auto: false, at: '2026-10-19T04:00:00.000Z' })
+  v2.close()
+
+  const db = await getDB()
+  expect(db.version).toBe(3)
+  expect([...db.objectStoreNames]).toContain('classroom')
+  expect((await db.getAll('outbox')).map((e) => e.event_id)).toEqual(['e2'])
+  expect(await db.get('classroom', 'current')).toBeUndefined()
 })

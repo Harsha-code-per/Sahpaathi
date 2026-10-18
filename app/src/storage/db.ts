@@ -14,8 +14,29 @@ export interface TapEvent {
   at: string
 }
 
-// Attendance events join this union when attendance lands.
-export type OutboxEvent = TapEvent
+/** One lesson's attendance (POST /sync contract): absent roll codes only, never names. One event per lesson play. */
+export interface AttendanceEvent {
+  kind: 'attendance'
+  event_id: string
+  classroom_id: string
+  episode_id: string
+  /** Roll numbers that missed the lesson; each gets one catch-up call. Empty means everyone was present. */
+  absent: string[]
+  /** ISO 8601, device clock. */
+  at: string
+}
+
+/** The opaque codes the sync API accepts for classrooms and rolls, so no names or phone numbers slip in. */
+export const isCode = (s: string) => /^[A-Za-z0-9-]{1,40}$/.test(s)
+
+export type OutboxEvent = TapEvent | AttendanceEvent
+
+/** The classroom this phone is set up for; one record under 'current'. */
+export interface ClassroomRecord {
+  id: 'current'
+  classroom_id: string
+  rolls: string[]
+}
 
 /** What the lesson list needs; kept apart from the audio so listing lessons stays cheap. */
 export interface StoredPack {
@@ -35,13 +56,14 @@ interface SahpaathiDB extends DBSchema {
   outbox: { key: string; value: OutboxEvent; indexes: { at: string } }
   packs: { key: string; value: StoredPack }
   pack_files: { key: string; value: StoredPackFiles }
+  classroom: { key: string; value: ClassroomRecord }
 }
 
 const DB_NAME = 'sahpaathi'
 let db: Promise<IDBPDatabase<SahpaathiDB>> | undefined
 
 export function getDB() {
-  db ??= openDB<SahpaathiDB>(DB_NAME, 2, {
+  db ??= openDB<SahpaathiDB>(DB_NAME, 3, {
     // Each version only adds stores, so phones upgrading from any older version keep their data.
     upgrade(d, oldVersion) {
       if (oldVersion < 1) d.createObjectStore('outbox', { keyPath: 'event_id' }).createIndex('at', 'at')
@@ -49,6 +71,7 @@ export function getDB() {
         d.createObjectStore('packs', { keyPath: 'id' })
         d.createObjectStore('pack_files', { keyPath: 'id' })
       }
+      if (oldVersion < 3) d.createObjectStore('classroom', { keyPath: 'id' })
     },
   })
   return db
