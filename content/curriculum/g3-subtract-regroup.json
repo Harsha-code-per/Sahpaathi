@@ -1,0 +1,9 @@
+{
+  "id": "subtract-regroup",
+  "grade": 3,
+  "subject": "numeracy",
+  "nipun_lo": "Grade 3 goal: solves simple addition and subtraction problems; this episode covers two-digit subtraction with regrouping",
+  "chapter": "NCERT Class 3 Mathematics: subtraction",
+  "notes": "Subtraction as taking away and as finding the difference. When the ones being taken away are more than the ones we have, open one ten into ten ones (regrouping), then subtract ones and then tens. Check the answer by adding it back. Short word problems from daily life with totals under 100.",
+  "duration_min": 15
+}

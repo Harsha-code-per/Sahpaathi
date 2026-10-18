@@ -1,0 +1,13 @@
+{
+  "id": "madurai-tamil",
+  "name": "Madurai",
+  "state": "Tamil Nadu",
+  "home_lang": "ta",
+  "school_lang": "ta",
+  "names": ["Kavin", "Meena", "Arun", "Divya", "Selvi", "Murugan"],
+  "crops": ["jasmine", "paddy", "banana", "coconut"],
+  "festivals": ["Pongal", "Chithirai festival", "Deepavali"],
+  "fauna": ["cow", "goat", "peacock", "crow"],
+  "props": ["pebbles", "tamarind seeds", "neem twigs", "slate and chalk", "fingers"],
+  "notes": "Rural multigrade Tamil-medium government school; Tamil at home and school."
+}

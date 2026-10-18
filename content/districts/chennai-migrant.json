@@ -1,0 +1,13 @@
+{
+  "id": "chennai-migrant",
+  "name": "Chennai",
+  "state": "Tamil Nadu",
+  "home_lang": "hi",
+  "school_lang": "ta",
+  "names": ["Pooja", "Raju", "Sunita", "Amit", "Kavya", "Arun", "Meena", "Kavin"],
+  "crops": ["banana", "coconut", "tomato", "rice", "idli"],
+  "festivals": ["Pongal", "Deepavali", "Chhath"],
+  "fauna": ["crow", "squirrel", "cow", "parrot"],
+  "props": ["pebbles", "tamarind seeds", "bottle caps", "slate and chalk", "fingers"],
+  "notes": "Children of migrant construction and factory workers from Bihar and Uttar Pradesh in a Tamil-medium government school. They speak Hindi at home and are new to Tamil."
+}
