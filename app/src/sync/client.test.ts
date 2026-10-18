@@ -44,7 +44,7 @@ describe('flushOutbox', () => {
   it('keeps events when no API URL is configured', async () => {
     await queue(2)
     const f = ok()
-    expect(await flushOutbox(undefined, f)).toMatchObject({ sent: 0, pending: 2, error: 'no API URL configured' })
+    expect(await flushOutbox('', f)).toMatchObject({ sent: 0, pending: 2, error: 'no API URL configured' }) // '' not undefined: undefined falls back to VITE_API_URL
     expect(f).not.toHaveBeenCalled()
   })
 
