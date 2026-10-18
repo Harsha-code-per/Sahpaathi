@@ -72,3 +72,18 @@ def test_cli_writes_pack_with_fake_voice(monkeypatch, tmp_path):
     out = tmp_path / "e.sahpaathi"
     assert build.main(["pack", str(SAMPLE), "-o", str(out), "--fake"]) == 0
     verify_pack(out, public)
+
+
+@needs_ffmpeg
+def test_cli_recap_and_qa(monkeypatch, tmp_path, capsys):
+    private, public = signing.generate_keypair()
+    monkeypatch.setattr(
+        build,
+        "VoiceSettings",
+        lambda: _Settings.model_construct(tts_api_key="", pack_signing_key=private),
+    )
+    out, recap = tmp_path / "e.sahpaathi", tmp_path / "recap.wav"
+    assert build.main(["pack", str(SAMPLE), "-o", str(out), "--recap", str(recap), "--fake"]) == 0
+    assert recap.stat().st_size > 0
+    assert build.main(["qa", str(out)]) == 0
+    assert "all checks passed" in capsys.readouterr().out
