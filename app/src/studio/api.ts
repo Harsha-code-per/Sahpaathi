@@ -2,7 +2,7 @@ import type { Episode } from '../lib/types'
 
 // Studio talks to the backend (docs/API.md). The token lives in sessionStorage: one login per tab.
 
-const BASE = `${String(import.meta.env.VITE_API_URL ?? '').replace(/\/+$/, '')}/api/v1`
+export const BASE = `${String(import.meta.env.VITE_API_URL ?? '').replace(/\/+$/, '')}/api/v1`
 const TOKEN_KEY = 'sahpaathi.studio.token'
 
 export type Status = 'generating' | 'failed' | 'in_review' | 'approved' | 'rejected'
@@ -60,7 +60,7 @@ export const session = {
   clear: () => sessionStorage.removeItem(TOKEN_KEY),
 }
 
-async function call<T>(path: string, init: RequestInit = {}): Promise<T> {
+export async function call<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = session.get()
   let res: Response
   try {
