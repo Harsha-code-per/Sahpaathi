@@ -5,7 +5,7 @@ import { parseEpisode } from './episode'
 // Checks a .sahpaathi pack before anything from it is stored or played (docs/EPISODE_SCHEMA.md, "Pack").
 //
 // Layout this verifier expects:
-//   manifest.json  { sha256: { <path>: <hex> }, signature: <base64 Ed25519>, audio?: { <line_id>: <path> } }
+//   manifest.json  { sha256: { <path>: <hex> }, signature: <base64 Ed25519> }  (any other keys are unsigned and ignored)
 //   episode.json   the Episode
 //   audio/*.opus   sketch.svg   ...
 // The signature covers the sha256 map, and the map covers every other file, so the episode is signed too.
@@ -129,22 +129,17 @@ export async function verifyPack(zip: Uint8Array, publicKeyB64: string | undefin
     throw e instanceof PackError ? e : new PackError(`The lesson in this pack is invalid (${(e as Error).message}).`)
   }
 
-  // 4. Audio: manifest.audio if given, else the audio/<line_id>.opus convention.
+  // 4. Audio comes only from signed paths audio/<line_id>.opus. manifest.audio is ignored: it sits outside the
+  //    signature, so trusting it would let anyone remap a line to a different (signed) clip.
   const lineIds = new Set(
     [...episode.segments.flatMap((s) => [...s.teach, ...s.easier, ...s.core, ...s.stretch]), ...episode.analogy, ...episode.ivr_recap].map((l) => l.id),
   )
-  const audioPaths: Record<string, unknown> = isObject(manifest.audio) ? manifest.audio : {}
-  if (!isObject(manifest.audio)) {
-    for (const p of paths) {
-      const m = /^audio\/(.+)\.opus$/.exec(p)
-      if (m) audioPaths[m[1]] = p
-    }
-  }
   const audio: VerifiedPack['audio'] = {}
-  for (const [id, path] of Object.entries(audioPaths)) {
+  for (const p of paths) {
+    const id = /^audio\/(.+)\.opus$/.exec(p)?.[1]
+    if (id === undefined) continue
     if (!lineIds.has(id)) throw new PackError(`The pack has audio for "${id}", which is not a line in this lesson.`)
-    if (typeof path !== 'string' || !files[path]) throw new PackError(`The audio for "${id}" is missing.`)
-    audio[id] = files[path]
+    audio[id] = files[p]
   }
   return { episode, audio }
 }
