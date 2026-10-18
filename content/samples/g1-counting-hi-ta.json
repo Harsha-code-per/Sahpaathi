@@ -9,7 +9,10 @@
   "school_lang": "ta",
   "district": "Chennai",
   "duration_min": 5,
-  "materials": ["5 pebbles per child", "slate"],
+  "materials": [
+    "5 pebbles per child",
+    "slate"
+  ],
   "chalk_sketch_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 40\"><circle cx=\"20\" cy=\"20\" r=\"12\"/><circle cx=\"60\" cy=\"20\" r=\"12\"/><circle cx=\"100\" cy=\"20\" r=\"12\"/></svg>",
   "segments": [
     {
@@ -17,32 +20,164 @@
       "title": "Count three pebbles",
       "activity": "pebble_task",
       "teach": [
-        { "id": "s1-t1", "speaker": "guide", "lang": "hi", "text": "नमस्ते बच्चो! तीन कंकड़ उठाओ।", "pause_after_sec": 5, "cue": "Children pick up 3 pebbles" },
-        { "id": "s1-t2", "speaker": "guide", "lang": "hi", "text": "एक, दो, तीन।", "pause_after_sec": 1 },
-        { "id": "s1-t3", "speaker": "guide", "lang": "ta", "text": "ஒன்று, இரண்டு, மூன்று. என்னுடன் சேர்ந்து சொல்லுங்கள்!", "pause_after_sec": 4, "cue": "Children repeat aloud" }
+        {
+          "id": "s1-t1",
+          "speaker": "guide",
+          "lang": "hi",
+          "text": "नमस्ते बच्चो! तीन कंकड़ उठाओ।",
+          "pause_after_sec": 5,
+          "cue": "Children pick up 3 pebbles"
+        },
+        {
+          "id": "s1-t2",
+          "speaker": "guide",
+          "lang": "hi",
+          "text": "एक, दो, तीन।",
+          "pause_after_sec": 1
+        },
+        {
+          "id": "s1-t3",
+          "speaker": "guide",
+          "lang": "ta",
+          "text": "ஒன்று, இரண்டு, மூன்று. என்னுடன் சேர்ந்து சொல்லுங்கள்!",
+          "pause_after_sec": 4,
+          "cue": "Children repeat aloud"
+        }
       ],
       "checkpoint": "Did most children hold up 3 pebbles?",
       "easier": [
-        { "id": "s1-e1", "speaker": "guide", "lang": "hi", "text": "चलो फिर से। एक... दो।", "pause_after_sec": 3 },
-        { "id": "s1-e2", "speaker": "guide", "lang": "ta", "text": "ஒன்று... இரண்டு.", "pause_after_sec": 3 }
+        {
+          "id": "s1-e1",
+          "speaker": "guide",
+          "lang": "hi",
+          "text": "चलो फिर से। एक... दो।",
+          "pause_after_sec": 3
+        },
+        {
+          "id": "s1-e2",
+          "speaker": "guide",
+          "lang": "ta",
+          "text": "ஒன்று... இரண்டு.",
+          "pause_after_sec": 3
+        }
       ],
       "core": [
-        { "id": "s1-c1", "speaker": "guide", "lang": "ta", "text": "மீண்டும்: ஒன்று, இரண்டு, மூன்று!", "pause_after_sec": 4 }
+        {
+          "id": "s1-c1",
+          "speaker": "guide",
+          "lang": "ta",
+          "text": "மீண்டும்: ஒன்று, இரண்டு, மூன்று!",
+          "pause_after_sec": 4
+        }
       ],
       "stretch": [
-        { "id": "s1-x1", "speaker": "guide", "lang": "ta", "text": "இன்னும் இரண்டு கற்களை எடுங்கள். ஒன்று, இரண்டு, மூன்று, நான்கு, ஐந்து!", "pause_after_sec": 6, "cue": "Children add 2 pebbles" }
+        {
+          "id": "s1-x1",
+          "speaker": "guide",
+          "lang": "ta",
+          "text": "இன்னும் இரண்டு கற்களை எடுங்கள். ஒன்று, இரண்டு, மூன்று, நான்கு, ஐந்து!",
+          "pause_after_sec": 6,
+          "cue": "Children add 2 pebbles"
+        }
       ],
       "math_checks": [
-        { "expr": "1 + 1 + 1", "answer": 3 },
-        { "expr": "3 + 2", "answer": 5 }
+        {
+          "expr": "1 + 1 + 1",
+          "answer": 3
+        },
+        {
+          "expr": "3 + 2",
+          "answer": 5
+        }
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "நான்கு, ஐந்து",
+      "activity": "call_response",
+      "teach": [
+        {
+          "id": "s2-t1",
+          "speaker": "guide",
+          "lang": "hi",
+          "text": "चार, पाँच।",
+          "pause_after_sec": 2
+        },
+        {
+          "id": "s2-t2",
+          "speaker": "guide",
+          "lang": "ta",
+          "text": "இப்போது தமிழில்: நான்கு, ஐந்து. என்னுடன் சொல்லுங்கள்!",
+          "pause_after_sec": 4,
+          "cue": "குழந்தைகள் சேர்ந்து சொல்கிறார்கள்"
+        },
+        {
+          "id": "s2-t3",
+          "speaker": "song",
+          "lang": "ta",
+          "text": "ஒன்று, இரண்டு, மூன்று, நான்கு, ஐந்து!",
+          "pause_after_sec": 5
+        }
+      ],
+      "checkpoint": "பெரும்பாலான குழந்தைகள் ஐந்து வரை தமிழில் எண்ணுகிறார்களா?",
+      "easier": [
+        {
+          "id": "s2-e1",
+          "speaker": "guide",
+          "lang": "ta",
+          "text": "மெதுவாக: நான்கு... ஐந்து.",
+          "pause_after_sec": 3
+        }
+      ],
+      "core": [
+        {
+          "id": "s2-c1",
+          "speaker": "guide",
+          "lang": "ta",
+          "text": "மீண்டும் ஐந்து வரை எண்ணுங்கள்!",
+          "pause_after_sec": 6
+        }
+      ],
+      "stretch": [
+        {
+          "id": "s2-x1",
+          "speaker": "guide",
+          "lang": "ta",
+          "text": "ஐந்து கற்களில் ஒன்றை எடுங்கள். எத்தனை? நான்கு!",
+          "pause_after_sec": 6
+        }
+      ],
+      "math_checks": [
+        {
+          "expr": "5 - 1",
+          "answer": 4
+        }
       ]
     }
   ],
   "analogy": [
-    { "id": "a1", "speaker": "guide", "lang": "hi", "text": "अम्मा तीन रोटी बनाती है: एक, दो, तीन।", "pause_after_sec": 2 }
+    {
+      "id": "a1",
+      "speaker": "guide",
+      "lang": "hi",
+      "text": "अम्मा तीन रोटी बनाती है: एक, दो, तीन।",
+      "pause_after_sec": 2
+    }
   ],
   "ivr_recap": [
-    { "id": "r1", "speaker": "guide", "lang": "hi", "text": "आज हमने तीन तक गिनना सीखा। एक, दो, तीन।", "pause_after_sec": 2 },
-    { "id": "r2", "speaker": "guide", "lang": "ta", "text": "ஒன்று, இரண்டு, மூன்று.", "pause_after_sec": 2 }
+    {
+      "id": "r1",
+      "speaker": "guide",
+      "lang": "hi",
+      "text": "आज हमने तीन तक गिनना सीखा। एक, दो, तीन।",
+      "pause_after_sec": 2
+    },
+    {
+      "id": "r2",
+      "speaker": "guide",
+      "lang": "ta",
+      "text": "ஒன்று, இரண்டு, மூன்று.",
+      "pause_after_sec": 2
+    }
   ]
 }
