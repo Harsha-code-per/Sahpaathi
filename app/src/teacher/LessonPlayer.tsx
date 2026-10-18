@@ -3,33 +3,44 @@ import type { Episode, Line, Tap } from '../lib/types'
 import LessonPrep from './LessonPrep'
 import { CHECKPOINT_TIMEOUT_SEC, advance, analogy, currentLine, start, tap, type Phase } from './player'
 import { recordTap } from '../sync/outbox'
+import { useChoralHint } from '../sensing/useChoralHint'
 
 /** Seconds a line stays on screen when it has no audio yet. */
 function estimateSec(line: Line) {
   return Math.max(2, line.text.length * 0.07)
 }
 
-/** Plays one line (audio, else timed text), waits its pause, then calls onDone once. Returns a cancel function. */
-function playLine(line: Line, url: string | undefined, onDone: () => void) {
+/**
+ * Plays one line (audio, else timed text), waits its pause, then calls onDone once. Returns a cancel function.
+ * `onPause(true/false)` brackets the silent pause after real audio, when children answer (the choral mic listens then).
+ */
+function playLine(line: Line, url: string | undefined, onDone: () => void, onPause: (on: boolean) => void) {
   let timer: number | undefined
   let finished = false
   const wait = (sec: number) => {
     if (finished) return
     finished = true
-    timer = window.setTimeout(onDone, (sec + line.pause_after_sec) * 1000)
+    timer = window.setTimeout(() => {
+      onPause(false)
+      onDone()
+    }, (sec + line.pause_after_sec) * 1000)
   }
   if (!url) {
     wait(estimateSec(line))
     return () => clearTimeout(timer)
   }
   const el = new Audio(url)
-  el.onended = () => wait(0)
+  el.onended = () => {
+    if (line.pause_after_sec > 0) onPause(true)
+    wait(0)
+  }
   el.onerror = () => wait(estimateSec(line))
   el.play().catch(() => wait(estimateSec(line)))
   return () => {
     el.onended = el.onerror = null
     el.pause()
     clearTimeout(timer)
+    onPause(false)
   }
 }
 
@@ -42,7 +53,16 @@ const TAPS: { tap: Tap; label: string; colour: string }[] = [
 const PART_LABEL = { teach: 'Teach', easier: 'Easier', core: 'Core', stretch: 'Stretch' }
 
 /** Three big tap buttons; mounted fresh per segment so the 10 s countdown restarts. Answers at most once. */
-function Checkpoint({ question, onTap }: { question: string; onTap: (t: Tap, auto: boolean) => void }) {
+function Checkpoint({
+  question,
+  suggested,
+  onTap,
+}: {
+  question: string
+  /** What the choral mic heard: a hint only, the teacher decides. */
+  suggested: Tap | null
+  onTap: (t: Tap, auto: boolean) => void
+}) {
   const [secondsLeft, setSecondsLeft] = useState(CHECKPOINT_TIMEOUT_SEC)
   const answered = useRef(false)
   const answer = (t: Tap, auto: boolean) => {
@@ -66,8 +86,13 @@ function Checkpoint({ question, onTap }: { question: string; onTap: (t: Tap, aut
   return (
     <section className="flex flex-1 flex-col gap-4">
       <p className="text-3xl font-semibold">{question}</p>
+      {suggested && <p className="text-lg text-sun">🎤 The speaker heard: {TAPS.find((t) => t.tap === suggested)?.label}</p>}
       {TAPS.map((t) => (
-        <button key={t.tap} className={`min-h-20 rounded-2xl text-2xl font-bold ${t.colour}`} onClick={() => answer(t.tap, false)}>
+        <button
+          key={t.tap}
+          className={`min-h-20 rounded-2xl text-2xl font-bold ${t.colour} ${t.tap === suggested ? 'ring-4 ring-white' : ''}`}
+          onClick={() => answer(t.tap, false)}
+        >
           {t.label}
         </button>
       ))}
@@ -90,11 +115,23 @@ interface LessonPlayerProps {
 export default function LessonPlayer({ episode, audio, pending, onTapRecorded, onExit }: LessonPlayerProps) {
   const [phase, setPhase] = useState<Phase>({ kind: 'idle' })
   const line = currentLine(episode, phase)
+  const choral = useChoralHint()
+  const { startAnswer, stopAnswer, takeHint } = choral
+  const [suggested, setSuggested] = useState<Tap | null>(null)
 
   useEffect(() => {
     if (!line) return
-    return playLine(line, audio[line.id], () => setPhase((p) => advance(episode, p)))
-  }, [line, audio, episode])
+    const onPause = (on: boolean) => (on ? startAnswer() : stopAnswer())
+    return playLine(line, audio[line.id], () => setPhase((p) => advance(episode, p)), onPause)
+  }, [line, audio, episode, startAnswer, stopAnswer])
+
+  // Ask the mic once per checkpoint; the suggestion is cleared as soon as the lesson moves on.
+  const checkpointSeg = phase.kind === 'checkpoint' ? phase.seg : null
+  useEffect(() => {
+    // Reading the mic buffer consumes it, so this must run once per checkpoint, not during render.
+    // oxlint-disable-next-line react/set-state-in-effect
+    setSuggested(checkpointSeg === null ? null : takeHint())
+  }, [checkpointSeg, takeHint])
 
   const onTap = (segmentId: string, t: Tap, auto: boolean) => {
     setPhase((p) => tap(episode, p, t))
@@ -126,6 +163,16 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
 
       {phase.kind === 'idle' && <LessonPrep episode={episode} onStart={() => setPhase(start(episode))} />}
 
+      {phase.kind === 'idle' && (
+        <button
+          className="min-h-14 rounded-2xl border-2 border-white/40 text-xl font-semibold disabled:opacity-60"
+          disabled={choral.state === 'starting' || choral.state === 'on'}
+          onClick={choral.enable}
+        >
+          {{ off: '🎤 Let the speaker listen (optional)', starting: '🎤 Listening to the room…', on: '🎤 Listening: on ✓', denied: '🎤 Mic blocked. Tap to try again' }[choral.state]}
+        </button>
+      )}
+
       {(phase.kind === 'line' || phase.kind === 'analogy') && line && (
         <section className="flex flex-1 flex-col gap-4">
           <span className="w-fit rounded-full bg-white/15 px-3 py-1 text-sm">
@@ -142,6 +189,7 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
         <Checkpoint
           key={phase.seg}
           question={segment.checkpoint}
+          suggested={suggested}
           onTap={(t, auto) => onTap(segment.id, t, auto)}
         />
       )}
