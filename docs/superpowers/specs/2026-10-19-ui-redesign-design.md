@@ -22,9 +22,9 @@ The app is what teachers and judges see first. It should look polished and consi
 - **Motion:** 200 ms ease-out; all of it off under `prefers-reduced-motion`.
 
 ## Components and structure
-- **shadcn on Base UI** (`shadcn init --base base`), components copied into `app/src/components/ui/`: button, badge, card, tabs, dialog, input, select, tooltip, sonner (toasts). Utility deps: `@base-ui/react`, `class-variance-authority`, `clsx`, `tailwind-merge`, `lucide-react`.
+- **shadcn on Base UI** (`shadcn init --base base`), components copied into `app/src/components/ui/`: button, badge, card, tabs, dialog, input, select, tooltip, sonner (toasts). Utility deps: `@base-ui/react`, `class-variance-authority`, `cn` (shadcn's current class merger, replacing `clsx` + `tailwind-merge`), `lucide-react`, `tw-animate-css`. Each component is added with `npx shadcn add` when a screen first needs it. Buttons are at least 44 px (`h-11`); `lg` is 56 px.
 - **Theme:** shadcn's CSS variables (`--background`, `--foreground`, `--card`, `--primary`, `--muted`, `--border`, `--ring`, …) set once per theme: `.theme-board` (dark) and `.theme-paper`. Extra tokens: `--most`, `--some`, `--few`. Defined in `app/src/index.css`.
-- **Fonts:** `@fontsource-variable/*` packages for the six families. Each ships per-script `unicode-range` files, so a browser only downloads a script when it appears. The service worker precaches the latin, latin-ext, devanagari, tamil, oriya and ol-chiki files (not cyrillic, greek or vietnamese), so every script works offline after the first visit.
+- **Fonts:** `@fontsource-variable/*` packages for the six families. Each ships per-script `unicode-range` files, so a browser only downloads a script when it appears. The service worker precaches Latin for Figtree and Bricolage and the one script file of each Noto family (about 370 KB, fetched in the background after the first visit), so every script works offline.
 - **`AppShell`** (`app/src/components/AppShell.tsx`): sidebar plus content. The logo button doubles as the collapse toggle (the mark swaps to a sidebar icon on hover and focus, Gemini style). Collapsed: a 76 px icon rail. Below 768 px the sidebar becomes a top bar with a menu sheet. The choice is remembered in `localStorage` (wrapped in try/catch). Used by the Studio and Admin.
 - **Logo** (`app/src/components/Logo.tsx` and `app/public/`): mark A, a speaker with two sound waves.
   - `logo.svg`: the marigold tile (app icon source).
@@ -48,8 +48,8 @@ The app is what teachers and judges see first. It should look polished and consi
 ## Build plan
 | Phase | Branch / PR | Contents | Reviewer | When |
 |---|---|---|---|---|
-| 1 | `feat/ui-foundation` | This spec; deps; shadcn init (base); theme tokens; fonts and precaching; `Logo`, `AppShell`; logo, favicon and app icons; manifest update. No screen changes except fonts (fixes the boxes) and icons | Sanjjith | now |
+| 1 | `feat/ui-foundation` | This spec; deps; shadcn init (base); theme tokens; fonts and precaching; logo, favicon and app icons; manifest. No screen changes except fonts (fixes the boxes) and icons | Sanjjith | now |
 | 2 | `feat/ui-teacher` | Library, player, attendance, lesson prep restyled | Sanjjith | after 22 Oct |
-| 3 | `feat/ui-studio` | Studio in `AppShell` | Harsha | after phase 1 |
+| 3 | `feat/ui-studio` | `Logo`, `AppShell` (they land with their first user) and the Studio in it | Harsha | after phase 1 |
 | 4 | `feat/ui-admin` | Admin in `AppShell`, charts, Kanban | Cholan / Loktrishal | after phase 3 |
 | 5 | `feat/ui-landing` | Landing page at `/` | Harsha | last, before freeze (29 Oct) |
