@@ -67,9 +67,11 @@ npm run dev
 Nothing above runs in the classroom. The teacher player works with **zero connectivity** once a weekly pack is on the phone.
 
 ## Deploy (free tiers)
+Live: app **https://sahpaathi.vercel.app** (teacher player at `/teacher`, `/studio`, `/admin`), API **https://sahpaathi-api.onrender.com**.
+
 - **Database: Neon.** Create a project and copy its `postgresql://...` connection string.
 - **Backend: Render.** New → Blueprint → this repo (`render.yaml`). Paste `DATABASE_URL`, `ANTHROPIC_API_KEY`, `DEMO_PASSWORD`, `CORS_ORIGINS` (the app's URL as a JSON list), `TTS_API_KEY`, `PACK_SIGNING_KEY`. `JWT_SECRET` is generated. Each start runs migrations and refreshes the demo accounts.
-- **App: Vercel.** Import the repo with root directory `app/`, and set `VITE_API_URL` (the Render URL) and `VITE_PACK_PUBLIC_KEY`. `app/vercel.json` serves `index.html` for `/studio` and `/admin`. Then put the Vercel URL in Render's `CORS_ORIGINS`, e.g. `["https://sahpaathi.vercel.app"]`; without it the browser blocks every API call, including the player's sync.
+- **App: Vercel.** Import the repo with root directory `app/`, and set `VITE_API_URL` (the Render URL) and `VITE_PACK_PUBLIC_KEY`. `app/vercel.json` serves `index.html` for `/studio` and `/admin`. From a laptop instead of a Git import: `npx vercel deploy --prod` at the repo root; `.vercelignore` uploads only `app/` and `content/`. Then put the Vercel URL in Render's `CORS_ORIGINS`, e.g. `["https://sahpaathi.vercel.app"]`; without it the browser blocks every API call, including the player's sync.
 - **One signing key for the team.** `PACK_SIGNING_KEY` (private) lives only in Render and in the `backend/.env` of whoever builds packs locally; `VITE_PACK_PUBLIC_KEY` is its public half. A pack signed with any other key is refused by the app.
 
 ## Test credentials and sample inputs

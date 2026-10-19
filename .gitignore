@@ -33,3 +33,6 @@ pgdata/
 .vscode/*
 !.vscode/extensions.json
 *.swp
+
+# Vercel CLI link (local only)
+/.vercel
