@@ -12,9 +12,25 @@ concurrency:
 jobs:
   backend:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: sahpaathi_test
+          POSTGRES_PASSWORD: sahpaathi_test_pw
+          POSTGRES_DB: sahpaathi_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     defaults:
       run:
         working-directory: backend
+    env:
+      DATABASE_URL: postgresql+psycopg://sahpaathi_test:sahpaathi_test_pw@localhost:5432/sahpaathi_test
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -25,5 +41,7 @@ jobs:
       - run: pip install -r requirements-dev.txt
       - name: Lint
         run: ruff check . && ruff format --check .
+      - name: Migrate
+        run: alembic upgrade head
       - name: Tests
         run: pytest -q

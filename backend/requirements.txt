@@ -8,3 +8,5 @@ alembic==1.20.0
 python-multipart==0.0.32
 anthropic==1.15.0      # factory (M1)
 cryptography==50.0.2   # pack signing, Ed25519 (M3)
+pyjwt==2.15.1          # JWT issuance and verification (M4)
+pwdlib[argon2]==0.3.1  # password hashing (M4)
