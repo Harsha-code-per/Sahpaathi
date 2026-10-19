@@ -2,7 +2,7 @@ import { CheckCircle2Icon, ClipboardListIcon, LogOutIcon, PlusIcon, SearchIcon }
 import { useCallback, useEffect, useState, type SubmitEvent } from 'react'
 import { cn } from 'cn'
 import { AppShell, type SidebarApi } from '@/components/AppShell'
-import { LogoMark } from '@/components/Logo'
+import { LoginCard } from '@/components/LoginCard'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { api, ApiError, session, type Catalog, type Status, type Summary } from './api'
@@ -14,59 +14,6 @@ const POLL_MS = 5000
 
 const field =
   'h-11 w-full rounded-xl border border-input bg-card px-3 text-base text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40'
-
-function Login({ onIn }: { onIn: () => void }) {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const [busy, setBusy] = useState(false)
-
-  async function submit(e: SubmitEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setBusy(true)
-    setError('')
-    try {
-      const res = await api.login(email, password)
-      if (res.role === 'teacher') throw new ApiError('Teacher accounts use the lesson player, not the Studio.', 403)
-      session.set(res.token)
-      onIn()
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not log in.')
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  return (
-    <main className="grid min-h-dvh place-items-center bg-background p-4">
-      <form onSubmit={submit} className="w-full max-w-sm space-y-5 rounded-3xl border border-border bg-card p-7 shadow-sm">
-        <div className="space-y-3">
-          <span className="grid size-12 place-items-center rounded-xl bg-primary text-primary-foreground">
-            <LogoMark className="size-7" />
-          </span>
-          <h1 className="font-heading text-2xl font-bold">Sahpaathi Studio</h1>
-          <p className="text-muted-foreground">Review the lessons Claude writes before they reach a classroom.</p>
-        </div>
-        <label className="block space-y-1.5">
-          <span className="text-sm font-semibold">Email</span>
-          <input className={field} type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} />
-        </label>
-        <label className="block space-y-1.5">
-          <span className="text-sm font-semibold">Password</span>
-          <input className={field} type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
-        </label>
-        {error && (
-          <p role="alert" className="rounded-xl bg-bad px-3 py-2 text-bad-foreground">
-            {error}
-          </p>
-        )}
-        <Button type="submit" className="w-full" disabled={busy}>
-          {busy ? 'Logging in…' : 'Log in'}
-        </Button>
-      </form>
-    </main>
-  )
-}
 
 function NewEpisode({ catalog, onStarted }: { catalog: Catalog; onStarted: (s: Summary) => void }) {
   const [lesson, setLesson] = useState(catalog.lessons[0]?.id ?? '')
@@ -201,7 +148,19 @@ export default function Studio() {
     return () => clearInterval(id)
   }, [writing, refresh])
 
-  if (!signedIn) return <Login onIn={() => setSignedIn(true)} />
+  if (!signedIn)
+    return (
+      <LoginCard
+        product="Studio"
+        blurb="Review the lessons Claude writes before they reach a classroom."
+        login={async (email, password) => {
+          const res = await api.login(email, password)
+          if (res.role === 'teacher') throw new ApiError('Teacher accounts use the lesson player, not the Studio.', 403)
+          session.set(res.token)
+          setSignedIn(true)
+        }}
+      />
+    )
 
   const current = items.find((e) => e.id === selected)
   const q = query.trim().toLowerCase()

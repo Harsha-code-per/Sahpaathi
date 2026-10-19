@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest'
 import type { Summary } from '../studio/api'
 import type { PackSummary } from './api'
-import { anyBuilding, callableEpisodes, dayBars, endMessage, formatSize, KEYPAD, packFilename, packRows, pct } from './view'
+import { anyBuilding, callableEpisodes, dayBars, endMessage, formatSize, KEYPAD, packFilename, packRows, pct, pipeline } from './view'
 
 const ep = (id: number, status: Summary['status']): Summary => ({
   id, lesson_id: 'l', district_id: 'd', status, title: `Episode ${id}`, passed: true, scores: null, error: null,
@@ -72,4 +72,16 @@ test('the end of a call says what the family answered', () => {
   expect(endMessage('completed', 'help')).toMatch(/follow up/)
   expect(endMessage('completed', 'understood')).toMatch(/understood/)
   expect(endMessage('no_response', null)).toMatch(/without an answer/)
+})
+
+test('pipeline puts each lesson in one column, from writing to classroom use', () => {
+  const usage = { episode_id: 'ep-5', taps: 4, most: 3, some: 1, few: 0, pct_most: 75, pct_some: 25, pct_few: 0, auto_fallbacks: 0 }
+  const cols = pipeline(
+    [ep(1, 'generating'), ep(2, 'failed'), ep(3, 'in_review'), ep(4, 'approved'), ep(5, 'approved'), ep(6, 'approved'), ep(7, 'rejected')],
+    [pack(10, 5, 'ready'), pack(11, 6, 'ready'), pack(12, 4, 'building')],
+    [usage],
+  )
+  const ids = Object.fromEntries(cols.map((c) => [c.key, c.cards.map((x) => x.episode.id)]))
+  expect(ids).toEqual({ writing: [2, 1], review: [3], approved: [4], packed: [6], used: [5] })
+  expect(cols.find((c) => c.key === 'used')!.cards[0].usage).toBe(usage)
 })

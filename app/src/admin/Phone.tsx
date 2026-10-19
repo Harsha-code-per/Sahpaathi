@@ -108,7 +108,7 @@ export default function Phone({ call, onClose, onSignedOut }: { call: CallSummar
   }, [phase, send])
 
   return (
-    <section className="mx-auto w-full max-w-xs space-y-3 rounded-3xl bg-ink p-5 text-white shadow-lg" aria-label="Keypad phone">
+    <section className="mx-auto w-full max-w-xs space-y-3 rounded-3xl bg-sidebar p-5 text-sidebar-foreground shadow-lg" aria-label="Keypad phone">
       <div className="text-center">
         <p className="text-sm opacity-70">Calling the family of</p>
         <p className="text-xl font-bold">
@@ -117,28 +117,28 @@ export default function Phone({ call, onClose, onSignedOut }: { call: CallSummar
       </div>
       <p className="min-h-12 text-center text-sm" aria-live="polite">
         {phase === 'ended' && step ? endMessage(step.status, step.outcome) : HINT[phase]}
-        {phase === 'waiting' && <span className="block text-sun">{secondsLeft} s</span>}
+        {phase === 'waiting' && <span className="block text-sidebar-primary">{secondsLeft} s</span>}
       </p>
-      {error && <p role="alert" className="rounded-lg bg-clay/20 p-2 text-sm">{error}</p>}
+      {error && <p role="alert" className="rounded-lg bg-bad p-2 text-bad-foreground text-sm">{error}</p>}
       <div className="grid grid-cols-3 gap-2">
         {KEYPAD.flat().map((key) => (
           <button
             key={key}
             disabled={phase !== 'waiting'}
             onClick={() => send(key)}
-            className="min-h-14 rounded-xl bg-white/15 text-2xl font-bold hover:bg-white/25 disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-sun focus-visible:outline-none"
+            className="min-h-14 rounded-xl bg-white/15 text-2xl font-bold hover:bg-white/25 disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none"
           >
             {key}
           </button>
         ))}
       </div>
       {phase === 'idle' && (
-        <button onClick={dial} className="min-h-14 w-full rounded-xl bg-leaf text-lg font-bold focus-visible:ring-2 focus-visible:ring-sun focus-visible:outline-none">
+        <button onClick={dial} className="min-h-14 w-full rounded-xl bg-most text-[#0d2420] text-lg font-bold focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none">
           Dial
         </button>
       )}
       {(phase === 'ended' || phase === 'idle') && (
-        <button onClick={onClose} className="min-h-12 w-full rounded-xl border border-white/30 font-semibold hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-sun focus-visible:outline-none">
+        <button onClick={onClose} className="min-h-12 w-full rounded-xl border border-white/30 font-semibold hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none">
           {phase === 'ended' ? 'Hang up' : 'Cancel'}
         </button>
       )}

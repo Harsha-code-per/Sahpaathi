@@ -3,9 +3,9 @@ import { adminApi, ApiError, type CallSummary, type PackSummary } from './api'
 import Phone from './Phone'
 import { callableEpisodes, CALL_STATUS, OUTCOME } from './view'
 
-const card = 'rounded-2xl bg-white p-4 shadow-sm'
-const field = 'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-ink focus:border-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/30'
-const primary = 'rounded-lg bg-ink px-4 py-2 font-semibold text-white hover:bg-ink/90 disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-sun focus-visible:outline-none'
+const card = 'rounded-2xl border border-border bg-card p-5'
+const field = 'h-11 w-full rounded-xl border border-input bg-card px-3 text-base text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40'
+const primary = 'inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-4 font-semibold text-primary-foreground outline-none hover:bg-primary/85 focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50'
 
 export default function Calls({ onSignedOut }: { onSignedOut: () => void }) {
   const [calls, setCalls] = useState<CallSummary[]>([])
@@ -59,7 +59,7 @@ export default function Calls({ onSignedOut }: { onSignedOut: () => void }) {
     <>
       <section className={`${card} space-y-3`} aria-labelledby="absent">
         <h2 id="absent" className="font-semibold">Mark a child absent</h2>
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-muted-foreground">
           The teacher's phone sends this by itself when attendance is taken. Use it here to try a call. Give a roll number only, never a name or a phone number.
         </p>
         <form onSubmit={mark} className="grid gap-3 sm:grid-cols-[1fr_8rem_2fr_auto] sm:items-end">
@@ -82,11 +82,11 @@ export default function Calls({ onSignedOut }: { onSignedOut: () => void }) {
           <button className={primary} disabled={busy || !chosen}>Queue call</button>
         </form>
         {loaded && episodes.length === 0 && (
-          <p className="text-sm text-slate-500">No episode has a ready pack yet. Build one on the Packs tab first; its recap is what the family hears.</p>
+          <p className="text-sm text-muted-foreground">No episode has a ready pack yet. Build one on the Packs tab first; its recap is what the family hears.</p>
         )}
       </section>
 
-      {error && <p role="alert" className={`${card} text-clay`}>{error}</p>}
+      {error && <p role="alert" className={`${card} text-bad-foreground`}>{error}</p>}
 
       {active && (
         <Phone
@@ -103,16 +103,16 @@ export default function Calls({ onSignedOut }: { onSignedOut: () => void }) {
       <section className={card} aria-labelledby="calls">
         <h2 id="calls" className="mb-3 font-semibold">Catch-up calls</h2>
         {!loaded ? (
-          <p className="text-slate-500">Loading…</p>
+          <p className="text-muted-foreground">Loading…</p>
         ) : calls.length === 0 ? (
-          <p className="text-slate-500">No calls yet. A call is queued for every child marked absent.</p>
+          <p className="text-muted-foreground">No calls yet. A call is queued for every child marked absent.</p>
         ) : (
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-border">
             {calls.map((c) => (
               <li key={c.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
                 <div className="min-w-0">
-                  <p className="font-medium">Roll {c.student_ref} <span className="font-normal text-slate-500">({c.classroom_id})</span></p>
-                  <p className="text-sm text-slate-500">{c.episode_slug}</p>
+                  <p className="font-medium">Roll {c.student_ref} <span className="font-normal text-muted-foreground">({c.classroom_id})</span></p>
+                  <p className="text-sm text-muted-foreground">{c.episode_slug}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${CALL_STATUS[c.status].tone}`}>{CALL_STATUS[c.status].label}</span>
