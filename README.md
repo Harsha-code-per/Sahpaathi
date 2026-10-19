@@ -75,7 +75,20 @@ Live: app **https://sahpaathi.vercel.app** (teacher player at `/teacher`, `/stud
 - **One signing key for the team.** `PACK_SIGNING_KEY` (private) lives only in Render and in the `backend/.env` of whoever builds packs locally; `VITE_PACK_PUBLIC_KEY` is its public half. A pack signed with any other key is refused by the app.
 
 ## Test credentials and sample inputs
-Added before submission (see [docs/SUBMISSION.md](docs/SUBMISSION.md)).
+Live app: **https://sahpaathi.vercel.app**. All three accounts share one password: **[DEMO_PASSWORD, given to evaluators]**.
+
+| Role | Email | Where to start | Try this |
+|---|---|---|---|
+| Teacher | `teacher@sahpaathi.test` | [/teacher](https://sahpaathi.vercel.app/teacher) | No login needed to play the built-in lesson, even in airplane mode: tap a checkpoint, let the 10 s fallback play, take attendance. Sign in under **Get new lessons** to download a voiced Tamil lesson. Switch the language at the top (English, தமிழ், हिन्दी, ଓଡ଼ିଆ) |
+| Reviewer | `reviewer@sahpaathi.test` | [/studio](https://sahpaathi.vercel.app/studio) | Open a lesson, read each line beside its English back-translation and the AI review, correct a line with the pencil, then approve or reject |
+| Admin | `admin@sahpaathi.test` | [/admin](https://sahpaathi.vercel.app/admin) | Overview charts and the lesson pipeline; **Lesson packs** to build and download a signed pack; **Catch-up calls** to queue a call for an absent roll number and press 1, 2 or 3 on the keypad simulator |
+
+**Sample inputs for the Studio's "Write a new lesson"** (about five minutes each; Claude writes, a second model reviews):
+1. Grade 1 · NCERT numbers 1 to 20 · **Chennai: Hindi to Tamil** (a migrant child's home language bridged to the Tamil-medium school)
+2. Grade 1 · NCERT addition (putting together) · **Madurai: Tamil**
+3. Grade 2 · NCERT tens and ones · **Mayurbhanj: Santali to Odia** (Santali lines are limited to the recorded phrase bank)
+4. Grade 3 · NCERT subtraction with regrouping · Chennai: Hindi to Tamil
+5. Grade 3 · NCERT multiplication as equal groups · Madurai: Tamil
 
 ## License
 [MIT](LICENSE). Open source so state programmes and NGOs can adapt it.
