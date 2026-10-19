@@ -94,6 +94,8 @@ export const adminApi = {
   queueCall: (classroom_id: string, student_ref: string, episode_slug: string) =>
     call<CallSummary>('/ivr/calls', { method: 'POST', body: JSON.stringify({ classroom_id, student_ref, episode_slug }) }),
   startCall: (id: number) => call<CallStep>(`/ivr/calls/${id}/start`, { method: 'POST' }),
+  /** Rings a real phone through Exotel. The number is used once by the server and not stored. */
+  dial: (id: number, phone: string) => call<CallSummary>(`/ivr/calls/${id}/dial`, { method: 'POST', body: JSON.stringify({ phone }) }),
   /** `digit` is "0" to "9", "*" or "#"; null means nothing was pressed in time. */
   press: (id: number, digit: string | null) =>
     call<CallStep>(`/ivr/calls/${id}/press`, { method: 'POST', body: JSON.stringify({ digit }) }),

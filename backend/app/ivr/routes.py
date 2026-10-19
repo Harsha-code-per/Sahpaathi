@@ -128,8 +128,9 @@ def queue_call(body: CallIn, _: Admin, db: DB) -> CallOut:
     return _out(call)
 
 
-@router.post("/calls/{call_id}/start")
-def start_call(call_id: int, _: Admin, db: DB) -> StepOut:
+def begin(db: Session, call_id: int) -> tuple[CatchupCall, flow.Step]:
+    """Moves a queued call to in progress on its newest ready pack; the simulator and Exotel both
+    start calls here."""
     call = _get(db, call_id)
     if call.status != "queued":
         raise HTTPException(status.HTTP_409_CONFLICT, f"This call is {call.status}, not queued.")
@@ -143,7 +144,12 @@ def start_call(call_id: int, _: Admin, db: DB) -> StepOut:
     call.status, call.pack_id = "in_progress", pack.id
     call.plays, call.missed = progress.plays, progress.missed
     db.commit()
-    return _step(call, step)
+    return call, step
+
+
+@router.post("/calls/{call_id}/start")
+def start_call(call_id: int, _: Admin, db: DB) -> StepOut:
+    return _step(*begin(db, call_id))
 
 
 @router.post("/calls/{call_id}/press")

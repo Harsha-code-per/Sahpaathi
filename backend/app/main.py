@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app import auth, dashboard, episodes, packs, sync
 from app.config import settings
 from app.db import SessionLocal
+from app.ivr import exotel
 from app.ivr import routes as ivr
 
 
@@ -33,6 +34,7 @@ app.include_router(packs.router)
 app.include_router(sync.router)
 app.include_router(dashboard.router)
 app.include_router(ivr.router)
+app.include_router(exotel.router)
 
 
 @app.get("/health")
