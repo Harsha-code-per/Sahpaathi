@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { isCode, type ClassroomRecord } from '../storage/db'
 import { recordAttendance } from '../sync/outbox'
 import { getClassroom, parseRolls, rollsAsText, saveClassroom } from './classroom'
+import { useT } from '../teacher/i18n'
 
 /**
  * Post-lesson attendance: tap the roll numbers who were absent, and ONE catch-up-call event is queued.
@@ -21,6 +22,7 @@ export function ClassroomSetup({
   classroom: ClassroomRecord | null
   onSaved: (c: ClassroomRecord) => void
 }) {
+  const { t } = useT()
   const [code, setCode] = useState(classroom?.classroom_id ?? '')
   const [rollsText, setRollsText] = useState(classroom ? rollsAsText(classroom.rolls) : '')
   const [error, setError] = useState<string | null>(null)
@@ -32,7 +34,7 @@ export function ClassroomSetup({
     try {
       onSaved(await saveClassroom({ classroom_id: code.trim(), rolls: parseRolls(rollsText) }))
     } catch (e) {
-      setError(e instanceof Error && e.message ? e.message : 'Could not save the classroom. Please try again.')
+      setError(e instanceof Error && e.message ? e.message : t.cantSaveClassroom)
     } finally {
       setBusy(false)
     }
@@ -40,9 +42,9 @@ export function ClassroomSetup({
 
   return (
     <section className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5">
-      <h2 className="font-heading text-xl font-bold">This classroom</h2>
+      <h2 className="font-heading text-xl font-bold">{t.thisClassroom}</h2>
       <label className="flex flex-col gap-2 text-lg">
-        <span className="text-muted-foreground">Classroom code, like G2-A</span>
+        <span className="text-muted-foreground">{t.codeLabel}</span>
         <input
           value={code}
           onChange={(e) => setCode(e.target.value)}
@@ -50,7 +52,7 @@ export function ClassroomSetup({
         />
       </label>
       <label className="flex flex-col gap-2 text-lg">
-        <span className="text-muted-foreground">Roll numbers, like 1-30 or 4, 7, 12</span>
+        <span className="text-muted-foreground">{t.rollsLabel}</span>
         <input value={rollsText} onChange={(e) => setRollsText(e.target.value)} className={field} />
       </label>
       {error && (
@@ -59,7 +61,7 @@ export function ClassroomSetup({
         </p>
       )}
       <Button size="lg" disabled={busy} onClick={save}>
-        {busy ? 'Saving…' : 'Save classroom'}
+        {busy ? t.saving : t.saveClassroom}
       </Button>
     </section>
   )
@@ -67,6 +69,7 @@ export function ClassroomSetup({
 
 /** The attendance flow after "Lesson finished": setup on first use, then one tap per absent roll. */
 export default function Attendance({ episodeId, onSaved }: { episodeId: string; onSaved: () => void }) {
+  const { t } = useT()
   const [classroom, setClassroom] = useState<ClassroomRecord | null | undefined>(undefined)
   const [absent, setAbsent] = useState(new Set<string>())
   const [saved, setSaved] = useState(false)
@@ -102,7 +105,7 @@ export default function Attendance({ episodeId, onSaved }: { episodeId: string; 
     } catch (e) {
       console.error('Could not queue attendance', e)
       saving.current = false
-      setError('Could not save attendance. Please try again.')
+      setError(t.cantSaveAttendance)
     } finally {
       setBusy(false)
     }
@@ -111,10 +114,10 @@ export default function Attendance({ episodeId, onSaved }: { episodeId: string; 
   return (
     <section className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="font-heading text-xl font-bold">Who was absent?</h2>
-        <span className="text-muted-foreground">Class {classroom.classroom_id}</span>
+        <h2 className="font-heading text-xl font-bold">{t.whoAbsent}</h2>
+        <span className="text-muted-foreground">{t.classCode(classroom.classroom_id)}</span>
       </div>
-      <p className="text-muted-foreground">Tap their roll numbers, then save.</p>
+      <p className="text-muted-foreground">{t.tapRolls}</p>
       <div className="grid grid-cols-6 gap-2 sm:grid-cols-8">
         {classroom.rolls.map((roll) => (
           <button
@@ -136,17 +139,15 @@ export default function Attendance({ episodeId, onSaved }: { episodeId: string; 
       {saved ? (
         <p role="status" className="flex gap-3 rounded-2xl bg-ok p-4 text-lg text-ok-foreground">
           <CheckCircle2Icon className="mt-0.5 size-6 shrink-0" aria-hidden />
-          <span>
-            Saved: {absent.size ? `${absent.size} absent` : 'everyone present'}. It sends at the next signal{absent.size ? ', and each absent child gets a catch-up call tonight' : ''}.
-          </span>
+          <span>{t.savedAttendance(absent.size)}</span>
         </p>
       ) : (
         <div className="flex flex-col gap-2">
           <Button size="lg" disabled={busy} onClick={() => save([...absent])}>
-            {absent.size ? `Save · ${absent.size} absent` : 'Save attendance'}
+            {absent.size ? t.saveAbsent(absent.size) : t.saveAttendance}
           </Button>
           <Button size="lg" variant="ghost" disabled={busy} onClick={() => save([])}>
-            Everyone was here
+            {t.everyoneHere}
           </Button>
         </div>
       )}

@@ -11,6 +11,8 @@ import { deletePack, importPack, listPacks, loadPackFiles } from '../packs/store
 import { PackError } from '../packs/verify'
 import type { ClassroomRecord, StoredPack } from '../storage/db'
 import GetLessons from './GetLessons'
+import { useT } from './i18n'
+import { UI_LANGS, type UiLang } from './strings'
 import { samplePack } from './samplePack'
 
 export interface OpenLesson {
@@ -22,25 +24,27 @@ type Notice = { kind: 'ok' | 'error'; text: string }
 
 /** "All synced" or how many taps and attendance saves wait for a signal. */
 export function SyncBadge({ pending }: { pending: number | null }) {
+  const { t } = useT()
   if (pending === null) return null
   return pending ? (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-warn px-2.5 py-1 text-[0.8125rem] font-semibold text-warn-foreground">
-      <CloudUploadIcon className="size-4" aria-hidden /> {pending} to sync
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-warn px-2.5 py-1 whitespace-nowrap text-[0.8125rem] font-semibold text-warn-foreground">
+      <CloudUploadIcon className="size-4" aria-hidden /> {t.toSync(pending)}
     </span>
   ) : (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-ok px-2.5 py-1 text-[0.8125rem] font-semibold text-ok-foreground">
-      <CloudCheckIcon className="size-4" aria-hidden /> All synced
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-ok px-2.5 py-1 whitespace-nowrap text-[0.8125rem] font-semibold text-ok-foreground">
+      <CloudCheckIcon className="size-4" aria-hidden /> {t.synced}
     </span>
   )
 }
 
 function LessonCard(props: { episode: Episode; badge?: string; featured?: boolean; onOpen: () => void; onShare?: () => void; onRemove?: () => void }) {
   const { episode: e } = props
-  const meta = `Grade ${e.grade} · ${e.district} · ${e.duration_min} min`
+  const { t } = useT()
+  const meta = t.lessonMeta(e.grade, e.district, e.duration_min)
   if (props.featured)
     return (
       <li className="space-y-3 rounded-3xl bg-primary p-5 text-primary-foreground">
-        <p className="text-[0.8125rem] font-bold tracking-[0.08em] uppercase">{props.badge ?? 'Newest lesson'}</p>
+        <p className="text-[0.8125rem] font-bold tracking-[0.08em] uppercase">{props.badge ?? t.newestLesson}</p>
         <h2 className="font-heading text-3xl leading-tight font-bold" lang={e.school_lang}>
           {e.title}
         </h2>
@@ -49,7 +53,7 @@ function LessonCard(props: { episode: Episode; badge?: string; featured?: boolea
           onClick={props.onOpen}
           className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-background text-lg font-bold text-primary outline-none focus-visible:ring-3 focus-visible:ring-foreground/40"
         >
-          <PlayIcon className="size-5" aria-hidden /> Open lesson
+          <PlayIcon className="size-5" aria-hidden /> {t.openLesson}
         </button>
         {props.onShare && props.onRemove && <PackActions onShare={props.onShare} onRemove={props.onRemove} onPrimary />}
       </li>
@@ -76,6 +80,7 @@ function LessonCard(props: { episode: Episode; badge?: string; featured?: boolea
 }
 
 function PackActions({ onShare, onRemove, onPrimary }: { onShare: () => void; onRemove: () => void; onPrimary?: boolean }) {
+  const { t } = useT()
   return (
     <div className="flex gap-2">
       <button
@@ -85,11 +90,11 @@ function PackActions({ onShare, onRemove, onPrimary }: { onShare: () => void; on
           onPrimary ? 'bg-primary-foreground/10 focus-visible:ring-foreground/40' : 'bg-secondary focus-visible:ring-ring',
         )}
       >
-        <Share2Icon className="size-4" aria-hidden /> Share with a teacher
+        <Share2Icon className="size-4" aria-hidden /> {t.share}
       </button>
       <button
         onClick={onRemove}
-        aria-label="Remove this lesson from the phone"
+        aria-label={t.remove}
         className={cn(
           'grid size-12 place-items-center rounded-xl outline-none focus-visible:ring-2',
           onPrimary ? 'bg-primary-foreground/10 focus-visible:ring-foreground/40' : 'text-few focus-visible:ring-ring',
@@ -103,6 +108,7 @@ function PackActions({ onShare, onRemove, onPrimary }: { onShare: () => void; on
 
 /** Lesson picker: imported packs (newest first) plus the built-in sample, and the "Add a lesson pack" button. */
 export default function Library({ onOpen, pending }: { onOpen: (lesson: OpenLesson) => void; pending: number | null }) {
+  const { t, lang, setLang } = useT()
   const [packs, setPacks] = useState<StoredPack[]>([])
   const [notice, setNotice] = useState<Notice | null>(null)
   const [busy, setBusy] = useState(false)
@@ -114,9 +120,9 @@ export default function Library({ onOpen, pending }: { onOpen: (lesson: OpenLess
     () =>
       listPacks().then(setPacks, (e) => {
         console.error('Could not list packs', e)
-        setNotice({ kind: 'error', text: 'Could not read the lessons saved on this phone.' })
+        setNotice({ kind: 'error', text: t.cantRead })
       }),
-    [],
+    [t],
   )
   useEffect(() => {
     refresh()
@@ -133,11 +139,11 @@ export default function Library({ onOpen, pending }: { onOpen: (lesson: OpenLess
     setNotice(null)
     try {
       const pack = await importPack(file)
-      setNotice({ kind: 'ok', text: `Added “${pack.episode.title}”.` })
+      setNotice({ kind: 'ok', text: t.added(pack.episode.title) })
       await refresh()
     } catch (err) {
       if (!(err instanceof PackError)) console.error('Pack import failed', err)
-      setNotice({ kind: 'error', text: err instanceof PackError ? err.message : 'Could not add this pack. Please try again.' })
+      setNotice({ kind: 'error', text: err instanceof PackError ? err.message : t.cantAdd })
     } finally {
       setBusy(false)
     }
@@ -153,14 +159,14 @@ export default function Library({ onOpen, pending }: { onOpen: (lesson: OpenLess
 
   async function share(p: StoredPack) {
     const files = await loadPackFiles(p.id)
-    if (!files) return setNotice({ kind: 'error', text: 'This lesson’s files are missing. Remove it and add the pack again.' })
+    if (!files) return setNotice({ kind: 'error', text: t.filesMissing })
     if ((await sharePack(p.id, p.episode.title, files.zip)) === 'saved') {
-      setNotice({ kind: 'ok', text: `Saved ${p.id}.sahpaathi to Downloads. Send it from Files, WhatsApp or Bluetooth.` })
+      setNotice({ kind: 'ok', text: t.savedToDownloads(`${p.id}.sahpaathi`) })
     }
   }
 
   async function remove(p: StoredPack) {
-    if (!confirm(`Remove “${p.episode.title}” from this phone?`)) return
+    if (!confirm(t.confirmRemove(p.episode.title))) return
     await deletePack(p.id)
     await refresh()
   }
@@ -177,15 +183,29 @@ export default function Library({ onOpen, pending }: { onOpen: (lesson: OpenLess
             </span>
             <h1 className="font-heading text-2xl font-bold">Sahpaathi</h1>
           </div>
-          <SyncBadge pending={pending} />
+          <label className="sr-only" htmlFor="ui-lang">
+            {t.language}
+          </label>
+          <select
+            id="ui-lang"
+            value={lang}
+            onChange={(e) => setLang(e.target.value as UiLang)}
+            className="h-11 rounded-xl border border-input bg-card px-2 font-semibold outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {UI_LANGS.map((l) => (
+              <option key={l.lang} value={l.lang}>
+                {l.name}
+              </option>
+            ))}
+          </select>
         </header>
 
-        <div className="flex items-center justify-between gap-3">
-          <p className="text-muted-foreground">
-            {classroom ? `Class ${classroom.classroom_id} · ${classroom.rolls.length} children` : 'Choose today’s lesson'}
-          </p>
-          <Button variant="ghost" size="sm" onClick={() => setEditingClassroom((v) => !v)}>
-            <PencilIcon aria-hidden /> {classroom ? 'Change class' : 'Set up class'}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <p className="text-muted-foreground">{classroom ? t.classLine(classroom.classroom_id, classroom.rolls.length) : t.chooseLesson}</p>
+          <SyncBadge pending={pending} />
+          <div className="flex-1" />
+          <Button variant="ghost" size="sm" className="-mr-3" onClick={() => setEditingClassroom((v) => !v)}>
+            <PencilIcon aria-hidden /> {classroom ? t.changeClass : t.setUpClass}
           </Button>
         </div>
 
@@ -196,11 +216,11 @@ export default function Library({ onOpen, pending }: { onOpen: (lesson: OpenLess
               onSaved={(c) => {
                 setClassroom(c)
                 setEditingClassroom(false)
-                setNotice({ kind: 'ok', text: `Classroom set to ${c.classroom_id}.` })
+                setNotice({ kind: 'ok', text: t.classroomSet(c.classroom_id) })
               }}
             />
             <Button variant="ghost" size="lg" onClick={() => setEditingClassroom(false)}>
-              Cancel
+              {t.cancel}
             </Button>
           </section>
         )}
@@ -215,26 +235,26 @@ export default function Library({ onOpen, pending }: { onOpen: (lesson: OpenLess
           {newest ? (
             <LessonCard featured episode={newest.episode} onOpen={() => open(newest)} onShare={() => share(newest)} onRemove={() => remove(newest)} />
           ) : (
-            <LessonCard featured badge="Built-in sample" episode={samplePack.episode} onOpen={() => onOpen(samplePack)} />
+            <LessonCard featured badge={t.builtInSample} episode={samplePack.episode} onOpen={() => onOpen(samplePack)} />
           )}
-          {rest.length > 0 && <li className="pt-2 text-[0.8125rem] font-semibold tracking-[0.08em] text-muted-foreground uppercase">On this phone</li>}
+          {rest.length > 0 && <li className="pt-2 text-[0.8125rem] font-semibold tracking-[0.08em] text-muted-foreground uppercase">{t.onThisPhone}</li>}
           {rest.map((p) => (
             <LessonCard key={p.id} episode={p.episode} onOpen={() => open(p)} onShare={() => share(p)} onRemove={() => remove(p)} />
           ))}
-          {newest && <LessonCard episode={samplePack.episode} badge="Built-in sample" onOpen={() => onOpen(samplePack)} />}
+          {newest && <LessonCard episode={samplePack.episode} badge={t.builtInSample} onOpen={() => onOpen(samplePack)} />}
         </ul>
 
         {getting ? (
           <GetLessons
             have={new Set(packs.map((p) => p.id))}
             onImported={(p) => {
-              setNotice({ kind: 'ok', text: `Added “${p.episode.title}”.` })
+              setNotice({ kind: 'ok', text: t.added(p.episode.title) })
               refresh()
             }}
           />
         ) : (
           <Button size="lg" variant="outline" className="h-16 text-lg" onClick={() => setGetting(true)}>
-            <CloudDownloadIcon className="size-5" aria-hidden /> Get new lessons
+            <CloudDownloadIcon className="size-5" aria-hidden /> {t.getNewLessons}
           </Button>
         )}
 
@@ -244,7 +264,7 @@ export default function Library({ onOpen, pending }: { onOpen: (lesson: OpenLess
             busy ? 'opacity-60' : 'cursor-pointer hover:border-primary',
           )}
         >
-          <DownloadIcon className="size-5" aria-hidden /> {busy ? 'Checking the pack…' : 'Add a pack from a file'}
+          <DownloadIcon className="size-5" aria-hidden /> {busy ? t.checkingPack : t.addFromFile}
           <input type="file" accept=".sahpaathi,application/zip" className="sr-only" disabled={busy} onChange={onFile} />
         </label>
       </div>

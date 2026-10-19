@@ -6,6 +6,7 @@ import { downloadPack, listRemotePacks, signIn, teacherToken, type RemotePack } 
 import { importPack } from '../packs/store'
 import { PackError } from '../packs/verify'
 import type { StoredPack } from '../storage/db'
+import { useT } from './i18n'
 
 const field =
   'min-h-14 w-full rounded-xl border border-input bg-background px-4 text-lg text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40'
@@ -14,6 +15,7 @@ const kb = (b: number | null) => (b === null ? '' : b < 1024 * 1024 ? `${Math.ro
 
 /** Online only: sign in once, see the ready lessons, download one into the phone. */
 export default function GetLessons({ have, onImported }: { have: Set<string>; onImported: (p: StoredPack) => void }) {
+  const { t } = useT()
   const [token, setToken] = useState(teacherToken.get)
   const [packs, setPacks] = useState<RemotePack[] | null>(null)
   const [error, setError] = useState('')
@@ -29,11 +31,11 @@ export default function GetLessons({ have, onImported }: { have: Set<string>; on
     (err: unknown) => {
       if (err instanceof ApiError && err.status === 401) {
         signOut()
-        return setError('Please sign in again.')
+        return setError(t.signInAgain)
       }
-      setError(err instanceof ApiError || err instanceof PackError ? err.message : 'Something went wrong. Please try again.')
+      setError(err instanceof ApiError || err instanceof PackError ? err.message : t.somethingWrong)
     },
-    [signOut],
+    [signOut, t],
   )
 
   useEffect(() => {
@@ -63,7 +65,7 @@ export default function GetLessons({ have, onImported }: { have: Set<string>; on
     } catch (err) {
       fail(err)
     } finally {
-      setProgress(({ [p.id]: _, ...rest }) => rest)
+      setProgress((s) => Object.fromEntries(Object.entries(s).filter(([k]) => Number(k) !== p.id)))
     }
   }
 
@@ -71,11 +73,11 @@ export default function GetLessons({ have, onImported }: { have: Set<string>; on
     <section className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5" aria-labelledby="get-lessons">
       <div className="flex items-center justify-between gap-3">
         <h2 id="get-lessons" className="font-heading text-xl font-bold">
-          New lessons
+          {t.newLessons}
         </h2>
         {token && (
           <Button variant="ghost" size="sm" onClick={signOut}>
-            <LogOutIcon aria-hidden /> Sign out
+            <LogOutIcon aria-hidden /> {t.signOut}
           </Button>
         )}
       </div>
@@ -88,23 +90,23 @@ export default function GetLessons({ have, onImported }: { have: Set<string>; on
 
       {!token ? (
         <form onSubmit={login} className="flex flex-col gap-3">
-          <p className="text-muted-foreground">Sign in once with your teacher account. It needs a signal; the lessons then play without one.</p>
+          <p className="text-muted-foreground">{t.signInHelp}</p>
           <label className="flex flex-col gap-2 text-lg">
-            <span className="text-muted-foreground">Email</span>
+            <span className="text-muted-foreground">{t.email}</span>
             <input name="email" type="email" autoComplete="username" required className={field} />
           </label>
           <label className="flex flex-col gap-2 text-lg">
-            <span className="text-muted-foreground">Password</span>
+            <span className="text-muted-foreground">{t.password}</span>
             <input name="password" type="password" autoComplete="current-password" required className={field} />
           </label>
           <Button size="lg" type="submit">
-            Sign in
+            {t.signIn}
           </Button>
         </form>
       ) : packs === null ? (
-        <p className="text-muted-foreground">Looking for lessons…</p>
+        <p className="text-muted-foreground">{t.looking}</p>
       ) : packs.length === 0 ? (
-        <p className="text-muted-foreground">No new lessons yet. Reviewers are still checking them.</p>
+        <p className="text-muted-foreground">{t.noneYet}</p>
       ) : (
         <ul className="flex flex-col gap-2">
           {packs.map((p) => {
@@ -115,21 +117,21 @@ export default function GetLessons({ have, onImported }: { have: Set<string>; on
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold">{p.title ?? p.episode_slug}</p>
                   <p className="text-sm text-muted-foreground">
-                    Grade {p.grade} · {p.district_id} · {kb(p.size_bytes)}
+                    {t.packMeta(p.grade, p.district_id, kb(p.size_bytes))}
                   </p>
                   {pct !== undefined && (
-                    <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-border" role="progressbar" aria-valuenow={Math.round(pct * 100)} aria-label="Downloading">
+                    <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-border" role="progressbar" aria-valuenow={Math.round(pct * 100)} aria-label={t.get}>
                       <div className="h-full bg-primary transition-[width]" style={{ width: `${pct * 100}%` }} />
                     </div>
                   )}
                 </div>
                 {onPhone ? (
                   <span className="flex items-center gap-1 text-sm font-semibold text-most">
-                    <CheckIcon className="size-4" aria-hidden /> On phone
+                    <CheckIcon className="size-4" aria-hidden /> {t.onPhone}
                   </span>
                 ) : (
-                  <Button size="sm" disabled={pct !== undefined} onClick={() => get(p)} aria-label={`Download ${p.title ?? p.episode_slug}`}>
-                    <CloudDownloadIcon aria-hidden /> {pct !== undefined ? `${Math.round(pct * 100)}%` : 'Get'}
+                  <Button size="sm" disabled={pct !== undefined} onClick={() => get(p)} aria-label={t.download(p.title ?? p.episode_slug ?? '')}>
+                    <CloudDownloadIcon aria-hidden /> {pct !== undefined ? `${Math.round(pct * 100)}%` : t.get}
                   </Button>
                 )}
               </li>

@@ -9,6 +9,7 @@ import { CHECKPOINT_TIMEOUT_SEC, advance, analogy, currentLine, start, tap, type
 import { recordTap } from '../sync/outbox'
 import { useChoralHint } from '../sensing/useChoralHint'
 import { SyncBadge } from './Library'
+import { useT } from './i18n'
 
 /** Seconds a line stays on screen when it has no audio yet. */
 function estimateSec(line: Line) {
@@ -50,13 +51,12 @@ function playLine(line: Line, url: string | undefined, onDone: () => void, onPau
 }
 
 // Most first, as on the planning card; each says which branch it plays. Colour is never the only cue.
-const TAPS: { tap: Tap; label: string; then: string; colour: string }[] = [
-  { tap: 'most', label: 'Most got it', then: 'stretch', colour: 'bg-most text-[#0d2420]' },
-  { tap: 'some', label: 'Some got it', then: 'more practice', colour: 'bg-some text-[#172524]' },
-  { tap: 'few', label: 'Few got it', then: 'easier', colour: 'bg-few text-[#1a0f0b]' },
+const TAPS: { tap: Tap; colour: string }[] = [
+  { tap: 'most', colour: 'bg-most text-[#0d2420]' },
+  { tap: 'some', colour: 'bg-some text-[#172524]' },
+  { tap: 'few', colour: 'bg-few text-[#1a0f0b]' },
 ]
 
-const PART_LABEL = { teach: 'Teach', easier: 'Easier', core: 'More practice', stretch: 'Stretch' }
 
 /** Three big tap buttons; mounted fresh per segment so the 10 s countdown restarts. Answers at most once. */
 function Checkpoint({
@@ -69,6 +69,7 @@ function Checkpoint({
   suggested: Tap | null
   onTap: (t: Tap, auto: boolean) => void
 }) {
+  const { t } = useT()
   const [secondsLeft, setSecondsLeft] = useState(CHECKPOINT_TIMEOUT_SEC)
   const answered = useRef(false)
   const answer = (t: Tap, auto: boolean) => {
@@ -95,20 +96,21 @@ function Checkpoint({
       <h2 className="font-heading text-[1.75rem] leading-tight font-bold">{question}</h2>
       {suggested && (
         <p className="flex items-center gap-2 text-lg text-primary">
-          <MicIcon className="size-5" aria-hidden /> The speaker heard: {TAPS.find((t) => t.tap === suggested)?.label}
+          <MicIcon className="size-5" aria-hidden /> {t.heard(t.taps[suggested])}
         </p>
       )}
-      {TAPS.map((t) => (
+      {TAPS.map((b) => (
         <button
-          key={t.tap}
+          key={b.tap}
           className={cn(
-            'flex min-h-18 items-center justify-between gap-3 rounded-2xl px-6 text-left text-2xl font-bold outline-none focus-visible:ring-4 focus-visible:ring-foreground',
-            t.colour,
-            t.tap === suggested && 'ring-4 ring-foreground',
+            'flex min-h-18 flex-col items-start justify-center gap-0.5 rounded-2xl px-6 py-3 text-left outline-none focus-visible:ring-4 focus-visible:ring-foreground',
+            b.colour,
+            b.tap === suggested && 'ring-4 ring-foreground',
           )}
-          onClick={() => answer(t.tap, false)}
+          onClick={() => answer(b.tap, false)}
         >
-          {t.label} <span className="text-base font-semibold opacity-80">{t.then}</span>
+          <span className="text-2xl leading-tight font-bold">{t.taps[b.tap]}</span>
+          <span className="text-base font-semibold opacity-80">→ {t.then[b.tap]}</span>
         </button>
       ))}
       <p className="flex items-center justify-center gap-3 text-muted-foreground" aria-live="polite">
@@ -126,7 +128,7 @@ function Checkpoint({
             strokeDashoffset={ring * (1 - secondsLeft / CHECKPOINT_TIMEOUT_SEC)}
           />
         </svg>
-        No tap? More practice plays in {secondsLeft} s
+        {t.noTap(secondsLeft)}
       </p>
     </section>
   )
@@ -144,6 +146,7 @@ interface LessonPlayerProps {
 }
 
 export default function LessonPlayer({ episode, audio, pending, onTapRecorded, onExit }: LessonPlayerProps) {
+  const { t } = useT()
   const [phase, setPhase] = useState<Phase>({ kind: 'idle' })
   const line = currentLine(episode, phase)
   const choral = useChoralHint()
@@ -200,7 +203,7 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
         <header className="space-y-3">
           <div className="flex items-center justify-between gap-3">
             <Button variant="ghost" className="-ml-3 text-muted-foreground" onClick={onExit}>
-              <ChevronLeftIcon aria-hidden /> Lessons
+              <ChevronLeftIcon aria-hidden /> {t.lessons}
             </Button>
             <SyncBadge pending={pending} />
           </div>
@@ -208,7 +211,7 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
             {episode.title}
           </h1>
           <p className="text-muted-foreground">
-            Grade {episode.grade} · {episode.district} · {episode.duration_min} min
+            {t.lessonMeta(episode.grade, episode.district, episode.duration_min)}
           </p>
           {segment && (
             <div className="space-y-2">
@@ -218,7 +221,7 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
                 ))}
               </div>
               <p className="text-sm text-muted-foreground">
-                Part {segIndex + 1} of {episode.segments.length} · <span lang={episode.school_lang}>{segment.title}</span>
+                {t.partOf(segIndex + 1, episode.segments.length)} · <span lang={episode.school_lang}>{segment.title}</span>
               </p>
             </div>
           )}
@@ -236,7 +239,7 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
                 onClick={choral.enable}
               >
                 <MicIcon aria-hidden />
-                {{ off: 'Let the speaker listen (optional)', starting: 'Listening to the room…', on: 'Listening: on', denied: 'Mic blocked. Tap to try again' }[choral.state]}
+                {t.mic[choral.state]}
               </Button>
             }
           />
@@ -246,7 +249,7 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
           <section className="flex flex-1 flex-col gap-4">
             <div className="space-y-3 rounded-3xl border border-border bg-card p-5">
               <span className="inline-block rounded-full bg-accent px-3 py-1 text-sm font-semibold">
-                {phase.kind === 'analogy' ? 'Simpler analogy' : PART_LABEL[phase.part]}
+                {phase.kind === 'analogy' ? t.analogyPart : t.parts[phase.part]}
               </span>
               <p lang={line.lang} className="text-[2rem] leading-snug font-semibold">
                 {line.text}
@@ -271,7 +274,7 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
 
         {(phase.kind === 'line' || phase.kind === 'checkpoint') && episode.analogy.length > 0 && (
           <Button variant="outline" size="lg" className="mt-auto" onClick={() => setPhase((p) => analogy(episode, p))}>
-            <LightbulbIcon className="text-primary" aria-hidden /> Need a simpler analogy
+            <LightbulbIcon className="text-primary" aria-hidden /> {t.needAnalogy}
           </Button>
         )}
 
@@ -281,11 +284,11 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
               <span className="grid size-14 place-items-center rounded-full bg-ok text-ok-foreground">
                 <PartyPopperIcon className="size-7" aria-hidden />
               </span>
-              <h2 className="font-heading text-2xl font-bold">Lesson finished</h2>
+              <h2 className="font-heading text-2xl font-bold">{t.finished}</h2>
             </div>
             <Attendance episodeId={episode.id} onSaved={onTapRecorded} />
             <Button variant="ghost" size="lg" onClick={() => setPhase(start(episode))}>
-              <RotateCcwIcon aria-hidden /> Play again
+              <RotateCcwIcon aria-hidden /> {t.playAgain}
             </Button>
           </section>
         )}

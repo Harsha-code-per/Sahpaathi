@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useSync } from '../sync/useSync'
 import Library, { type OpenLesson } from './Library'
 import LessonPlayer from './LessonPlayer'
+import { LangProvider } from './i18n'
 
 /** Teacher section: pick a lesson, play it. Sync runs here so it keeps going across lessons. */
 export default function Teacher() {
@@ -13,6 +14,13 @@ export default function Teacher() {
     setLesson(null)
   }
 
-  if (!lesson) return <Library onOpen={setLesson} pending={pending} />
-  return <LessonPlayer key={lesson.episode.id} {...lesson} pending={pending} onTapRecorded={sync} onExit={exit} />
+  return (
+    <LangProvider>
+      {lesson ? (
+        <LessonPlayer key={lesson.episode.id} {...lesson} pending={pending} onTapRecorded={sync} onExit={exit} />
+      ) : (
+        <Library onOpen={setLesson} pending={pending} />
+      )}
+    </LangProvider>
+  )
 }
