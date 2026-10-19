@@ -87,3 +87,13 @@ def test_cli_recap_and_qa(monkeypatch, tmp_path, capsys):
     assert recap.stat().st_size > 0
     assert build.main(["qa", str(out)]) == 0
     assert "all checks passed" in capsys.readouterr().out
+
+
+def test_load_episode_accepts_a_library_wrapper(tmp_path):
+    bare = json.loads(SAMPLE.read_text(encoding="utf-8"))
+    wrapped = tmp_path / "wrapped.json"
+    wrapped.write_text(
+        json.dumps({"lesson_id": "x", "district_id": "y", "episode": bare, "edits": None}),
+        encoding="utf-8",
+    )
+    assert build.load_episode(wrapped) == build.load_episode(SAMPLE)

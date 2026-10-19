@@ -10,6 +10,7 @@ Needs ffmpeg on PATH, PACK_SIGNING_KEY (see `keygen`) and, unless --fake, TTS_AP
 """
 
 import argparse
+import json
 import sys
 import tempfile
 from pathlib import Path
@@ -69,6 +70,14 @@ def build_episode_pack(
         return build_pack(episode, audio, private_key_b64, out_path)
 
 
+def load_episode(path: Path) -> Episode:
+    """Read a bare episode, or a reviewed-library file that wraps one under "episode"."""
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if isinstance(data, dict) and isinstance(data.get("episode"), dict):
+        data = data["episode"]
+    return Episode.model_validate(data)
+
+
 def _voice(fake: bool, santali_dir: Path | None, api_key: str) -> TTSProvider:
     providers: list[TTSProvider] = [FakeTTS() if fake else SarvamTTS(api_key, cache_dir=CACHE_DIR)]
     if santali_dir is not None:
@@ -112,7 +121,7 @@ def main(argv: list[str] | None = None) -> int:
             "PACK_SIGNING_KEY is not set. Run `keygen` and put it in backend/.env.", file=sys.stderr
         )
         return 2
-    episode = Episode.model_validate_json(args.episode.read_text(encoding="utf-8"))
+    episode = load_episode(args.episode)
     try:
         voice = _voice(args.fake, args.santali, cfg.tts_api_key)
         out = build_episode_pack(episode, voice, cfg.pack_signing_key, args.out, args.recap)
