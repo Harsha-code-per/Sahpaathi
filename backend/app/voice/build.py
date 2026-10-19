@@ -17,6 +17,7 @@ from pathlib import Path
 from app.factory.schema import Episode, Lang
 from app.voice import signing
 from app.voice.audio import AudioError, normalize_to_opus
+from app.voice.ivr_prompts import build_menu
 from app.voice.pack import build_pack
 from app.voice.qa import format_report, inspect_pack
 from app.voice.recap import build_ivr_recap
@@ -50,14 +51,21 @@ def build_episode_pack(
     private_key_b64: str,
     out_path: Path,
     recap_path: Path | None = None,
+    ivr_dir: Path | None = None,
 ) -> Path:
-    """Write the signed pack; with `recap_path`, also the 8 kHz IVR recap WAV for absentee calls."""
+    """Write the signed pack. Optional extras for the absentee call: `recap_path` (the 8 kHz recap
+    WAV a phone provider plays) and `ivr_dir` (recap.opus and menu.opus for the call flow)."""
     with tempfile.TemporaryDirectory() as tmp:
         raw, opus = Path(tmp, "raw"), Path(tmp, "opus")
         wavs = synthesize_episode(episode, voice, raw)
         audio = {i: normalize_to_opus(f, opus / f"{i}.opus") for i, f in wavs.items()}
         if recap_path is not None:
             build_ivr_recap(episode, wavs, recap_path)
+        if ivr_dir is not None:
+            recap_wav = build_ivr_recap(episode, wavs, Path(tmp, "recap.wav"))
+            menu_wav = build_menu(episode, voice, Path(tmp, "menu.wav"))
+            normalize_to_opus(recap_wav, ivr_dir / "recap.opus")
+            normalize_to_opus(menu_wav, ivr_dir / "menu.opus")
         return build_pack(episode, audio, private_key_b64, out_path)
 
 
