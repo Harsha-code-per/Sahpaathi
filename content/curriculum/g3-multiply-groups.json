@@ -1,0 +1,9 @@
+{
+  "id": "multiply-groups",
+  "grade": 3,
+  "subject": "numeracy",
+  "nipun_lo": "Grade 3 goal: reads and writes numbers up to 9999 and solves simple multiplication problems; this episode covers multiplication as equal groups (tables of 2, 3 and 5)",
+  "chapter": "NCERT Class 3 Mathematics: multiplication as equal groups",
+  "notes": "Multiplication counts equal groups quickly. 4 groups of 3 seeds is 3 + 3 + 3 + 3 = 12, written 4 x 3 = 12. Make groups with real objects, then skip count: 3, 6, 9, 12. Groups must be equal; unequal groups cannot be multiplied this way. Swapping gives the same total: 4 groups of 3 and 3 groups of 4 both make 12. Practise the tables of 2, 3 and 5 up to 10 groups, with everyday groups such as pairs of eyes, 3 wheels of an auto, 5 fingers on a hand.",
+  "duration_min": 15
+}

@@ -1,4 +1,5 @@
-"""Create or refresh the demo accounts, one per role, all with DEMO_PASSWORD.
+"""Create or refresh the demo accounts, one per role, all with DEMO_PASSWORD, then add the reviewed
+episodes from content/episodes/ that the database does not have yet (app.library).
 
 Run: python -m app.seed   (the Docker image runs it on start when DEMO_PASSWORD is set)
 These are the test credentials evaluators get; there are no real users' accounts.
@@ -9,6 +10,7 @@ import sys
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app import library
 from app.auth import hash_password
 from app.config import settings
 from app.db import SessionLocal
@@ -36,4 +38,5 @@ if __name__ == "__main__":
         sys.exit("DEMO_PASSWORD is not set; no demo accounts created.")
     with SessionLocal() as db:
         seed(db, settings.demo_password)
-    print(f"seeded {len(DEMO_USERS)} demo accounts")
+        added = library.load(db)
+    print(f"seeded {len(DEMO_USERS)} demo accounts; added {added} reviewed episodes")
