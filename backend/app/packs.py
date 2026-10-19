@@ -84,6 +84,7 @@ def fail_orphans(db: Session) -> None:
 class PackSummary(BaseModel):
     id: int
     episode_id: int
+    episode_slug: str | None  # the episode's own id: what attendance and catch-up calls use
     status: str
     error: str | None
     size_bytes: int | None
@@ -98,6 +99,7 @@ def _summary(pack: PackRecord, rec: EpisodeRecord) -> PackSummary:
     return PackSummary(
         id=pack.id,
         episode_id=pack.episode_id,
+        episode_slug=ep.get("id"),
         status=pack.status,
         error=pack.error,
         size_bytes=pack.size_bytes,

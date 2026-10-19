@@ -1,14 +1,14 @@
 import { expect, test } from 'vitest'
 import type { Summary } from '../studio/api'
 import type { PackSummary } from './api'
-import { anyBuilding, dayBars, formatSize, packFilename, packRows, pct } from './view'
+import { anyBuilding, callableEpisodes, dayBars, endMessage, formatSize, KEYPAD, packFilename, packRows, pct } from './view'
 
 const ep = (id: number, status: Summary['status']): Summary => ({
   id, lesson_id: 'l', district_id: 'd', status, title: `Episode ${id}`, passed: true, scores: null, error: null,
   created_at: '2026-10-19T04:00:00Z',
 })
 const pack = (id: number, episode_id: number, status: PackSummary['status']): PackSummary => ({
-  id, episode_id, status, error: null, size_bytes: 1000, title: null, grade: 1, district_id: 'd',
+  id, episode_id, episode_slug: `ep-${episode_id}`, status, error: null, size_bytes: 1000, title: null, grade: 1, district_id: 'd',
   created_at: '2026-10-19T04:00:00Z',
 })
 
@@ -52,4 +52,24 @@ test('the download is named after the episode slug, and nothing unsafe is truste
   expect(packFilename(null, 7)).toBe('pack-7.sahpaathi')
   expect(packFilename('attachment; filename="கூழாங்கல்: ஒன்று.sahpaathi"', 7)).toBe('pack-7.sahpaathi')
   expect(packFilename('attachment; filename="../../x.sahpaathi"', 7)).toBe('pack-7.sahpaathi')
+})
+
+test('only episodes with a ready pack can be called about, once each, newest first', () => {
+  const packs = [pack(1, 1, 'ready'), pack(2, 1, 'ready'), pack(3, 2, 'building'), pack(4, 3, 'ready'), pack(5, 4, 'failed')]
+  packs[3].title = 'Counting'
+  expect(callableEpisodes(packs)).toEqual([
+    { slug: 'ep-3', title: 'Counting' },
+    { slug: 'ep-1', title: 'ep-1' },
+  ])
+  expect(callableEpisodes([{ ...pack(9, 9, 'ready'), episode_slug: null }])).toEqual([])
+})
+
+test('the keypad has the twelve phone keys in phone order', () => {
+  expect(KEYPAD.flat().join('')).toBe('123456789*0#')
+})
+
+test('the end of a call says what the family answered', () => {
+  expect(endMessage('completed', 'help')).toMatch(/follow up/)
+  expect(endMessage('completed', 'understood')).toMatch(/understood/)
+  expect(endMessage('no_response', null)).toMatch(/without an answer/)
 })

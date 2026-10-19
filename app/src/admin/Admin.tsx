@@ -1,5 +1,6 @@
 import { useState, type SubmitEvent } from 'react'
 import { adminApi, ApiError, session } from './api'
+import Calls from './Calls'
 import Dashboard from './Dashboard'
 import Packs from './Packs'
 
@@ -55,6 +56,7 @@ function Login({ onIn }: { onIn: () => void }) {
 const TABS = [
   { id: 'dashboard', label: 'Dashboard' },
   { id: 'packs', label: 'Packs' },
+  { id: 'calls', label: 'Calls' },
 ] as const
 type Tab = (typeof TABS)[number]['id']
 
@@ -92,7 +94,9 @@ export default function Admin() {
         </button>
       </header>
       <main className="mx-auto max-w-5xl space-y-4 p-4">
-        {tab === 'dashboard' ? <Dashboard onSignedOut={logout} /> : <Packs onSignedOut={logout} />}
+        {tab === 'dashboard' && <Dashboard onSignedOut={logout} />}
+        {tab === 'packs' && <Packs onSignedOut={logout} />}
+        {tab === 'calls' && <Calls onSignedOut={logout} />}
       </main>
     </div>
   )
