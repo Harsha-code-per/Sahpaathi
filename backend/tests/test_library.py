@@ -30,6 +30,7 @@ def test_reviewed_episodes_travel_from_studio_to_a_fresh_deploy(db, tmp_path):
     reviewer_id = db.query(User).filter_by(role="reviewer").one().id
     rec.status, rec.review_notes = "approved", "Checked every Tamil line."
     rec.reviewed_by_id = reviewer_id
+    rec.edits = {"s1-t1": {"before": "AI text", "by": "Demo Reviewer", "at": "2026-10-19"}}
     db.commit()
     path = library.export(db, rec.id, tmp_path / "lib")
     assert path.name == f"{EPISODE.id}.json"
@@ -41,6 +42,7 @@ def test_reviewed_episodes_travel_from_studio_to_a_fresh_deploy(db, tmp_path):
     loaded = db.query(EpisodeRecord).one()
     assert (loaded.status, loaded.review_notes) == ("approved", "Checked every Tamil line.")
     assert loaded.episode["id"] == EPISODE.id and loaded.reviewed_by_id is not None
+    assert loaded.edits["s1-t1"]["before"] == "AI text"  # the correction history travels too
 
 
 def test_committed_library_episodes_are_valid(db):

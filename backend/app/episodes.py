@@ -6,7 +6,7 @@ instance; move to a job queue if we ever run more than one backend instance.
 """
 
 import logging
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
@@ -17,7 +17,8 @@ from sqlalchemy.orm import Session
 from app import db as database
 from app.auth import require
 from app.config import settings
-from app.factory import judge
+from app.factory import judge, rules
+from app.factory.schema import Episode
 from app.factory.scriptwriter import District, Lesson
 from app.models import EpisodeRecord, User
 from app.voice.splicer import load_phrasebank
@@ -107,6 +108,7 @@ class Detail(Summary):
     review: dict | None
     review_notes: str | None
     reviewed_by: str | None
+    edits: dict | None  # line id -> {before, by, at}: what a reviewer corrected
 
 
 def _summary(rec: EpisodeRecord) -> dict:
@@ -173,7 +175,48 @@ def get_episode(episode_id: int, _: Reviewer, db: DB) -> Detail:
         review=rec.review,
         review_notes=rec.review_notes,
         reviewed_by=reviewer.name if reviewer else None,
+        edits=rec.edits,
     )
+
+
+class LineEditIn(BaseModel):
+    text: str = Field(max_length=2000)
+
+
+@router.patch("/episodes/{episode_id}/lines/{line_id}")
+def edit_line(episode_id: int, line_id: str, body: LineEditIn, user: Reviewer, db: DB) -> Detail:
+    """A reviewer corrects one line's wording. The AI's original is kept in `edits`, the code
+    checks run again, and the English gloss of that line is now out of date (the Studio says so)."""
+    rec = _get(db, episode_id)
+    if rec.status != "in_review":
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, f"This episode is {rec.status}, not in review."
+        )
+    episode = Episode.model_validate(rec.episode)
+    line = next((x for x in episode.lines() if x.id == line_id), None)
+    if line is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No such line.")
+    text = " ".join(body.text.split())
+    if not text:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "A line cannot be empty.")
+    if line.lang == "sat" and text not in santali_bank():
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_CONTENT,
+            "Santali lines are spliced from recordings, so they must be a recorded phrase.",
+        )
+    edits = dict(rec.edits or {})
+    before = edits.get(line_id, {}).get("before", line.text)
+    line.text = text
+    problems = rules.check(Episode.model_validate(episode.model_dump()))
+    if problems:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, "; ".join(problems))
+    if text == before:  # changed back to the AI's wording
+        edits.pop(line_id, None)
+    else:
+        edits[line_id] = {"before": before, "by": user.name, "at": datetime.now(UTC).isoformat()}
+    rec.episode, rec.edits = episode.model_dump(), edits or None
+    db.commit()
+    return get_episode(episode_id, user, db)
 
 
 class ReviewIn(BaseModel):

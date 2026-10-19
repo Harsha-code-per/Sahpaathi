@@ -34,11 +34,19 @@ export interface Summary {
   created_at: string
 }
 
+/** A reviewer's correction of one line; `before` is the AI's original wording. */
+export interface Edit {
+  before: string
+  by: string
+  at: string
+}
+
 export interface Detail extends Summary {
   episode: Episode | null
   review: Review | null
   review_notes: string | null
   reviewed_by: string | null
+  edits: Record<string, Edit> | null
 }
 
 export interface Catalog {
@@ -89,4 +97,6 @@ export const api = {
   generate: (lesson_id: string, district_id: string) => call<Summary>('/episodes', post({ lesson_id, district_id })),
   decide: (id: number, decision: 'approve' | 'reject', notes: string) =>
     call<Detail>(`/episodes/${id}/review`, post({ decision, notes })),
+  editLine: (id: number, lineId: string, text: string) =>
+    call<Detail>(`/episodes/${id}/lines/${lineId}`, { method: 'PATCH', body: JSON.stringify({ text }) }),
 }

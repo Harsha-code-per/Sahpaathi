@@ -54,11 +54,9 @@ def export(db: Session, record_id: int, out_dir: Path = LIBRARY) -> Path:
         raise ValueError(f"episode {record_id} is not approved; only approved ones are exported")
     out_dir.mkdir(parents=True, exist_ok=True)
     path = out_dir / f"{rec.episode['id']}.json"
-    data = {k: getattr(rec, k) for k in ("lesson_id", "district_id", "episode", "review")}
-    path.write_text(
-        json.dumps({**data, "review_notes": rec.review_notes}, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    keys = ("lesson_id", "district_id", "episode", "review", "review_notes", "edits")
+    data = {k: getattr(rec, k) for k in keys}
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return path
 
 
@@ -81,6 +79,7 @@ def load(db: Session, library: Path = LIBRARY) -> int:
                 episode=episode.model_dump(),
                 review=Review.model_validate(data["review"]).model_dump(),
                 review_notes=data.get("review_notes"),
+                edits=data.get("edits"),
                 created_by_id=reviewer.id,
                 reviewed_by_id=reviewer.id,
             )

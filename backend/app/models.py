@@ -63,6 +63,8 @@ class EpisodeRecord(Base):
     review: Mapped[dict | None] = mapped_column(JSON(none_as_null=True))  # judge Review
     error: Mapped[str | None] = mapped_column(Text)
     review_notes: Mapped[str | None] = mapped_column(Text)
+    # Reviewer corrections: line id -> {"before": the AI's text, "by": name, "at": ISO time}
+    edits: Mapped[dict | None] = mapped_column(JSON(none_as_null=True))
     created_by_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     reviewed_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
