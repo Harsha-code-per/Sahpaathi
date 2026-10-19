@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { Episode, Line } from '../lib/types'
-import { api, ApiError, type Detail, type Issue, type Status } from './api'
+import { api, ApiError, type Detail, type Edit, type Issue, type Status } from './api'
 import { CRITERIA, LANG_NAMES, STATUS, glossById, issuesByLine, minutes, schoolShare, svgDataUrl } from './view'
 
 const POLL_MS = 5000
@@ -26,25 +26,98 @@ interface LineCtx {
   ep: Episode
   gloss: Map<string, string>
   issues: Map<string, Issue[]>
+  edits: Record<string, Edit>
+  /** Set while the episode is in review: the reviewer may correct a line's wording. */
+  onEdit?: (lineId: string, text: string) => Promise<void>
+}
+
+/** Inline correction of one line. 422s (empty, not a recorded Santali phrase) stay in the row. */
+function LineEditor({ line, onSave, onDone }: { line: Line; onSave: (text: string) => Promise<void>; onDone: () => void }) {
+  const [text, setText] = useState(line.text)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+
+  async function save() {
+    setBusy(true)
+    setError('')
+    try {
+      await onSave(text)
+      onDone()
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Could not save the line.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      <textarea
+        lang={line.lang}
+        aria-label={`Correct line ${line.id}`}
+        className="block w-full rounded-lg border border-slate-300 p-2 text-lg leading-relaxed focus:border-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/30"
+        rows={2}
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        autoFocus
+      />
+      {error && <p role="alert" className="text-sm text-clay">{error}</p>}
+      <div className="flex gap-2">
+        <button
+          onClick={save}
+          disabled={busy || !text.trim() || text === line.text}
+          className="rounded-lg bg-ink px-3 py-1 text-sm font-semibold text-white disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-sun focus-visible:outline-none"
+        >
+          {busy ? 'Saving…' : 'Save line'}
+        </button>
+        <button onClick={onDone} className="rounded-lg px-3 py-1 text-sm text-slate-600 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-ink focus-visible:outline-none">
+          Cancel
+        </button>
+      </div>
+    </div>
+  )
 }
 
 /** One spoken line: home language on a sun rule, school language on a leaf rule, gloss beside it. */
 function LineRow({ line, ctx }: { line: Line; ctx: LineCtx }) {
+  const [editing, setEditing] = useState(false)
   const home = line.lang === ctx.ep.home_lang && ctx.ep.home_lang !== ctx.ep.school_lang
   const notes = ctx.issues.get(line.id) ?? []
+  const edit = ctx.edits[line.id]
+  const gloss = ctx.gloss.get(line.id)
   return (
     <li id={`line-${line.id}`} className={`scroll-mt-20 border-l-4 py-2 pl-3 ${home ? 'border-sun' : 'border-leaf'} ${notes.length ? 'bg-sun/10' : ''}`}>
       <div className="grid gap-x-6 gap-y-1 md:grid-cols-2">
-        <p lang={line.lang} className="text-lg leading-relaxed">
-          {line.text}
+        {editing && ctx.onEdit ? (
+          <LineEditor line={line} onSave={(text) => ctx.onEdit!(line.id, text)} onDone={() => setEditing(false)} />
+        ) : (
+          <p lang={line.lang} className="text-lg leading-relaxed">
+            {line.text}
+          </p>
+        )}
+        <p className="text-slate-600">
+          {edit && gloss && <span className="text-xs font-semibold text-slate-500">English of the original line: </span>}
+          {gloss ?? 'No English translation.'}
         </p>
-        <p className="text-slate-600">{ctx.gloss.get(line.id) ?? 'No English translation.'}</p>
       </div>
+      {edit && (
+        <p className="mt-1 text-sm text-slate-600">
+          <span className="font-semibold text-leaf">Corrected by {edit.by}.</span> Was: <span lang={line.lang}>{edit.before}</span>
+        </p>
+      )}
       <p className="mt-1 text-xs text-slate-500">
         {LANG_NAMES[line.lang]}
         {SPEAKER[line.speaker] && `, ${SPEAKER[line.speaker]}`}
         {line.pause_after_sec > 0 && `, then a ${line.pause_after_sec} s pause`}
         <span className="text-slate-400"> {line.id}</span>
+        {ctx.onEdit && !editing && (
+          <button
+            onClick={() => setEditing(true)}
+            className="ml-2 rounded px-1.5 py-0.5 font-semibold text-ink underline decoration-slate-300 underline-offset-2 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-ink focus-visible:outline-none"
+          >
+            Edit
+          </button>
+        )}
       </p>
       {line.cue && <p className="mt-1 text-sm text-slate-700">Children: {line.cue}</p>}
       {notes.map((n, i) => (
@@ -213,7 +286,20 @@ export default function EpisodeView(props: {
 
   if (!detail) return <p className="text-slate-500">Loading…</p>
   const ep = detail.episode
-  const ctx: LineCtx | null = ep ? { ep, gloss: glossById(detail.review), issues: issuesByLine(ep, detail.review) } : null
+  const edits = detail.edits ?? {}
+  const onEdit =
+    detail.status === 'in_review'
+      ? async (lineId: string, text: string) => {
+          try {
+            setDetail(await api.editLine(id, lineId, text))
+          } catch (err) {
+            if (err instanceof ApiError && (err.status === 422 || err.status === 409)) throw err // shown in the row
+            onError(err)
+          }
+        }
+      : undefined
+  const ctx: LineCtx | null = ep ? { ep, gloss: glossById(detail.review), issues: issuesByLine(ep, detail.review), edits, onEdit } : null
+  const edited = Object.keys(edits).length
   const general = ctx?.issues.get('episode') ?? []
   const main = ep ? ep.segments.flatMap((s) => [...s.teach, ...s.core]) : []
 
@@ -252,7 +338,13 @@ export default function EpisodeView(props: {
               {detail.passed
                 ? 'No blocking problems found. You still decide.'
                 : `${detail.review.rubric.issues.length} notes are pinned to the lines below. Read them before you decide.`}
+              {detail.status === 'in_review' && ' Press Edit on any line to correct its wording.'}
             </p>
+            {edited > 0 && (
+              <p className="mt-1 font-semibold text-leaf">
+                {edited} {edited === 1 ? 'line' : 'lines'} corrected by reviewers. The scores and notes are from before the corrections.
+              </p>
+            )}
             <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-3">
               {CRITERIA.map((c) => {
                 const s = detail.review!.rubric.scores[c.key]

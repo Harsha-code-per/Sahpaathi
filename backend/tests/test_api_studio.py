@@ -125,3 +125,32 @@ def test_database_refuses_a_decision_without_a_reviewer(api):
         )
         with pytest.raises(IntegrityError):
             db.commit()
+
+
+def test_reviewer_corrects_a_line_and_the_original_is_kept(api, monkeypatch):
+    monkeypatch.setattr(episodes.judge, "generate", lambda *a: (EPISODE, REVIEW))
+    h = auth(api, "reviewer")
+    eid = api.post("/api/v1/episodes", json=NEW, headers=h).json()["id"]
+    line = EPISODE.lines()[0]
+    url = f"/api/v1/episodes/{eid}/lines/{line.id}"
+
+    res = api.patch(url, json={"text": "  வணக்கம்   குழந்தைகளே!  "}, headers=h)
+    assert res.status_code == 200, res.text
+    edited = Episode.model_validate(res.json()["episode"])
+    assert next(x for x in edited.lines() if x.id == line.id).text == "வணக்கம் குழந்தைகளே!"
+    edit = res.json()["edits"][line.id]
+    assert edit["before"] == line.text and edit["by"] == "Demo Reviewer"
+
+    again = api.patch(url, json={"text": "வணக்கம்!"}, headers=h).json()
+    assert again["edits"][line.id]["before"] == line.text  # still the AI's original
+    back = api.patch(url, json={"text": line.text}, headers=h).json()
+    assert back["edits"] is None  # changed back: nothing is marked as edited
+
+    assert api.patch(url, json={"text": "   "}, headers=h).status_code == 422
+    assert (
+        api.patch(f"/api/v1/episodes/{eid}/lines/nope", json={"text": "x"}, headers=h).status_code
+        == 404
+    )
+    assert api.patch(url, json={"text": "x"}, headers=auth(api, "teacher")).status_code == 403
+    api.post(f"/api/v1/episodes/{eid}/review", json={"decision": "approve"}, headers=h)
+    assert api.patch(url, json={"text": "x"}, headers=h).status_code == 409  # approved is final
