@@ -10,6 +10,7 @@ from sqlalchemy import (
     LargeBinary,
     String,
     Text,
+    UniqueConstraint,
     func,
 )
 from sqlalchemy.orm import Mapped, mapped_column
@@ -115,4 +116,42 @@ class SyncEvent(Base):
     at: Mapped[datetime] = mapped_column(DateTime(timezone=True))  # the device's clock
     received_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
+    )
+
+
+CALL_STATUSES = ("queued", "in_progress", "completed", "no_response")
+CALL_OUTCOMES = ("understood", "help")
+
+
+class CatchupCall(Base):
+    """An absentee catch-up call for one child and one episode.
+
+    The child is only ever an opaque `student_ref` (the teacher's roll number) inside a
+    `classroom_id` code: no names and no phone numbers are stored. Dialling a real phone needs a
+    separate, consented contact list, added when a telephony provider is connected.
+    """
+
+    __tablename__ = "catchup_calls"
+    __table_args__ = (
+        UniqueConstraint("classroom_id", "student_ref", "episode_slug"),  # one call per child
+        CheckConstraint(_in("status", CALL_STATUSES), name="status_known"),
+        CheckConstraint(
+            "outcome IS NULL OR outcome IN ('understood', 'help')", name="outcome_known"
+        ),
+        # An outcome only exists once the parent answered.
+        CheckConstraint("outcome IS NULL OR status = 'completed'", name="outcome_when_completed"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    classroom_id: Mapped[str] = mapped_column(String(40))
+    student_ref: Mapped[str] = mapped_column(String(40))
+    episode_slug: Mapped[str] = mapped_column(String(100))  # the episode's own id, as in packs
+    status: Mapped[str] = mapped_column(String(20), default="queued")
+    outcome: Mapped[str | None] = mapped_column(String(20))
+    pack_id: Mapped[int | None] = mapped_column(ForeignKey("packs.id"))  # set when the call starts
+    plays: Mapped[int] = mapped_column(Integer, default=0)  # times the recap was played
+    missed: Mapped[int] = mapped_column(Integer, default=0)  # menus with no usable key
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
