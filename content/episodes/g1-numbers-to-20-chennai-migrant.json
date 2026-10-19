@@ -1,0 +1,1763 @@
+{
+  "lesson_id": "g1-numbers-to-20",
+  "district_id": "chennai-migrant",
+  "episode": {
+    "schema_version": 1,
+    "id": "g1-numbers-to-20-chennai-migrant",
+    "title": "கூழாங்கல் எண்ணுவோம்: ஒன்று முதல் இருபது வரை",
+    "grade": 1,
+    "subject": "numeracy",
+    "nipun_lo": "1 முதல் 99 வரை எண்களை வாசிக்கவும் எழுதவும் எண்ணவும் தெரியும்; இந்தப் பாடம்: பொருட்களை எண்ணுதல் மற்றும் 20 வரை எண் பெயர்கள்",
+    "home_lang": "hi",
+    "school_lang": "ta",
+    "district": "Chennai, Tamil Nadu",
+    "duration_min": 15,
+    "materials": [
+      "ஒவ்வொரு குழந்தைக்கும் 20 கூழாங்கற்கள்",
+      "ஒவ்வொரு ஜோடிக்கும் 12 புளியங்கொட்டைகள் (முடிந்தால் பெரியவை)",
+      "ஒவ்வொரு ஜோடிக்கும் 9 பாட்டில் மூடிகள் (முடிந்தால் பெரியவை)",
+      "குழந்தைகளின் விரல்கள்",
+      "பாதுகாப்பு: சிறு பொருட்கள் வாயில் செல்லாதபடி ஒரு பார்வையில் கவனிக்கவும்; வகுப்பு முடிந்ததும் எல்லாவற்றையும் சேகரிக்கவும்"
+    ],
+    "chalk_sketch_svg": "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 140' fill='none' stroke='black' stroke-width='3'><rect x='20' y='20' width='250' height='100'/><line x1='20' y1='70' x2='270' y2='70'/><line x1='70' y1='20' x2='70' y2='120'/><line x1='120' y1='20' x2='120' y2='120'/><line x1='170' y1='20' x2='170' y2='120'/><line x1='220' y1='20' x2='220' y2='120'/><circle cx='45' cy='45' r='15'/><circle cx='95' cy='45' r='15'/><circle cx='145' cy='45' r='15'/><circle cx='195' cy='45' r='15'/><circle cx='245' cy='45' r='15'/><circle cx='45' cy='95' r='15'/><circle cx='95' cy='95' r='15'/><circle cx='145' cy='95' r='15'/><circle cx='195' cy='95' r='15'/><circle cx='245' cy='95' r='15'/></svg>",
+    "segments": [
+      {
+        "id": "s1",
+        "title": "தொட்டு எண்ணுவோம்",
+        "activity": "pebble_task",
+        "teach": [
+          {
+            "id": "s1-t1",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "नमस्ते पूजा, राजू, सुनीता, अमित! आज हम गिनती सीखेंगे।",
+            "pause_after_sec": 4.0,
+            "cue": "குழந்தைகள் கவனமாகக் கேட்கிறார்கள்"
+          },
+          {
+            "id": "s1-t2",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "अपने सामने पाँच कंकड़ रखो। कंकड़ मुँह में नहीं डालना।",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s1-t3",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "ஐந்து கூழாங்கற்களை உங்கள் முன் வையுங்கள். வாயில் போடாதீர்கள்.",
+            "pause_after_sec": 20.0,
+            "cue": "குழந்தைகள் ஐந்து கற்களை முன்னால் வைக்கிறார்கள்"
+          },
+          {
+            "id": "s1-t4",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "हर कंकड़ को एक बार छुओ। एक कंकड़, एक नंबर। एक, दो, तीन, चार, पाँच।",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s1-t5",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "ஒரு கல்லுக்கு ஒரு எண். தொட்டு சொல்லுங்கள்: ஒன்று, இரண்டு, மூன்று, நான்கு, ஐந்து.",
+            "pause_after_sec": 25.0,
+            "cue": "குழந்தைகள் ஒவ்வொரு கல்லையும் தொட்டு எண்ணுகிறார்கள்"
+          },
+          {
+            "id": "s1-t6",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "आख़िरी नंबर बताता है कि कितने कंकड़ हैं।",
+            "pause_after_sec": 6.0,
+            "cue": "குழந்தைகள் கடைசி எண்ணை மீண்டும் சொல்கிறார்கள்"
+          },
+          {
+            "id": "s1-t7",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "पाँच पर रुके, तो पाँच कंकड़ हैं। शाबाश!",
+            "pause_after_sec": 6.0,
+            "cue": "குழந்தைகள் ஐந்து என்று சொல்கிறார்கள்"
+          }
+        ],
+        "checkpoint": "பெரும்பாலான குழந்தைகள் ஐந்து கற்களையும் ஒவ்வொன்றாக ஒருமுறை தொட்டு எண்ணுகிறார்களா?",
+        "easier": [
+          {
+            "id": "s1-e1",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "कोई बात नहीं। हम धीरे चलेंगे। तीन कंकड़ उठाओ।",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s1-e2",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "மூன்று கூழாங்கற்களை எடுங்கள்.",
+            "pause_after_sec": 12.0,
+            "cue": "குழந்தைகள் மூன்று கற்களை எடுக்கிறார்கள்"
+          },
+          {
+            "id": "s1-e3",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "मैं बोलती हूँ, तुम उँगली से छुओ। एक, दो, तीन।",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s1-e4",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "ஒன்று, இரண்டு, மூன்று. விரலால் தொட்டு சொல்லுங்கள்.",
+            "pause_after_sec": 20.0,
+            "cue": "குழந்தைகள் தொட்டுக்கொண்டே எண்ணுகிறார்கள்"
+          },
+          {
+            "id": "s1-e5",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "आख़िरी नंबर तीन। तीन कंकड़ हैं! बहुत बढ़िया।",
+            "pause_after_sec": 5.0,
+            "cue": "குழந்தைகள் மூன்று என்று சொல்கிறார்கள்"
+          }
+        ],
+        "core": [
+          {
+            "id": "s1-c1",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "अब सात कंकड़ उठाओ। एक-एक छूकर गिनो।",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s1-c2",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "ஏழு கூழாங்கற்களை எடுத்து, தொட்டு எண்ணுங்கள்.",
+            "pause_after_sec": 25.0,
+            "cue": "குழந்தைகள் ஏழு கற்களை எண்ணுகிறார்கள்"
+          },
+          {
+            "id": "s1-c3",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "कंकड़ फैला दो और फिर से गिनो। क्या फिर सात आया?",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s1-c4",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "கற்களைப் பரப்பி மீண்டும் எண்ணுங்கள். மறுபடியும் ஏழு?",
+            "pause_after_sec": 25.0,
+            "cue": "குழந்தைகள் கற்களைப் பரப்பி மீண்டும் எண்ணுகிறார்கள்"
+          },
+          {
+            "id": "s1-c5",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "शाबाश पूजा! शाबाश राजू! कंकड़ कहीं भी रखो, गिनती वही रहती है।",
+            "pause_after_sec": 5.0,
+            "cue": null
+          },
+          {
+            "id": "s1-c6",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "एक हाथ में पाँच उँगलियाँ, दूसरे में भी पाँच। मिलकर दस।",
+            "pause_after_sec": 10.0,
+            "cue": "குழந்தைகள் இரண்டு கைகளின் விரல்களைப் பார்க்கிறார்கள்"
+          },
+          {
+            "id": "s1-c7",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "दस उँगलियाँ! तुम सब बहुत अच्छा गिनते हो।",
+            "pause_after_sec": 4.0,
+            "cue": null
+          },
+          {
+            "id": "s1-c8",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "பத்து விரல்கள். பத்து! பத்து!",
+            "pause_after_sec": 8.0,
+            "cue": "குழந்தைகள் பத்து என்று சொல்கிறார்கள்"
+          }
+        ],
+        "stretch": [
+          {
+            "id": "s1-x1",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "अब दस कंकड़ उठाओ। गिनकर अपने साथी को बताओ।",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s1-x2",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "பத்து கற்களை எண்ணுங்கள். நண்பருக்குச் சொல்லுங்கள்.",
+            "pause_after_sec": 30.0,
+            "cue": "குழந்தைகள் பத்து கற்களை எண்ணி நண்பரிடம் சொல்கிறார்கள்"
+          },
+          {
+            "id": "s1-x3",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "साथी की गिनती सुनो। क्या उसका आख़िरी नंबर भी दस है?",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s1-x4",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "நண்பரின் கடைசி எண்ணும் பத்தா? சொல்லுங்கள்.",
+            "pause_after_sec": 10.0,
+            "cue": "குழந்தைகள் நண்பரின் எண்ணிக்கையைக் கேட்கிறார்கள்"
+          }
+        ],
+        "math_checks": [
+          {
+            "expr": "5 + 5",
+            "answer": 10
+          }
+        ]
+      },
+      {
+        "id": "s2",
+        "title": "எண் பாட்டு: முன்னும் பின்னும்",
+        "activity": "song",
+        "teach": [
+          {
+            "id": "s2-t1",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "अब गिनती का गाना गाएँगे। पोंगल का गाना!",
+            "pause_after_sec": 3.0,
+            "cue": null
+          },
+          {
+            "id": "s2-t2",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "खड़े हो जाओ। हर नंबर पर एक ताली बजाओ।",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s2-t3",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "எழுந்து நில்லுங்கள். ஒவ்வொரு எண்ணுக்கும் ஒரு கைதட்டல்.",
+            "pause_after_sec": 8.0,
+            "cue": "குழந்தைகள் எழுந்து நிற்கிறார்கள்"
+          },
+          {
+            "id": "s2-t4",
+            "speaker": "song",
+            "lang": "hi",
+            "text": "एक, दो, तीन, चार, पाँच, छह, सात, आठ, नौ, दस!",
+            "pause_after_sec": 12.0,
+            "cue": "குழந்தைகள் கைதட்டி ஹிந்தியில் பத்து வரை எண்ணுகிறார்கள்"
+          },
+          {
+            "id": "s2-t5",
+            "speaker": "song",
+            "lang": "ta",
+            "text": "ஒன்று, இரண்டு, மூன்று, நான்கு, ஐந்து, ஆறு, ஏழு, எட்டு, ஒன்பது, பத்து!",
+            "pause_after_sec": 12.0,
+            "cue": "குழந்தைகள் கைதட்டி தமிழில் பத்து வரை எண்ணுகிறார்கள்"
+          },
+          {
+            "id": "s2-t6",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "अब उल्टी गिनती गाओ। दस से एक तक। धीरे-धीरे बैठते जाओ।",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s2-t7",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "இப்போது பின்னோக்கி எண்ணுவோம். பத்திலிருந்து ஒன்று வரை. மெதுவாக உட்காருங்கள்.",
+            "pause_after_sec": 3.0,
+            "cue": null
+          },
+          {
+            "id": "s2-t8",
+            "speaker": "song",
+            "lang": "hi",
+            "text": "दस, नौ, आठ, सात, छह, पाँच, चार, तीन, दो, एक!",
+            "pause_after_sec": 12.0,
+            "cue": "குழந்தைகள் பின்னோக்கி எண்ணிக்கொண்டே மெதுவாக உட்காருகிறார்கள்"
+          }
+        ],
+        "checkpoint": "பெரும்பாலான குழந்தைகள் பத்திலிருந்து ஒன்று வரை பின்னோக்கி சொல்கிறார்களா?",
+        "easier": [
+          {
+            "id": "s2-e1",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "धीरे चलते हैं। पाँच तक उँगलियों से गिनो।",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s2-e2",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "மெதுவாகச் செய்வோம். விரல்களால் ஐந்து வரை எண்ணுங்கள்.",
+            "pause_after_sec": 15.0,
+            "cue": "குழந்தைகள் விரல்களால் ஐந்து வரை எண்ணுகிறார்கள்"
+          },
+          {
+            "id": "s2-e3",
+            "speaker": "song",
+            "lang": "hi",
+            "text": "एक, दो, तीन, चार, पाँच।",
+            "pause_after_sec": 8.0,
+            "cue": "குழந்தைகள் ஹிந்தியில் ஐந்து வரை சொல்கிறார்கள்"
+          },
+          {
+            "id": "s2-e4",
+            "speaker": "song",
+            "lang": "ta",
+            "text": "ஒன்று, இரண்டு, மூன்று, நான்கு, ஐந்து.",
+            "pause_after_sec": 10.0,
+            "cue": "குழந்தைகள் தமிழில் ஐந்து வரை சொல்கிறார்கள்"
+          }
+        ],
+        "core": [
+          {
+            "id": "s2-c1",
+            "speaker": "song",
+            "lang": "ta",
+            "text": "பத்து, ஒன்பது, எட்டு, ஏழு, ஆறு, ஐந்து, நான்கு, மூன்று, இரண்டு, ஒன்று!",
+            "pause_after_sec": 12.0,
+            "cue": "குழந்தைகள் தமிழில் பின்னோக்கி எண்ணுகிறார்கள்"
+          },
+          {
+            "id": "s2-c2",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "शाबाश बच्चो! उल्टी गिनती भी आ गई।",
+            "pause_after_sec": 3.0,
+            "cue": null
+          },
+          {
+            "id": "s2-c3",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "गिलहरी छोटी छलाँग लगाती है। तुम भी हर नंबर पर छलाँग लगाओ।",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s2-c4",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "அணில் போல ஒவ்வொரு எண்ணுக்கும் ஒரு சிறிய தாவல்.",
+            "pause_after_sec": 6.0,
+            "cue": "குழந்தைகள் இடத்திலேயே சிறிதாகத் தாவத் தயாராகிறார்கள்"
+          },
+          {
+            "id": "s2-c5",
+            "speaker": "song",
+            "lang": "ta",
+            "text": "ஒன்று, இரண்டு, மூன்று, நான்கு, ஐந்து, ஆறு, ஏழு, எட்டு, ஒன்பது, பத்து!",
+            "pause_after_sec": 20.0,
+            "cue": "குழந்தைகள் தாவிக்கொண்டே பத்து வரை எண்ணுகிறார்கள்"
+          },
+          {
+            "id": "s2-c6",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "अमित, कविन, मीना, पूजा, तुम सबने ज़ोर से गिना।",
+            "pause_after_sec": 3.0,
+            "cue": null
+          },
+          {
+            "id": "s2-c7",
+            "speaker": "child",
+            "lang": "ta",
+            "text": "நான் பத்து வரை சொன்னேன்!",
+            "pause_after_sec": 3.0,
+            "cue": "குழந்தைகள் சிரித்து மகிழ்கிறார்கள்"
+          }
+        ],
+        "stretch": [
+          {
+            "id": "s2-x1",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "अब आठ से शुरू करो। एक तक उल्टा गिनो।",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s2-x2",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "எட்டிலிருந்து ஒன்று வரை பின்னோக்கி எண்ணுங்கள்.",
+            "pause_after_sec": 12.0,
+            "cue": "குழந்தைகள் எட்டிலிருந்து பின்னோக்கி எண்ணுகிறார்கள்"
+          },
+          {
+            "id": "s2-x3",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "மிகச் சிறப்பு! நீங்கள் எல்லோரும் எண் நட்சத்திரங்கள்!",
+            "pause_after_sec": 3.0,
+            "cue": null
+          }
+        ],
+        "math_checks": []
+      },
+      {
+        "id": "s3",
+        "title": "பத்து மற்றும் இன்னும் சில",
+        "activity": "pebble_task",
+        "teach": [
+          {
+            "id": "s3-t1",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "दस के बाद सुनो: ग्यारह, बारह, तेरह, चौदह, पंद्रह, सोलह, सत्रह, अठारह, उन्नीस, बीस।",
+            "pause_after_sec": 15.0,
+            "cue": "குழந்தைகள் ஹிந்தியில் பதினொன்று முதல் இருபது வரை திரும்பச் சொல்கிறார்கள்"
+          },
+          {
+            "id": "s3-t2",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "दस कंकड़ गिनकर एक ढेरी बनाओ। यह दस की ढेरी है।",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s3-t3",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "பத்து கற்களை எண்ணி ஒரு குவியல் செய்யுங்கள்.",
+            "pause_after_sec": 25.0,
+            "cue": "குழந்தைகள் பத்து கற்களின் குவியல் செய்கிறார்கள்"
+          },
+          {
+            "id": "s3-t4",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "अब तीन कंकड़ दूसरी जगह रखो। दस और तीन।",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s3-t5",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "மூன்று கற்களைத் தனியே வையுங்கள்.",
+            "pause_after_sec": 12.0,
+            "cue": "குழந்தைகள் மூன்று கற்களைத் தனியே வைக்கிறார்கள்"
+          },
+          {
+            "id": "s3-t6",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "दस और तीन मिलकर तेरह होते हैं।",
+            "pause_after_sec": 4.0,
+            "cue": null
+          },
+          {
+            "id": "s3-t7",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "பத்து மற்றும் மூன்று, பதிமூன்று!",
+            "pause_after_sec": 4.0,
+            "cue": null
+          },
+          {
+            "id": "s3-t8",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "என்னுடன் சொல்லுங்கள்: பத்து மற்றும் மூன்று, பதிமூன்று.",
+            "pause_after_sec": 8.0,
+            "cue": "குழந்தைகள் சேர்ந்து சொல்கிறார்கள்"
+          }
+        ],
+        "checkpoint": "பெரும்பாலான குழந்தைகள் பத்து குவியலோடு மூன்று கற்கள் வைத்து பதிமூன்று என்கிறார்களா?",
+        "easier": [
+          {
+            "id": "s3-e1",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "सब कंकड़ अलग कर दो। दस की ढेरी बनाओ, उसके पास एक कंकड़ रखो।",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s3-e2",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "பத்து குவியலோடு ஒரு கல் வைத்து, எல்லாவற்றையும் எண்ணுங்கள். மொத்தம் எத்தனை?",
+            "pause_after_sec": 15.0,
+            "cue": "குழந்தைகள் பத்து குவியலோடு ஒரு கல் வைத்து எண்ணுகிறார்கள்"
+          },
+          {
+            "id": "s3-e3",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "दस और एक, ग्यारह।",
+            "pause_after_sec": 4.0,
+            "cue": null
+          },
+          {
+            "id": "s3-e4",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "பத்து மற்றும் ஒன்று, பதினொன்று. சொல்லுங்கள்.",
+            "pause_after_sec": 6.0,
+            "cue": "குழந்தைகள் பதினொன்று என்று சொல்கிறார்கள்"
+          },
+          {
+            "id": "s3-e5",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "अब एक कंकड़ और जोड़ो। फिर सब गिनो।",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s3-e6",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "இன்னும் ஒரு கல் சேர்த்து எண்ணுங்கள். மொத்தம் எத்தனை?",
+            "pause_after_sec": 12.0,
+            "cue": "குழந்தைகள் இன்னொரு கல் சேர்த்து எண்ணுகிறார்கள்"
+          },
+          {
+            "id": "s3-e7",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "பத்து மற்றும் இரண்டு, பன்னிரண்டு.",
+            "pause_after_sec": 5.0,
+            "cue": "குழந்தைகள் பன்னிரண்டு என்று சொல்கிறார்கள்"
+          }
+        ],
+        "core": [
+          {
+            "id": "s3-c1",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "अब पाँच और कंकड़ लो। दस की ढेरी के पास रखो। फिर सब गिनो।",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s3-c2",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "ஐந்து கற்களை குவியல் அருகே வைத்து, எல்லாவற்றையும் எண்ணுங்கள். மொத்தம் எத்தனை?",
+            "pause_after_sec": 25.0,
+            "cue": "குழந்தைகள் பத்து குவியலோடு ஐந்து கற்கள் சேர்த்து எண்ணுகிறார்கள்"
+          },
+          {
+            "id": "s3-c3",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "பத்து மற்றும் ஐந்து, பதினைந்து! சேர்ந்து சொல்லுங்கள்.",
+            "pause_after_sec": 8.0,
+            "cue": "குழந்தைகள் பதினைந்து என்று சொல்கிறார்கள்"
+          },
+          {
+            "id": "s3-c4",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "पहले वाले पाँच कंकड़ हटाओ। दस की ढेरी में सात जोड़ो और सब गिनो।",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s3-c5",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "ஐந்து கற்களை எடுத்துவிட்டு, குவியலோடு ஏழு சேர்த்து எண்ணுங்கள். மொத்தம் எத்தனை?",
+            "pause_after_sec": 20.0,
+            "cue": "குழந்தைகள் பத்து குவியலோடு ஏழு கற்கள் சேர்த்து எல்லாவற்றையும் எண்ணுகிறார்கள்"
+          },
+          {
+            "id": "s3-c6",
+            "speaker": "child",
+            "lang": "ta",
+            "text": "பதினேழு!",
+            "pause_after_sec": 2.0,
+            "cue": null
+          },
+          {
+            "id": "s3-c7",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "दस और सात, सत्रह! बहुत बढ़िया।",
+            "pause_after_sec": 3.0,
+            "cue": null
+          },
+          {
+            "id": "s3-c8",
+            "speaker": "song",
+            "lang": "ta",
+            "text": "பதினொன்று, பன்னிரண்டு, பதிமூன்று, பதினான்கு, பதினைந்து, பதினாறு, பதினேழு, பதினெட்டு, பத்தொன்பது, இருபது!",
+            "pause_after_sec": 20.0,
+            "cue": "குழந்தைகள் தமிழில் பதினொன்று முதல் இருபது வரை சொல்கிறார்கள்"
+          }
+        ],
+        "stretch": [
+          {
+            "id": "s3-x1",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "सात कंकड़ हटाओ। दस की ढेरी के पास नौ कंकड़ रखो।",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s3-x2",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "ஏழு கற்களை எடுத்துவிட்டு, ஒன்பது கற்கள் சேர்த்து எண்ணுங்கள். மொத்தம் எத்தனை?",
+            "pause_after_sec": 20.0,
+            "cue": "குழந்தைகள் பத்து குவியலோடு ஒன்பது கற்கள் சேர்த்து எண்ணுகிறார்கள்"
+          },
+          {
+            "id": "s3-x3",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "பத்து மற்றும் ஒன்பது, பத்தொன்பது!",
+            "pause_after_sec": 4.0,
+            "cue": null
+          },
+          {
+            "id": "s3-x4",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "एक कंकड़ और जोड़ो। अब दो ढेरी बनाओ। कुल कितने हुए?",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s3-x5",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "இன்னும் ஒரு கல் சேர்த்து, இரண்டு குவியல் ஆக்குங்கள். மொத்தம் எத்தனை?",
+            "pause_after_sec": 15.0,
+            "cue": "குழந்தைகள் இரண்டு பத்து குவியல் செய்து எண்ணுகிறார்கள்"
+          },
+          {
+            "id": "s3-x6",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "दस और दस मिलकर बीस होते हैं।",
+            "pause_after_sec": 3.0,
+            "cue": null
+          },
+          {
+            "id": "s3-x7",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "பத்து மற்றும் பத்து, இருபது!",
+            "pause_after_sec": 5.0,
+            "cue": "குழந்தைகள் இருபது என்று சொல்கிறார்கள்"
+          }
+        ],
+        "math_checks": [
+          {
+            "expr": "10 + 3",
+            "answer": 13
+          },
+          {
+            "expr": "10 + 5",
+            "answer": 15
+          },
+          {
+            "expr": "10 + 7",
+            "answer": 17
+          },
+          {
+            "expr": "10 + 1",
+            "answer": 11
+          },
+          {
+            "expr": "10 + 2",
+            "answer": 12
+          },
+          {
+            "expr": "10 + 9",
+            "answer": 19
+          },
+          {
+            "expr": "10 + 10",
+            "answer": 20
+          }
+        ]
+      },
+      {
+        "id": "s4",
+        "title": "எது அதிகம்? எது குறைவு?",
+        "activity": "pair_work",
+        "teach": [
+          {
+            "id": "s4-t1",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "अब साथी के साथ खेल खेलेंगे। एक साथी ढूँढो।",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s4-t2",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "ஒரு நண்பரைத் தேடுங்கள்.",
+            "pause_after_sec": 8.0,
+            "cue": "குழந்தைகள் ஜோடி சேர்கிறார்கள்"
+          },
+          {
+            "id": "s4-t3",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "एक साथी पाँच ढक्कन लो, दूसरा आठ इमली के बीज। बीज मुँह में नहीं।",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s4-t4",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "ஒருவர் ஐந்து பாட்டில் மூடிகள், மற்றவர் எட்டு புளியங்கொட்டைகள் எடுங்கள். வாயில் போடாதீர்கள்.",
+            "pause_after_sec": 20.0,
+            "cue": "ஆசிரியர் ஜோடிகளை ஒரு பார்வையில் கவனிக்கவும்; வகுப்பு முடிந்ததும் எல்லா சிறு பொருட்களையும் சேகரிக்கவும்"
+          },
+          {
+            "id": "s4-t5",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "दोनों ढेरियों को छूकर गिनो। फिर साथी को बताओ, किसके पास ज़्यादा हैं?",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s4-t6",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "இரண்டையும் தொட்டு எண்ணுங்கள். எது அதிகம்? நண்பரிடம் சொல்லுங்கள்.",
+            "pause_after_sec": 22.0,
+            "cue": "குழந்தைகள் இரண்டு குவியலையும் எண்ணி, எது அதிகம் என்று நண்பரிடம் சொல்கிறார்கள்"
+          },
+          {
+            "id": "s4-t7",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "अगर तुमने आठ कहा, शाबाश! आठ ज़्यादा हैं। पाँच कम हैं।",
+            "pause_after_sec": 3.0,
+            "cue": null
+          },
+          {
+            "id": "s4-t8",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "எட்டு அதிகம். ஐந்து குறைவு. சொல்லுங்கள்.",
+            "pause_after_sec": 8.0,
+            "cue": "குழந்தைகள் அதிகம், குறைவு என்று சொல்கிறார்கள்"
+          }
+        ],
+        "checkpoint": "பெரும்பாலான குழந்தைகள் இரண்டு குவியலில் எது அதிகம் என்று சரியாகச் சொல்கிறார்களா?",
+        "easier": [
+          {
+            "id": "s4-e1",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "छोटे नंबर लेते हैं। तीन ढक्कन और पाँच बीज लो।",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s4-e2",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "மூன்று மூடிகள், ஐந்து கொட்டைகள் எடுங்கள்.",
+            "pause_after_sec": 15.0,
+            "cue": "குழந்தைகள் மூன்று மூடிகளும் ஐந்து கொட்டைகளும் எடுக்கிறார்கள்"
+          },
+          {
+            "id": "s4-e3",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "हर ढक्कन के सामने एक बीज रखो। जो बीज बच जाएँ, वे ज़्यादा हैं।",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s4-e4",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "ஒவ்வொரு மூடிக்கும் எதிரே ஒரு கொட்டை வையுங்கள். மீதம் இருப்பது அதிகம். எது அதிகம்? சொல்லுங்கள்.",
+            "pause_after_sec": 20.0,
+            "cue": "குழந்தைகள் மூடிக்கு எதிரே கொட்டைகளை வைத்து எது அதிகம் என்று சொல்கிறார்கள்"
+          },
+          {
+            "id": "s4-e5",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "पाँच ज़्यादा, तीन कम। ताली बजाओ!",
+            "pause_after_sec": 4.0,
+            "cue": null
+          },
+          {
+            "id": "s4-e6",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "ஐந்து அதிகம். மூன்று குறைவு. கைதட்டுங்கள்!",
+            "pause_after_sec": 5.0,
+            "cue": "குழந்தைகள் கைதட்டுகிறார்கள்"
+          }
+        ],
+        "core": [
+          {
+            "id": "s4-c1",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "अब बारह बीज और नौ ढक्कन लो। गिनो और बताओ, कौन ज़्यादा?",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s4-c2",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "பன்னிரண்டு கொட்டைகள், ஒன்பது மூடிகள். எண்ணி, எது அதிகம் என்று சொல்லுங்கள்.",
+            "pause_after_sec": 25.0,
+            "cue": "குழந்தைகள் எண்ணி நண்பரிடம் விடை சொல்கிறார்கள்"
+          },
+          {
+            "id": "s4-c3",
+            "speaker": "child",
+            "lang": "ta",
+            "text": "பன்னிரண்டு அதிகம்! ஒன்பது குறைவு!",
+            "pause_after_sec": 3.0,
+            "cue": null
+          },
+          {
+            "id": "s4-c4",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "அருமை! பன்னிரண்டு அதிகம், ஒன்பது குறைவு.",
+            "pause_after_sec": 4.0,
+            "cue": "குழந்தைகள் தங்கள் விடையைச் சரிபார்க்கிறார்கள்"
+          },
+          {
+            "id": "s4-c5",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "अब एक से बीस तक साथ में गिनो। खड़े होकर, ज़ोर से!",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s4-c6",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "ஒன்று முதல் இருபது வரை எல்லோரும் சேர்ந்து எண்ணுங்கள்.",
+            "pause_after_sec": 3.0,
+            "cue": "குழந்தைகள் எழுந்து நிற்கிறார்கள்"
+          },
+          {
+            "id": "s4-c7",
+            "speaker": "song",
+            "lang": "ta",
+            "text": "ஒன்று, இரண்டு, மூன்று, நான்கு, ஐந்து, ஆறு, ஏழு, எட்டு, ஒன்பது, பத்து, பதினொன்று, பன்னிரண்டு, பதிமூன்று, பதினான்கு, பதினைந்து, பதினாறு, பதினேழு, பதினெட்டு, பத்தொன்பது, இருபது!",
+            "pause_after_sec": 30.0,
+            "cue": "குழந்தைகள் ஒன்று முதல் இருபது வரை உரக்கச் சொல்கிறார்கள்"
+          },
+          {
+            "id": "s4-c8",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "அருமை! இருபது வரை எண்ணிவிட்டீர்கள். உங்களுக்குப் பெரிய கைதட்டல்!",
+            "pause_after_sec": 4.0,
+            "cue": "குழந்தைகள் கைதட்டுகிறார்கள்"
+          }
+        ],
+        "stretch": [
+          {
+            "id": "s4-x1",
+            "speaker": "guide",
+            "lang": "hi",
+            "text": "एक साथी सोलह कंकड़ की ढेरी बनाओ, दूसरा सत्रह की। कौन ज़्यादा?",
+            "pause_after_sec": 0.0,
+            "cue": null
+          },
+          {
+            "id": "s4-x2",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "ஒருவர் பதினாறு, மற்றவர் பதினேழு கற்களின் குவியல் செய்யுங்கள். எது அதிகம்?",
+            "pause_after_sec": 30.0,
+            "cue": "குழந்தைகள் இரண்டு குவியலை எண்ணி ஒப்பிடுகிறார்கள்"
+          },
+          {
+            "id": "s4-x3",
+            "speaker": "guide",
+            "lang": "ta",
+            "text": "பதினேழு அதிகம். பதினாறு குறைவு. மிகச் சிறப்பு!",
+            "pause_after_sec": 5.0,
+            "cue": "குழந்தைகள் விடையைச் சரிபார்க்கிறார்கள்"
+          }
+        ],
+        "math_checks": []
+      }
+    ],
+    "analogy": [
+      {
+        "id": "a1",
+        "speaker": "guide",
+        "lang": "hi",
+        "text": "सुनो एक कहानी। सुनीता की माँ बाज़ार से केले लाई।",
+        "pause_after_sec": 2.0,
+        "cue": null
+      },
+      {
+        "id": "a2",
+        "speaker": "guide",
+        "lang": "hi",
+        "text": "सुनीता ने हर केले को एक बार छुआ। एक, दो, तीन।",
+        "pause_after_sec": 2.0,
+        "cue": null
+      },
+      {
+        "id": "a3",
+        "speaker": "guide",
+        "lang": "hi",
+        "text": "आख़िरी केला सातवाँ था। तो सात केले हैं!",
+        "pause_after_sec": 2.0,
+        "cue": null
+      },
+      {
+        "id": "a4",
+        "speaker": "guide",
+        "lang": "ta",
+        "text": "ஏழு வாழைப்பழங்கள்! கடைசி எண் எத்தனை என்று சொல்லும்.",
+        "pause_after_sec": 2.0,
+        "cue": null
+      },
+      {
+        "id": "a5",
+        "speaker": "guide",
+        "lang": "hi",
+        "text": "अगर वह एक केले को दो बार छूती, तो गिनती गड़बड़ हो जाती।",
+        "pause_after_sec": 2.0,
+        "cue": null
+      },
+      {
+        "id": "a6",
+        "speaker": "guide",
+        "lang": "hi",
+        "text": "एक केला, एक नंबर। यही गिनती का नियम है।",
+        "pause_after_sec": 2.0,
+        "cue": null
+      },
+      {
+        "id": "a7",
+        "speaker": "guide",
+        "lang": "ta",
+        "text": "ஒரு பழம், ஒரு எண்.",
+        "pause_after_sec": 2.0,
+        "cue": null
+      },
+      {
+        "id": "a8",
+        "speaker": "guide",
+        "lang": "hi",
+        "text": "दस केले का गुच्छा, और तीन अलग। दस और तीन, तेरह!",
+        "pause_after_sec": 2.0,
+        "cue": null
+      },
+      {
+        "id": "a9",
+        "speaker": "guide",
+        "lang": "ta",
+        "text": "பத்து மற்றும் மூன்று, பதிமூன்று!",
+        "pause_after_sec": 2.0,
+        "cue": null
+      }
+    ],
+    "ivr_recap": [
+      {
+        "id": "r1",
+        "speaker": "guide",
+        "lang": "hi",
+        "text": "नमस्ते! आज कक्षा छूट गई? कोई बात नहीं। हम साथ सीखेंगे।",
+        "pause_after_sec": 3.0,
+        "cue": null
+      },
+      {
+        "id": "r2",
+        "speaker": "guide",
+        "lang": "hi",
+        "text": "अपनी उँगलियाँ या पाँच छोटे पत्थर ले लो। मुँह में मत डालना।",
+        "pause_after_sec": 0.0,
+        "cue": null
+      },
+      {
+        "id": "r3",
+        "speaker": "guide",
+        "lang": "ta",
+        "text": "உங்கள் விரல்கள் அல்லது ஐந்து சிறு கற்கள் எடுங்கள். வாயில் போடாதீர்கள்.",
+        "pause_after_sec": 10.0,
+        "cue": "குழந்தை விரல்கள் அல்லது கற்களை எடுக்கிறது"
+      },
+      {
+        "id": "r4",
+        "speaker": "guide",
+        "lang": "hi",
+        "text": "हर उँगली को एक बार छुओ और गिनो: एक, दो, तीन, चार, पाँच।",
+        "pause_after_sec": 0.0,
+        "cue": null
+      },
+      {
+        "id": "r5",
+        "speaker": "guide",
+        "lang": "ta",
+        "text": "ஒரு விரலுக்கு ஒரு எண்: ஒன்று, இரண்டு, மூன்று, நான்கு, ஐந்து.",
+        "pause_after_sec": 15.0,
+        "cue": "குழந்தை தொட்டு எண்ணுகிறது"
+      },
+      {
+        "id": "r6",
+        "speaker": "guide",
+        "lang": "hi",
+        "text": "आख़िरी नंबर बताता है कि कितने हैं। पाँच!",
+        "pause_after_sec": 4.0,
+        "cue": null
+      },
+      {
+        "id": "r7",
+        "speaker": "guide",
+        "lang": "hi",
+        "text": "अब दोनों हाथ दिखाओ। पाँच उँगलियाँ इधर, पाँच उधर। मिलकर दस।",
+        "pause_after_sec": 8.0,
+        "cue": null
+      },
+      {
+        "id": "r8",
+        "speaker": "guide",
+        "lang": "ta",
+        "text": "இரண்டு கைகளையும் காட்டுங்கள். பத்து விரல்கள், பத்து!",
+        "pause_after_sec": 8.0,
+        "cue": "குழந்தை பத்து என்று சொல்கிறது"
+      },
+      {
+        "id": "r9",
+        "speaker": "guide",
+        "lang": "hi",
+        "text": "दस के बाद ग्यारह, बारह, तेरह। दस और तीन, तेरह।",
+        "pause_after_sec": 4.0,
+        "cue": null
+      },
+      {
+        "id": "r10",
+        "speaker": "guide",
+        "lang": "hi",
+        "text": "दस उँगलियाँ दिखाओ। फिर तीन छोटे पत्थर साथ में रखो।",
+        "pause_after_sec": 0.0,
+        "cue": null
+      },
+      {
+        "id": "r11",
+        "speaker": "guide",
+        "lang": "ta",
+        "text": "பத்து விரல்களைக் காட்டுங்கள். மூன்று சிறு கற்களையும் வையுங்கள்.",
+        "pause_after_sec": 15.0,
+        "cue": "குழந்தை பத்து விரல்களையும் மூன்று கற்களையும் வைக்கிறது"
+      },
+      {
+        "id": "r12",
+        "speaker": "guide",
+        "lang": "hi",
+        "text": "दस और तीन, तेरह। मेरे साथ बोलो।",
+        "pause_after_sec": 8.0,
+        "cue": null
+      },
+      {
+        "id": "r13",
+        "speaker": "guide",
+        "lang": "ta",
+        "text": "பத்து மற்றும் மூன்று, பதிமூன்று. சொல்லுங்கள்.",
+        "pause_after_sec": 8.0,
+        "cue": "குழந்தை பதிமூன்று என்று சொல்கிறது"
+      },
+      {
+        "id": "r14",
+        "speaker": "guide",
+        "lang": "hi",
+        "text": "अब उल्टी गिनती गाओ। दस से एक तक।",
+        "pause_after_sec": 0.0,
+        "cue": null
+      },
+      {
+        "id": "r15",
+        "speaker": "song",
+        "lang": "hi",
+        "text": "दस, नौ, आठ, सात, छह, पाँच, चार, तीन, दो, एक!",
+        "pause_after_sec": 12.0,
+        "cue": "குழந்தை ஹிந்தியில் பின்னோக்கி எண்ணுகிறது"
+      },
+      {
+        "id": "r16",
+        "speaker": "song",
+        "lang": "ta",
+        "text": "பத்து, ஒன்பது, எட்டு, ஏழு, ஆறு, ஐந்து, நான்கு, மூன்று, இரண்டு, ஒன்று!",
+        "pause_after_sec": 12.0,
+        "cue": "குழந்தை தமிழில் பின்னோக்கி எண்ணுகிறது"
+      },
+      {
+        "id": "r17",
+        "speaker": "guide",
+        "lang": "hi",
+        "text": "आज तुमने सीखा: एक चीज़ छुओ, एक नंबर बोलो।",
+        "pause_after_sec": 3.0,
+        "cue": null
+      },
+      {
+        "id": "r18",
+        "speaker": "guide",
+        "lang": "ta",
+        "text": "ஒரு பொருளுக்கு ஒரு எண். கடைசி எண் எத்தனை என்று சொல்லும்.",
+        "pause_after_sec": 3.0,
+        "cue": null
+      },
+      {
+        "id": "r19",
+        "speaker": "guide",
+        "lang": "hi",
+        "text": "शाबाश! कल कक्षा में फिर मिलते हैं।",
+        "pause_after_sec": 2.0,
+        "cue": null
+      }
+    ]
+  },
+  "review": {
+    "model": "claude-haiku-5-5",
+    "rubric": {
+      "scores": {
+        "pedagogy": {
+          "score": 3,
+          "reason": "The sequence is clear, but the episode never has children read or write numerals despite the NIPUN goal, and scripted child answers pre-empt the children's own responses."
+        },
+        "age_fit": {
+          "score": 4,
+          "reason": "Most lines are short and use familiar numbers, though a few Hindi sentences in the core branches are long."
+        },
+        "accuracy": {
+          "score": 3,
+          "reason": "The analogy counts to three and then calls the last banana seventh, which is a clear internal contradiction for a counting lesson."
+        },
+        "language_bridge": {
+          "score": 3,
+          "reason": "Several new Tamil number names (14, 16, 18, 20) first appear only in a fast chant with no Hindi-to-Tamil restatement before it."
+        },
+        "localisation": {
+          "score": 4,
+          "reason": "Bananas, pebbles, tamarind seeds, squirrels and Pongal suit the district, though the Pongal label is not backed by any Pongal content."
+        },
+        "safety": {
+          "score": 3,
+          "reason": "The pair activity uses small bottle caps and seeds for young children with only a mouth warning and no supervision or size guidance."
+        }
+      },
+      "issues": [
+        {
+          "line_id": "a2",
+          "criterion": "accuracy",
+          "problem": "The line counts only one, two, three, but the next line says the last banana was the seventh, so the count does not match.",
+          "fix": "Change the Hindi to count through seven: एक, दो, तीन, चार, पाँच, छह, सात, and add a matching Tamil restatement."
+        },
+        {
+          "line_id": "s3-c8",
+          "criterion": "language_bridge",
+          "problem": "Tamil number names fourteen, sixteen, eighteen and twenty are heard for the first time in this fast chant with no prior Hindi-to-Tamil restatement.",
+          "fix": "Before the chant, add a short Hindi line and Tamil restatement for 14, 16, 18 and 20 (for example, 'दस और चार, चौदह' / 'பத்து மற்றும் நான்கு, பதினான்கு'), then pause for children to repeat."
+        },
+        {
+          "line_id": "s4-t3",
+          "criterion": "safety",
+          "problem": "Young children are handed small bottle caps and tamarind seeds to handle in pairs, with only a 'do not put in mouth' warning, which is a choking risk when no adult is positioned to watch.",
+          "fix": "Use larger objects such as big pebbles or bottle caps only, say the teacher will walk around to check each pair, and add a cue to collect all small items before the next line."
+        },
+        {
+          "line_id": "s2-t1",
+          "criterion": "localisation",
+          "problem": "The line calls the counting song the Pongal song, but the song itself has no Pongal content, so the label is misleading and the link is not used.",
+          "fix": "Either change the line to 'counting song' or add one Pongal-linked counting example, such as counting pots of rice or coconuts, so the festival reference is real."
+        },
+        {
+          "line_id": "s2-c7",
+          "criterion": "pedagogy",
+          "problem": "A scripted child speaker announces 'I said up to ten!' on the recording, which removes the chance for real children to answer or check their own counts.",
+          "fix": "Replace the scripted child line with a guide prompt such as 'तुमने कहाँ तक गिना?' / 'நீங்கள் எத்தனை வரை எண்ணினீர்கள்?' followed by a 5-second pause."
+        },
+        {
+          "line_id": "s4-c3",
+          "criterion": "pedagogy",
+          "problem": "A scripted child speaker gives the answer 'twelve more, nine less' immediately after the question, so the class hears the answer before attempting it.",
+          "fix": "Remove the child line, ask the question, add a 10-second pause for children to say their answer, then have the guide confirm."
+        },
+        {
+          "line_id": "s3-c6",
+          "criterion": "pedagogy",
+          "problem": "A scripted child speaker says 'seventeen' right after the count, which pre-empts the children and makes the checkpoint less reliable.",
+          "fix": "Replace the child line with a guide prompt asking children to say the total, with a 5-second pause before confirming the answer."
+        },
+        {
+          "line_id": "s1-c5",
+          "criterion": "age_fit",
+          "problem": "The Hindi sentence 'Wherever you put the pebbles, the count stays the same' is long and abstract for a new Grade 1 listener.",
+          "fix": "Shorten to two sentences: 'कंकड़ कहीं भी रखो। गिनती वही रहती है।' with the matching Tamil restatement."
+        },
+        {
+          "line_id": "s1-t1",
+          "criterion": "pedagogy",
+          "problem": "The episode teaches counting and number names but never has children read or write numerals (for example 5, 13), although the NIPUN goal requires reading and writing numbers.",
+          "fix": "Add a short slate-and-chalk step in which children write 5 and then 13 after the pebble count, with a pause for them to copy and a Tamil restatement of the digit names."
+        }
+      ]
+    },
+    "gloss": [
+      {
+        "line_id": "a1",
+        "english": "Listen, a story. Sunita's mother brought bananas from the market."
+      },
+      {
+        "line_id": "a2",
+        "english": "Sunita touched each banana once. One, two, three."
+      },
+      {
+        "line_id": "a3",
+        "english": "The last banana was the seventh. So there are seven bananas!"
+      },
+      {
+        "line_id": "a4",
+        "english": "Seven bananas! Say what the last number is."
+      },
+      {
+        "line_id": "a5",
+        "english": "If she touched one banana twice, the counting would go wrong."
+      },
+      {
+        "line_id": "a6",
+        "english": "One banana, one number. This is the rule of counting."
+      },
+      {
+        "line_id": "a7",
+        "english": "One fruit, one number."
+      },
+      {
+        "line_id": "a8",
+        "english": "A bunch of ten bananas, and three separate. Ten and three, thirteen!"
+      },
+      {
+        "line_id": "a9",
+        "english": "Ten and three, thirteen!"
+      },
+      {
+        "line_id": "r1",
+        "english": "Hello! Did you miss class today? No problem. We will learn together."
+      },
+      {
+        "line_id": "r2",
+        "english": "Take your fingers or five small stones. Do not put them in your mouth."
+      },
+      {
+        "line_id": "r3",
+        "english": "Take your fingers or five small stones. Do not put them in your mouth."
+      },
+      {
+        "line_id": "r4",
+        "english": "Touch each finger once and count: one, two, three, four, five."
+      },
+      {
+        "line_id": "r5",
+        "english": "One number for one finger: one, two, three, four, five."
+      },
+      {
+        "line_id": "r6",
+        "english": "The last number tells how many there are. Five!"
+      },
+      {
+        "line_id": "r7",
+        "english": "Now show both hands. Five fingers here, five there. Together, ten."
+      },
+      {
+        "line_id": "r8",
+        "english": "Show both hands. Ten fingers, ten!"
+      },
+      {
+        "line_id": "r9",
+        "english": "After ten comes eleven, twelve, thirteen. Ten and three, thirteen."
+      },
+      {
+        "line_id": "r10",
+        "english": "Show ten fingers. Then place three small stones together."
+      },
+      {
+        "line_id": "r11",
+        "english": "Show ten fingers. Place three small stones too."
+      },
+      {
+        "line_id": "r12",
+        "english": "Ten and three, thirteen. Say it with me."
+      },
+      {
+        "line_id": "r13",
+        "english": "Ten and three, thirteen. Say it."
+      },
+      {
+        "line_id": "r14",
+        "english": "Now sing the countdown. Ten to one."
+      },
+      {
+        "line_id": "r15",
+        "english": "Ten, nine, eight, seven, six, five, four, three, two, one!"
+      },
+      {
+        "line_id": "r16",
+        "english": "Ten, nine, eight, seven, six, five, four, three, two, one!"
+      },
+      {
+        "line_id": "r17",
+        "english": "Today you learned: touch one thing, say one number."
+      },
+      {
+        "line_id": "r18",
+        "english": "One number for one object. Say what the last number is."
+      },
+      {
+        "line_id": "r19",
+        "english": "Well done! See you in class again tomorrow."
+      },
+      {
+        "line_id": "s1-t1",
+        "english": "Hello Pooja, Raju, Sunita, Amit! Today we will learn counting."
+      },
+      {
+        "line_id": "s1-t2",
+        "english": "Put five pebbles in front of you. Do not put the pebbles in your mouth."
+      },
+      {
+        "line_id": "s1-t3",
+        "english": "Place five pebbles in front of you. Do not put them in your mouth."
+      },
+      {
+        "line_id": "s1-t4",
+        "english": "Touch each pebble once. One pebble, one number. One, two, three, four, five."
+      },
+      {
+        "line_id": "s1-t5",
+        "english": "One number for one pebble. Touch and say: one, two, three, four, five."
+      },
+      {
+        "line_id": "s1-t6",
+        "english": "The last number tells how many pebbles there are."
+      },
+      {
+        "line_id": "s1-t7",
+        "english": "Stopped at five, so there are five pebbles. Well done!"
+      },
+      {
+        "line_id": "s1-e1",
+        "english": "No problem. We will go slowly. Pick up three pebbles."
+      },
+      {
+        "line_id": "s1-e2",
+        "english": "Pick up three pebbles."
+      },
+      {
+        "line_id": "s1-e3",
+        "english": "I say, you touch with your finger. One, two, three."
+      },
+      {
+        "line_id": "s1-e4",
+        "english": "One, two, three. Touch with your finger and say."
+      },
+      {
+        "line_id": "s1-e5",
+        "english": "Last number three. Three pebbles! Very good."
+      },
+      {
+        "line_id": "s1-c1",
+        "english": "Now pick up seven pebbles. Touch and count each one."
+      },
+      {
+        "line_id": "s1-c2",
+        "english": "Pick up seven pebbles, touch them and count."
+      },
+      {
+        "line_id": "s1-c3",
+        "english": "Spread the pebbles out and count again. Did you get seven again?"
+      },
+      {
+        "line_id": "s1-c4",
+        "english": "Spread the pebbles and count again. Seven again?"
+      },
+      {
+        "line_id": "s1-c5",
+        "english": "Well done Pooja! Well done Raju! Wherever you put the pebbles, the count stays the same."
+      },
+      {
+        "line_id": "s1-c6",
+        "english": "Five fingers on one hand, five on the other. Together, ten."
+      },
+      {
+        "line_id": "s1-c7",
+        "english": "Ten fingers! You all count very well."
+      },
+      {
+        "line_id": "s1-c8",
+        "english": "Ten fingers. Ten! Ten!"
+      },
+      {
+        "line_id": "s1-x1",
+        "english": "Now pick up ten pebbles. Count them and tell your partner."
+      },
+      {
+        "line_id": "s1-x2",
+        "english": "Count ten pebbles. Tell your friend."
+      },
+      {
+        "line_id": "s1-x3",
+        "english": "Listen to your partner's count. Is their last number also ten?"
+      },
+      {
+        "line_id": "s1-x4",
+        "english": "Is the friend's last number also ten? Say it."
+      },
+      {
+        "line_id": "s2-t1",
+        "english": "Now we will sing the counting song. The Pongal song!"
+      },
+      {
+        "line_id": "s2-t2",
+        "english": "Stand up. Clap once on each number."
+      },
+      {
+        "line_id": "s2-t3",
+        "english": "Stand up. One clap for each number."
+      },
+      {
+        "line_id": "s2-t4",
+        "english": "One, two, three, four, five, six, seven, eight, nine, ten!"
+      },
+      {
+        "line_id": "s2-t5",
+        "english": "One, two, three, four, five, six, seven, eight, nine, ten!"
+      },
+      {
+        "line_id": "s2-t6",
+        "english": "Now sing the countdown. Ten to one. Sit down slowly, one by one."
+      },
+      {
+        "line_id": "s2-t7",
+        "english": "Now let's count backwards. From ten to one. Sit down slowly."
+      },
+      {
+        "line_id": "s2-t8",
+        "english": "Ten, nine, eight, seven, six, five, four, three, two, one!"
+      },
+      {
+        "line_id": "s2-e1",
+        "english": "Let's go slowly. Count up to five on your fingers."
+      },
+      {
+        "line_id": "s2-e2",
+        "english": "Let's do it slowly. Count up to five on your fingers."
+      },
+      {
+        "line_id": "s2-e3",
+        "english": "One, two, three, four, five."
+      },
+      {
+        "line_id": "s2-e4",
+        "english": "One, two, three, four, five."
+      },
+      {
+        "line_id": "s2-c1",
+        "english": "Ten, nine, eight, seven, six, five, four, three, two, one!"
+      },
+      {
+        "line_id": "s2-c2",
+        "english": "Well done children! The countdown has come too."
+      },
+      {
+        "line_id": "s2-c3",
+        "english": "The squirrel makes small jumps. You also jump on each number."
+      },
+      {
+        "line_id": "s2-c4",
+        "english": "Like a squirrel, a small jump for each number."
+      },
+      {
+        "line_id": "s2-c5",
+        "english": "One, two, three, four, five, six, seven, eight, nine, ten!"
+      },
+      {
+        "line_id": "s2-c6",
+        "english": "Amit, Kavin, Meena, Pooja, you all counted loudly."
+      },
+      {
+        "line_id": "s2-c7",
+        "english": "I said up to ten!"
+      },
+      {
+        "line_id": "s2-x1",
+        "english": "Now start from eight. Count backwards to one."
+      },
+      {
+        "line_id": "s2-x2",
+        "english": "From eight to one, count backwards."
+      },
+      {
+        "line_id": "s2-x3",
+        "english": "Excellent! You are all number stars!"
+      },
+      {
+        "line_id": "s3-t1",
+        "english": "After ten listen: eleven, twelve, thirteen, fourteen, fifteen, sixteen, seventeen, eighteen, nineteen, twenty."
+      },
+      {
+        "line_id": "s3-t2",
+        "english": "Count ten pebbles and make a heap. This is the ten heap."
+      },
+      {
+        "line_id": "s3-t3",
+        "english": "Count ten pebbles and make a heap."
+      },
+      {
+        "line_id": "s3-t4",
+        "english": "Now place three pebbles in another place. Ten and three."
+      },
+      {
+        "line_id": "s3-t5",
+        "english": "Place three pebbles separately."
+      },
+      {
+        "line_id": "s3-t6",
+        "english": "Ten and three together make thirteen."
+      },
+      {
+        "line_id": "s3-t7",
+        "english": "Ten and three, thirteen!"
+      },
+      {
+        "line_id": "s3-t8",
+        "english": "Say with me: ten and three, thirteen."
+      },
+      {
+        "line_id": "s3-e1",
+        "english": "Separate all the pebbles. Make a heap of ten, put one pebble beside it."
+      },
+      {
+        "line_id": "s3-e2",
+        "english": "Count the heap of ten with one pebble beside it. How many in total?"
+      },
+      {
+        "line_id": "s3-e3",
+        "english": "Ten and one, eleven."
+      },
+      {
+        "line_id": "s3-e4",
+        "english": "Ten and one, eleven. Say it."
+      },
+      {
+        "line_id": "s3-e5",
+        "english": "Now add one more pebble. Then count all."
+      },
+      {
+        "line_id": "s3-e6",
+        "english": "Add one more pebble and count. How many in total?"
+      },
+      {
+        "line_id": "s3-e7",
+        "english": "Ten and two, twelve."
+      },
+      {
+        "line_id": "s3-c1",
+        "english": "Now take five more pebbles. Put them near the ten heap. Then count all."
+      },
+      {
+        "line_id": "s3-c2",
+        "english": "Put five pebbles near the heap and count everything. How many in total?"
+      },
+      {
+        "line_id": "s3-c3",
+        "english": "Ten and five, fifteen! Say it together."
+      },
+      {
+        "line_id": "s3-c4",
+        "english": "Remove the first five pebbles. Add seven to the ten heap and count all."
+      },
+      {
+        "line_id": "s3-c5",
+        "english": "Remove five pebbles, add seven to the heap and count everything. How many in total?"
+      },
+      {
+        "line_id": "s3-c6",
+        "english": "Seventeen!"
+      },
+      {
+        "line_id": "s3-c7",
+        "english": "Ten and seven, seventeen! Very good."
+      },
+      {
+        "line_id": "s3-c8",
+        "english": "Eleven, twelve, thirteen, fourteen, fifteen, sixteen, seventeen, eighteen, nineteen, twenty!"
+      },
+      {
+        "line_id": "s3-x1",
+        "english": "Remove seven pebbles. Put nine pebbles near the ten heap."
+      },
+      {
+        "line_id": "s3-x2",
+        "english": "Remove seven pebbles, add nine pebbles and count. How many in total?"
+      },
+      {
+        "line_id": "s3-x3",
+        "english": "Ten and nine, nineteen!"
+      },
+      {
+        "line_id": "s3-x4",
+        "english": "Add one more pebble. Now make two heaps. How many in total?"
+      },
+      {
+        "line_id": "s3-x5",
+        "english": "Add one more pebble, make two heaps. How many in total?"
+      },
+      {
+        "line_id": "s3-x6",
+        "english": "Ten and ten together make twenty."
+      },
+      {
+        "line_id": "s3-x7",
+        "english": "Ten and ten, twenty!"
+      },
+      {
+        "line_id": "s4-t1",
+        "english": "Now we will play a game with a partner. Find a partner."
+      },
+      {
+        "line_id": "s4-t2",
+        "english": "Find a friend."
+      },
+      {
+        "line_id": "s4-t3",
+        "english": "One partner takes five bottle caps, the other eight tamarind seeds. Seeds not in the mouth."
+      },
+      {
+        "line_id": "s4-t4",
+        "english": "One takes five bottle caps, the other eight tamarind seeds. Do not put them in your mouth."
+      },
+      {
+        "line_id": "s4-t5",
+        "english": "Count both piles by touching them. Then tell your partner, who has more?"
+      },
+      {
+        "line_id": "s4-t6",
+        "english": "Count both by touching. Which is more? Tell your friend."
+      },
+      {
+        "line_id": "s4-t7",
+        "english": "If you said eight, well done! Eight is more. Five is less."
+      },
+      {
+        "line_id": "s4-t8",
+        "english": "Eight is more. Five is less. Say it."
+      },
+      {
+        "line_id": "s4-e1",
+        "english": "Let's take small numbers. Take three caps and five seeds."
+      },
+      {
+        "line_id": "s4-e2",
+        "english": "Three caps, five seeds."
+      },
+      {
+        "line_id": "s4-e3",
+        "english": "Put one seed in front of each cap. The seeds left over are more."
+      },
+      {
+        "line_id": "s4-e4",
+        "english": "Put one seed in front of each cap. What is left over is more. Which is more? Say it."
+      },
+      {
+        "line_id": "s4-e5",
+        "english": "Five more, three less. Clap!"
+      },
+      {
+        "line_id": "s4-e6",
+        "english": "Five is more. Three is less. Clap your hands!"
+      },
+      {
+        "line_id": "s4-c1",
+        "english": "Now take twelve seeds and nine caps. Count and tell which is more."
+      },
+      {
+        "line_id": "s4-c2",
+        "english": "Twelve seeds, nine caps. Count and say which is more."
+      },
+      {
+        "line_id": "s4-c3",
+        "english": "Twelve more! Nine less!"
+      },
+      {
+        "line_id": "s4-c4",
+        "english": "Excellent! Twelve more, nine less."
+      },
+      {
+        "line_id": "s4-c5",
+        "english": "Now count together from one to twenty. Stand up, loudly!"
+      },
+      {
+        "line_id": "s4-c6",
+        "english": "Everyone count together from one to twenty."
+      },
+      {
+        "line_id": "s4-c7",
+        "english": "One, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve, thirteen, fourteen, fifteen, sixteen, seventeen, eighteen, nineteen, twenty!"
+      },
+      {
+        "line_id": "s4-c8",
+        "english": "Excellent! You counted up to twenty. A big clap for you!"
+      },
+      {
+        "line_id": "s4-x1",
+        "english": "One partner makes a heap of sixteen pebbles, the other seventeen. Which is more?"
+      },
+      {
+        "line_id": "s4-x2",
+        "english": "One makes a heap of sixteen, the other seventeen. Which is more?"
+      },
+      {
+        "line_id": "s4-x3",
+        "english": "Seventeen more. Sixteen less. Excellent!"
+      }
+    ]
+  },
+  "review_notes": "Read by a Tamil speaker: number words correct. Fix the analogy count before voicing.",
+  "edits": null
+}
