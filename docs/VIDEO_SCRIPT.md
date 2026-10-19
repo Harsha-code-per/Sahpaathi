@@ -1,0 +1,15 @@
+# 3-minute video script
+
+Public YouTube video required by the submission (challenge → UI walkthrough → key features → ease of use). Record the phone screen (Android screen recorder) and the laptop (OBS or the browser's own recorder); film the classroom shots on a phone. **Children only with written consent (docs/CONSENT_FORM.md); otherwise film hands, slates and the speaker, never faces.** Voice-over in English, captions in Tamil and Hindi if time allows.
+
+| Time | On screen | Voice-over (about 150 words a minute) |
+|---|---|---|
+| 0:00–0:20 | A single-teacher classroom: Grade 3 at the board, Grade 1 waiting. Title card: "1,04,125 single-teacher schools (UDISE+ 2024–25)" | "In over a lakh Indian schools, one teacher teaches every grade at once. While she teaches Grade 3, Grade 1 waits. Many of those children speak a home language that is not the school's." |
+| 0:20–0:35 | The ₹500 speaker next to a phone; the landing page hero | "Sahpaathi is a second teacher in a ₹500 speaker. It runs a lively audio lesson for one grade, in the children's home language, with no internet in the room." |
+| 0:35–1:05 | Laptop: Studio. Write a lesson (Grade 1 numbers to 20, Chennai, Hindi to Tamil), then open a finished one: review scores, a flag under its line, the pencil correction, Approve | "Claude writes each lesson from the textbook chapter and the district: local names, crops and free props like pebbles. Four checks follow: code recomputes every sum, a second model reviews and translates every line back, and a native speaker corrects and approves. Only approved lessons are voiced." |
+| 1:05–1:50 | Phone in airplane mode (show the icon): language switch to தமிழ், open lesson, the blackboard sketch, Start; the speaker plays; checkpoint; tap "Most got it"; the analogy button | "In class the phone is offline. The teacher picks the lesson in her own language and presses start. After each part she glances at the children and taps: most, some or few got it. The lesson switches to stretch, more practice or easier, instantly, on the phone. No tap in ten seconds? It carries on." |
+| 1:50–2:15 | Attendance: tap two roll numbers, Save. Laptop: Admin, the call simulator, press 2 | "After class she marks who was absent. When the phone next finds a signal, each absent child gets a catch-up call on a parent's basic phone: the recap, then press one to hear it again, two if the child understood, three for help." |
+| 2:15–2:40 | Admin overview: donut, taps per day, lesson pipeline | "Block officers see how lessons land: how often most children got it, which lessons need work, and which calls were answered." |
+| 2:40–3:00 | Testing photo or quote from interview #1 (consented), then the end card with sahpaathi.vercel.app | "We tested it with teachers in Tamil Nadu and changed it from what they told us. Sahpaathi: a co-teacher for the grade the teacher can't reach right now. Try it at sahpaathi.vercel.app." |
+
+**Before recording:** have a voiced Tamil pack on the phone, turn on airplane mode before opening the app, set the phone to Do Not Disturb, and use the demo accounts in the README. Keep it under 3:00; cut the Admin part first if long.
