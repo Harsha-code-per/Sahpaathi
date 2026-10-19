@@ -1,0 +1,9 @@
+# Vercel builds only the app (Root Directory: app), which reads the sample lesson from content/.
+# Upload nothing else: never backend/.env, keys or local builds.
+/*
+!/app
+!/content
+/app/node_modules
+/app/dist
+/app/.env
+/app/.env.*
