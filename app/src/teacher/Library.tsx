@@ -1,4 +1,8 @@
+import { CloudCheckIcon, CloudUploadIcon, DownloadIcon, PencilIcon, PlayIcon, Share2Icon, Trash2Icon } from 'lucide-react'
 import { useCallback, useEffect, useState, type ChangeEvent } from 'react'
+import { cn } from 'cn'
+import { LogoMark } from '@/components/Logo'
+import { Button } from '@/components/ui/button'
 import type { Episode } from '../lib/types'
 import { ClassroomSetup } from '../attendance/Attendance'
 import { getClassroom } from '../attendance/classroom'
@@ -15,33 +19,89 @@ export interface OpenLesson {
 
 type Notice = { kind: 'ok' | 'error'; text: string }
 
-function LessonCard(props: { episode: Episode; badge?: string; onOpen: () => void; onShare?: () => void; onRemove?: () => void }) {
+/** "All synced" or how many taps and attendance saves wait for a signal. */
+export function SyncBadge({ pending }: { pending: number | null }) {
+  if (pending === null) return null
+  return pending ? (
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-warn px-2.5 py-1 text-[0.8125rem] font-semibold text-warn-foreground">
+      <CloudUploadIcon className="size-4" aria-hidden /> {pending} to sync
+    </span>
+  ) : (
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-ok px-2.5 py-1 text-[0.8125rem] font-semibold text-ok-foreground">
+      <CloudCheckIcon className="size-4" aria-hidden /> All synced
+    </span>
+  )
+}
+
+function LessonCard(props: { episode: Episode; badge?: string; featured?: boolean; onOpen: () => void; onShare?: () => void; onRemove?: () => void }) {
   const { episode: e } = props
+  const meta = `Grade ${e.grade} · ${e.district} · ${e.duration_min} min`
+  if (props.featured)
+    return (
+      <li className="space-y-3 rounded-3xl bg-primary p-5 text-primary-foreground">
+        <p className="text-[0.8125rem] font-bold tracking-[0.08em] uppercase">{props.badge ?? 'Newest lesson'}</p>
+        <h2 className="font-heading text-3xl leading-tight font-bold" lang={e.school_lang}>
+          {e.title}
+        </h2>
+        <p>{meta}</p>
+        <button
+          onClick={props.onOpen}
+          className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-background text-lg font-bold text-primary outline-none focus-visible:ring-3 focus-visible:ring-foreground/40"
+        >
+          <PlayIcon className="size-5" aria-hidden /> Open lesson
+        </button>
+        {props.onShare && props.onRemove && <PackActions onShare={props.onShare} onRemove={props.onRemove} onPrimary />}
+      </li>
+    )
   return (
-    <li className="rounded-2xl bg-white/10 p-4">
-      <button className="min-h-16 w-full text-left" onClick={props.onOpen}>
-        <span className="block text-xl font-semibold">▶ {e.title}</span>
-        <span className="block opacity-80">
-          Grade {e.grade} · {e.district} · {e.duration_min} min
+    <li className="rounded-2xl border border-border bg-card">
+      <button className="flex min-h-18 w-full items-center gap-3 p-4 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring" onClick={props.onOpen}>
+        <span className="min-w-0 flex-1">
+          <span className="block text-lg font-semibold" lang={e.school_lang}>
+            {e.title}
+          </span>
+          <span className="block text-sm text-muted-foreground">{meta}</span>
+          {props.badge && <span className="block text-sm text-primary">{props.badge}</span>}
         </span>
-        {props.badge && <span className="block text-sm text-sun">{props.badge}</span>}
+        <PlayIcon className="size-5 shrink-0 text-muted-foreground" aria-hidden />
       </button>
       {props.onShare && props.onRemove && (
-        <div className="mt-3 flex gap-3">
-          <button className="min-h-12 flex-1 rounded-xl bg-white/15 font-semibold" onClick={props.onShare}>
-            ↗ Share with a teacher
-          </button>
-          <button className="min-h-12 rounded-xl px-4 font-semibold text-clay" onClick={props.onRemove}>
-            Remove
-          </button>
+        <div className="px-4 pb-4">
+          <PackActions onShare={props.onShare} onRemove={props.onRemove} />
         </div>
       )}
     </li>
   )
 }
 
+function PackActions({ onShare, onRemove, onPrimary }: { onShare: () => void; onRemove: () => void; onPrimary?: boolean }) {
+  return (
+    <div className="flex gap-2">
+      <button
+        onClick={onShare}
+        className={cn(
+          'flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl font-semibold outline-none focus-visible:ring-2',
+          onPrimary ? 'bg-primary-foreground/10 focus-visible:ring-foreground/40' : 'bg-secondary focus-visible:ring-ring',
+        )}
+      >
+        <Share2Icon className="size-4" aria-hidden /> Share with a teacher
+      </button>
+      <button
+        onClick={onRemove}
+        aria-label="Remove this lesson from the phone"
+        className={cn(
+          'grid size-12 place-items-center rounded-xl outline-none focus-visible:ring-2',
+          onPrimary ? 'bg-primary-foreground/10 focus-visible:ring-foreground/40' : 'text-few focus-visible:ring-ring',
+        )}
+      >
+        <Trash2Icon className="size-5" aria-hidden />
+      </button>
+    </div>
+  )
+}
+
 /** Lesson picker: imported packs (newest first) plus the built-in sample, and the "Add a lesson pack" button. */
-export default function Library({ onOpen }: { onOpen: (lesson: OpenLesson) => void }) {
+export default function Library({ onOpen, pending }: { onOpen: (lesson: OpenLesson) => void; pending: number | null }) {
   const [packs, setPacks] = useState<StoredPack[]>([])
   const [notice, setNotice] = useState<Notice | null>(null)
   const [busy, setBusy] = useState(false)
@@ -103,53 +163,75 @@ export default function Library({ onOpen }: { onOpen: (lesson: OpenLesson) => vo
     await refresh()
   }
 
+  const [newest, ...rest] = packs
+
   return (
-    <main className="flex min-h-screen flex-col gap-5 bg-ink p-6 text-white">
-      <header className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-sun">Sahpaathi</h1>
-          <p className="mt-1 opacity-80">Choose today’s lesson</p>
+    <main className="theme-board min-h-dvh bg-background text-foreground">
+      <div className="mx-auto flex max-w-xl flex-col gap-5 px-5 py-6">
+        <header className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="grid size-11 place-items-center rounded-xl bg-primary text-primary-foreground">
+              <LogoMark className="size-6" />
+            </span>
+            <h1 className="font-heading text-2xl font-bold">Sahpaathi</h1>
+          </div>
+          <SyncBadge pending={pending} />
+        </header>
+
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-muted-foreground">
+            {classroom ? `Class ${classroom.classroom_id} · ${classroom.rolls.length} children` : 'Choose today’s lesson'}
+          </p>
+          <Button variant="ghost" size="sm" onClick={() => setEditingClassroom((v) => !v)}>
+            <PencilIcon aria-hidden /> {classroom ? 'Change class' : 'Set up class'}
+          </Button>
         </div>
-        <button className="min-h-14 rounded-xl px-3 text-center text-sm font-semibold opacity-80" onClick={() => setEditingClassroom((v) => !v)}>
-          ✏️ Change classroom
-        </button>
-      </header>
 
-      {editingClassroom && (
-        <section className="flex flex-col gap-3">
-          <ClassroomSetup
-            classroom={classroom}
-            onSaved={(c) => {
-              setClassroom(c)
-              setEditingClassroom(false)
-              setNotice({ kind: 'ok', text: `Classroom set to ${c.classroom_id}.` })
-            }}
-          />
-          <button className="min-h-14 rounded-2xl bg-white/15 text-lg" onClick={() => setEditingClassroom(false)}>
-            Cancel
-          </button>
-        </section>
-      )}
+        {editingClassroom && (
+          <section className="flex flex-col gap-3">
+            <ClassroomSetup
+              classroom={classroom}
+              onSaved={(c) => {
+                setClassroom(c)
+                setEditingClassroom(false)
+                setNotice({ kind: 'ok', text: `Classroom set to ${c.classroom_id}.` })
+              }}
+            />
+            <Button variant="ghost" size="lg" onClick={() => setEditingClassroom(false)}>
+              Cancel
+            </Button>
+          </section>
+        )}
 
-      <label
-        className={`flex min-h-16 items-center justify-center rounded-2xl border-2 border-dashed border-sun text-xl font-semibold text-sun ${busy ? 'opacity-60' : 'cursor-pointer'}`}
-      >
-        {busy ? 'Checking the pack…' : '📥 Add a lesson pack'}
-        <input type="file" accept=".sahpaathi,application/zip" className="hidden" disabled={busy} onChange={onFile} />
-      </label>
+        {notice && (
+          <p role="status" className={cn('rounded-2xl p-4 text-lg', notice.kind === 'ok' ? 'bg-ok text-ok-foreground' : 'bg-bad text-bad-foreground')}>
+            {notice.text}
+          </p>
+        )}
 
-      {notice && (
-        <p role="status" className={`rounded-xl p-4 text-lg ${notice.kind === 'ok' ? 'bg-leaf/25' : 'bg-clay/30'}`}>
-          {notice.text}
-        </p>
-      )}
+        <ul className="flex flex-col gap-3">
+          {newest ? (
+            <LessonCard featured episode={newest.episode} onOpen={() => open(newest)} onShare={() => share(newest)} onRemove={() => remove(newest)} />
+          ) : (
+            <LessonCard featured badge="Built-in sample" episode={samplePack.episode} onOpen={() => onOpen(samplePack)} />
+          )}
+          {rest.length > 0 && <li className="pt-2 text-[0.8125rem] font-semibold tracking-[0.08em] text-muted-foreground uppercase">On this phone</li>}
+          {rest.map((p) => (
+            <LessonCard key={p.id} episode={p.episode} onOpen={() => open(p)} onShare={() => share(p)} onRemove={() => remove(p)} />
+          ))}
+          {newest && <LessonCard episode={samplePack.episode} badge="Built-in sample" onOpen={() => onOpen(samplePack)} />}
+        </ul>
 
-      <ul className="flex flex-col gap-3">
-        {packs.map((p) => (
-          <LessonCard key={p.id} episode={p.episode} onOpen={() => open(p)} onShare={() => share(p)} onRemove={() => remove(p)} />
-        ))}
-        <LessonCard episode={samplePack.episode} badge="Built-in sample" onOpen={() => onOpen(samplePack)} />
-      </ul>
+        <label
+          className={cn(
+            'flex min-h-16 items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-input text-lg font-semibold focus-within:ring-2 focus-within:ring-ring',
+            busy ? 'opacity-60' : 'cursor-pointer hover:border-primary',
+          )}
+        >
+          <DownloadIcon className="size-5" aria-hidden /> {busy ? 'Checking the pack…' : 'Add a lesson pack'}
+          <input type="file" accept=".sahpaathi,application/zip" className="sr-only" disabled={busy} onChange={onFile} />
+        </label>
+      </div>
     </main>
   )
 }
