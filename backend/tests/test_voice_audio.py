@@ -52,3 +52,16 @@ def test_silence_and_missing_input_raise(tmp_path):
         audio.normalize_to_opus(silent, tmp_path / "o.opus")
     with pytest.raises(audio.AudioError):
         audio.normalize_to_opus(tmp_path / "nope.wav", tmp_path / "o.opus")
+
+
+def test_short_peaky_line_still_lands_on_target(tmp_path):
+    """Sharp spikes make the limiter eat loudness; the closed-loop gain must win it back."""
+    src = tmp_path / "peaky.wav"
+    subprocess.run(
+        ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-f", "lavfi", "-i",
+         "aevalsrc=0.04*sin(2*PI*300*t)+if(lt(mod(t\,0.25)\,0.003)\,0.95\,0):d=1.5:s=24000",
+         str(src)],
+        check=True,
+    )  # fmt: skip
+    out = audio.normalize_to_opus(src, tmp_path / "out.opus")
+    assert abs(audio.measure_lufs(out) - audio.TARGET_LUFS) < 1.0
