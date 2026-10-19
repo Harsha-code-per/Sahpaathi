@@ -118,9 +118,7 @@ def sync(body: SyncIn, db: DB) -> SyncOut:
 
     already = set(db.scalars(select(SyncEvent.event_id).where(SyncEvent.event_id.in_(taps))))
     fresh = [row for event_id, row in taps.items() if event_id not in already]
-    accepted = len(fresh)
-    if fresh:
-        _insert_ignoring_duplicates(db, SyncEvent, fresh, ["event_id"])
+    accepted = _insert_ignoring_duplicates(db, SyncEvent, fresh, ["event_id"]) if fresh else 0
     for event in attendance.values():
         # Attendance is idempotent through the call itself: one per child and episode.
         absent = sorted(set(event.absent))
