@@ -1,5 +1,6 @@
 import { api as studio, ApiError, BASE, call, session } from '../studio/api'
 import type { Summary } from '../studio/api'
+import { packFilename } from './view'
 
 // Admin talks to the same backend as the Studio (docs/API.md) and shares its login token.
 export { ApiError, session }
@@ -67,7 +68,10 @@ export async function downloadPack(pack: PackSummary): Promise<void> {
   }
   if (!res.ok) throw new ApiError(`The server answered ${res.status}.`, res.status)
   const url = URL.createObjectURL(await res.blob())
-  const a = Object.assign(document.createElement('a'), { href: url, download: `${pack.title ?? `pack-${pack.id}`}.sahpaathi` })
+  const a = Object.assign(document.createElement('a'), {
+    href: url,
+    download: packFilename(res.headers.get('Content-Disposition'), pack.id),
+  })
   a.click()
   URL.revokeObjectURL(url)
 }

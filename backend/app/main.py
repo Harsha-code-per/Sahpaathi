@@ -22,6 +22,9 @@ app.add_middleware(
     allow_origins=settings.cors_origins,
     allow_methods=["*"],
     allow_headers=["*"],
+    # Browsers hide these from cross-origin JavaScript unless exposed: the Admin download reads the
+    # filename, and a resumed pack download reads the range.
+    expose_headers=["Content-Disposition", "Content-Range", "Accept-Ranges"],
 )
 app.include_router(auth.router)
 app.include_router(episodes.router)
