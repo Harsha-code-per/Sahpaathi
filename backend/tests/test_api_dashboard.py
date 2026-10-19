@@ -49,7 +49,10 @@ def test_empty_dashboard_has_no_percentages_and_a_full_calendar(api):
         "taps": 0, "most": 0, "some": 0, "few": 0,
         "pct_most": None, "pct_some": None, "pct_few": None,
     }  # fmt: skip
-    assert d["episodes"] == [] and d["packs_ready"] == 0 and d["catchup_calls"] is None
+    assert d["episodes"] == [] and d["packs_ready"] == 0 and d["catchup_calls"] == {
+        "total": 0, "queued": 0, "in_progress": 0, "completed": 0, "no_response": 0,
+        "understood": 0, "help": 0, "pct_answered": None,
+    }  # fmt: skip
     assert len(d["last_days"]) == 14 and all(day["taps"] == 0 for day in d["last_days"])
     assert d["last_days"][-1]["date"] == datetime.now(UTC).date().isoformat()
 
@@ -105,3 +108,25 @@ def test_counts_of_episodes_by_status_and_ready_packs(api):
     d = api.get("/api/v1/dashboard", headers=auth(api, "admin")).json()
     assert d["episodes_by_status"] == {"approved": 1, "failed": 1}
     assert d["packs_ready"] == 1
+
+
+def test_catchup_call_stats(api):
+    from app.models import CatchupCall
+
+    rows = [
+        ("1", "queued", None),
+        ("2", "in_progress", None),
+        ("3", "completed", "understood"),
+        ("4", "completed", "help"),
+        ("5", "completed", "understood"),
+        ("6", "no_response", None),
+    ]
+    with SessionLocal() as db:
+        for ref, st, outcome in rows:
+            db.add(CatchupCall(classroom_id="C1", student_ref=ref, episode_slug="ep", status=st,
+                               outcome=outcome))  # fmt: skip
+        db.commit()
+    c = api.get("/api/v1/dashboard", headers=auth(api, "admin")).json()["catchup_calls"]
+    assert (c["total"], c["queued"], c["in_progress"]) == (6, 1, 1)
+    assert (c["completed"], c["no_response"], c["understood"], c["help"]) == (3, 1, 2, 1)
+    assert c["pct_answered"] == 75.0  # 3 of the 4 finished calls were answered
