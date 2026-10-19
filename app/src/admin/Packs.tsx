@@ -3,9 +3,9 @@ import { adminApi, ApiError, downloadPack, type PackSummary, type Summary } from
 import { anyBuilding, formatSize, PACK_STATUS, packRows } from './view'
 
 const POLL_MS = 5000
-const card = 'rounded-2xl bg-white p-4 shadow-sm'
-const button = 'rounded-lg bg-ink px-3 py-2 text-sm font-semibold text-white hover:bg-ink/90 disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-sun focus-visible:outline-none'
-const quiet = 'rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold hover:bg-slate-50 disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-ink focus-visible:outline-none'
+const card = 'rounded-2xl border border-border bg-card p-5'
+const button = 'inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground outline-none hover:bg-primary/85 focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50'
+const quiet = 'inline-flex min-h-11 items-center justify-center rounded-lg border border-input bg-card px-4 text-sm font-semibold outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50'
 
 export default function Packs({ onSignedOut }: { onSignedOut: () => void }) {
   const [episodes, setEpisodes] = useState<Summary[]>([])
@@ -69,25 +69,25 @@ export default function Packs({ onSignedOut }: { onSignedOut: () => void }) {
   return (
     <section className={`${card} space-y-3`} aria-labelledby="packs">
       <h2 id="packs" className="font-semibold">Packs for approved episodes</h2>
-      <p className="text-sm text-slate-500">
+      <p className="text-sm text-muted-foreground">
         A pack is the episode with its voices, signed so the app can check it. Building takes a few minutes and uses text-to-speech credits, so build once per approved episode.
       </p>
-      {error && <p role="alert" className="text-clay">{error}</p>}
+      {error && <p role="alert" className="text-bad-foreground">{error}</p>}
       {!loaded ? (
-        <p className="text-slate-500">Loading…</p>
+        <p className="text-muted-foreground">Loading…</p>
       ) : rows.length === 0 ? (
-        <p className="text-slate-500">No approved episodes yet. Approve one in the Studio first.</p>
+        <p className="text-muted-foreground">No approved episodes yet. Approve one in the Studio first.</p>
       ) : (
-        <ul className="divide-y divide-slate-100">
+        <ul className="divide-y divide-border">
           {rows.map(({ episode, latest, ready }) => (
             <li key={episode.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
               <div className="min-w-0">
                 <p className="font-medium">{episode.title ?? `${episode.lesson_id}, ${episode.district_id}`}</p>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-muted-foreground">
                   {episode.district_id}
                   {ready && `, pack ${formatSize(ready.size_bytes)}`}
                 </p>
-                {latest?.status === 'failed' && <p className="mt-1 text-sm text-clay">{latest.error}</p>}
+                {latest?.status === 'failed' && <p className="mt-1 text-sm text-bad-foreground">{latest.error}</p>}
               </div>
               <div className="flex items-center gap-2">
                 {latest && (

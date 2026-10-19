@@ -1,37 +1,56 @@
-import { useCallback, useEffect, useState } from 'react'
-import { adminApi, ApiError, type Dashboard as Data, type Understanding } from './api'
-import { dayBars, pct } from './view'
+import { RefreshCwIcon } from 'lucide-react'
+import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import { Bar, BarChart, CartesianGrid, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { Button } from '@/components/ui/button'
+import type { Summary } from '../studio/api'
+import { adminApi, ApiError, type Dashboard as Data, type PackSummary } from './api'
+import Pipeline from './Pipeline'
+import { pct } from './view'
 
-const card = 'rounded-2xl bg-white p-4 shadow-sm'
+// Chart colours are the theme tokens (index.css); SVG attributes need the values themselves.
+const C = { most: '#3fb8a0', some: '#f4b23e', few: '#e8704a', ink: '#172524', muted: '#55625f', grid: '#e3dfd3' }
+const tooltip = { contentStyle: { borderRadius: 12, border: `1px solid ${C.grid}`, fontFamily: 'inherit' } }
+const card = 'rounded-2xl border border-border bg-card p-5'
 
-function Split({ u }: { u: Understanding }) {
-  // Same order as the numbers above it (Most, Some, Few) and the player's button colours.
-  const parts = [
-    { key: 'most', label: 'Most', n: u.most, colour: 'bg-leaf' },
-    { key: 'some', label: 'Some', n: u.some, colour: 'bg-sun' },
-    { key: 'few', label: 'Few', n: u.few, colour: 'bg-clay' },
-  ]
-  if (!u.taps) return <p className="text-slate-500">No taps yet.</p>
+function Tile(props: { label: string; value: string; note: ReactNode; tone?: string; children?: ReactNode }) {
   return (
-    <div
-      className="flex h-4 overflow-hidden rounded-full bg-slate-200"
-      role="img"
-      aria-label={parts.map((p) => `${p.label} got it: ${p.n}`).join(', ')}
-    >
-      {parts.map((p) => (
-        <div key={p.key} className={p.colour} style={{ width: `${(100 * p.n) / u.taps}%` }} />
-      ))}
+    <div className={`${card} flex flex-col gap-1`}>
+      <p className="text-sm font-semibold text-muted-foreground">{props.label}</p>
+      <div className="flex items-end justify-between gap-3">
+        <p className={`font-heading text-4xl font-bold ${props.tone ?? ''}`}>{props.value}</p>
+        {props.children}
+      </div>
+      <p className="text-[0.8125rem] text-muted-foreground">{props.note}</p>
     </div>
   )
 }
 
+function Panel({ title, note, children, className = '' }: { title: string; note?: string; children: ReactNode; className?: string }) {
+  return (
+    <section className={`${card} flex min-w-0 flex-col gap-3 ${className}`} aria-label={title}>
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 className="font-heading text-lg font-bold">{title}</h2>
+        {note && <p className="text-sm text-muted-foreground">{note}</p>}
+      </div>
+      {children}
+    </section>
+  )
+}
+
+const Empty = ({ children }: { children: ReactNode }) => <p className="grid min-h-40 place-items-center text-center text-muted-foreground">{children}</p>
+
+const short = (t: string) => (t.length > 26 ? `${t.slice(0, 25)}…` : t)
+const shortDate = (d: string) => new Date(d).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
+
 export default function Dashboard({ onSignedOut }: { onSignedOut: () => void }) {
   const [data, setData] = useState<Data | null>(null)
+  const [episodes, setEpisodes] = useState<Summary[]>([])
+  const [packs, setPacks] = useState<PackSummary[]>([])
   const [error, setError] = useState('')
 
   const load = useCallback(() => {
-    adminApi.dashboard().then(
-      (d) => (setData(d), setError('')),
+    Promise.all([adminApi.dashboard(), adminApi.episodes(), adminApi.packs()]).then(
+      ([d, e, p]) => (setData(d), setEpisodes(e), setPacks(p), setError('')),
       (err) => {
         if (err instanceof ApiError && (err.status === 401 || err.status === 403)) return onSignedOut()
         setError(err instanceof ApiError ? err.message : 'Could not load the dashboard.')
@@ -41,103 +60,134 @@ export default function Dashboard({ onSignedOut }: { onSignedOut: () => void }) 
 
   useEffect(load, [load])
 
-  if (error) return <p role="alert" className={`${card} text-clay`}>{error}</p>
-  if (!data) return <p className="text-slate-500">Loading…</p>
+  if (error)
+    return (
+      <p role="alert" className="rounded-2xl bg-bad p-5 text-bad-foreground">
+        {error}
+      </p>
+    )
+  if (!data) return <p className="text-muted-foreground">Loading…</p>
 
-  const { overall } = data
-  const bars = dayBars(data.last_days)
+  const { overall, catchup_calls: calls } = data
+  const animate = !matchMedia('(prefers-reduced-motion: reduce)').matches
+  const split = [
+    { name: 'Most got it', value: overall.most, fill: C.most },
+    { name: 'Some got it', value: overall.some, fill: C.some },
+    { name: 'Few got it', value: overall.few, fill: C.few },
+  ]
+  const days = data.last_days.map((d) => ({ ...d, label: shortDate(d.date) }))
+  const titles = new Map(packs.filter((p) => p.episode_slug).map((p) => [p.episode_slug!, p.title ?? p.episode_slug!]))
+  const lessons = data.episodes.map((e) => ({ name: titles.get(e.episode_id) ?? e.episode_id, Most: e.most, Some: e.some, Few: e.few }))
+  const funnel = [
+    { label: 'Queued', n: calls.total, colour: C.muted },
+    { label: 'Finished', n: calls.completed + calls.no_response, colour: C.some },
+    { label: 'A parent answered', n: calls.completed, colour: C.most },
+    { label: 'Child understood', n: calls.understood, colour: '#1c7f6c' },
+  ]
+
   return (
     <>
-      <section className={`${card} space-y-3`} aria-labelledby="understanding">
-        <div className="flex items-center justify-between">
-          <h2 id="understanding" className="font-semibold">How well children followed</h2>
-          <button onClick={load} className="rounded-lg px-3 py-1 text-sm text-slate-600 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-ink focus-visible:outline-none">
-            Refresh
-          </button>
-        </div>
-        <div className="grid grid-cols-3 gap-3 text-center">
-          <div>
-            <p className="text-4xl font-bold text-leaf">{pct(overall.pct_most)}</p>
-            <p className="text-sm text-slate-600">Most got it</p>
-          </div>
-          <div>
-            <p className="text-4xl font-bold text-ink">{pct(overall.pct_some)}</p>
-            <p className="text-sm text-slate-600">Some got it</p>
-          </div>
-          <div>
-            <p className="text-4xl font-bold text-clay">{pct(overall.pct_few)}</p>
-            <p className="text-sm text-slate-600">Few got it</p>
-          </div>
-        </div>
-        <Split u={overall} />
-        <p className="text-sm text-slate-500">
-          {overall.taps} teacher taps. {data.auto_fallbacks} checkpoints had no tap, so the lesson carried on with Core; they are not counted above.
-        </p>
-      </section>
+      <div className="flex justify-end">
+        <Button variant="outline" onClick={load}>
+          <RefreshCwIcon aria-hidden /> Refresh
+        </Button>
+      </div>
 
-      <section className={card} aria-labelledby="days">
-        <h2 id="days" className="mb-3 font-semibold">Taps in the last 14 days</h2>
-        <ol className="flex h-32 items-end gap-1">
-          {bars.map((b) => (
-            <li key={b.date} className="flex h-full flex-1 flex-col items-center justify-end gap-1" title={`${b.date}: ${b.taps} taps`}>
-              <span className="text-xs text-slate-500">{b.taps || ''}</span>
-              <span className="w-full rounded-t bg-ink" style={{ height: `${b.height}%`, minHeight: b.taps ? 2 : 0 }} />
-            </li>
-          ))}
-        </ol>
-        <div className="mt-1 flex justify-between text-xs text-slate-500">
-          <span>{bars[0]?.date}</span>
-          <span>{bars[bars.length - 1]?.date}</span>
-        </div>
-      </section>
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <Tile label="“Most got it”" value={pct(overall.pct_most)} tone="text-ok-foreground" note={`of ${overall.taps} teacher taps`} />
+        <Tile label="Teacher taps" value={String(overall.taps)} note={`${data.auto_fallbacks} checkpoints had no tap, so Core played`}>
+          <div className="h-10 w-28" aria-hidden>
+            <ResponsiveContainer>
+              <LineChart data={days} accessibilityLayer={false}>
+                <Line dataKey="taps" stroke={C.most} strokeWidth={2.5} dot={false} isAnimationActive={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </Tile>
+        <Tile label="Catch-up calls answered" value={pct(calls.pct_answered)} note={`${calls.completed} of ${calls.completed + calls.no_response} finished calls`} />
+        <Tile label="Packs ready" value={String(data.packs_ready)} note="signed, ready to download" />
+      </div>
 
-      <section className={card} aria-labelledby="episodes">
-        <h2 id="episodes" className="mb-3 font-semibold">By episode</h2>
-        {data.episodes.length === 0 ? (
-          <p className="text-slate-500">No lesson has synced taps yet. Taps arrive when a teacher's phone gets signal.</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="text-slate-500">
-                <tr>
-                  <th className="py-1 pr-3 font-medium">Episode</th>
-                  <th className="px-3 font-medium">Taps</th>
-                  <th className="px-3 font-medium">Most</th>
-                  <th className="px-3 font-medium">Some</th>
-                  <th className="px-3 font-medium">Few</th>
-                  <th className="pl-3 font-medium">No tap</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.episodes.map((e) => (
-                  <tr key={e.episode_id} className="border-t border-slate-100">
-                    <td className="py-2 pr-3 font-medium whitespace-nowrap">{e.episode_id}</td>
-                    <td className="px-3">{e.taps}</td>
-                    <td className="px-3 text-leaf">{pct(e.pct_most)}</td>
-                    <td className="px-3">{pct(e.pct_some)}</td>
-                    <td className="px-3 text-clay">{pct(e.pct_few)}</td>
-                    <td className="pl-3">{e.auto_fallbacks}</td>
-                  </tr>
+      <div className="grid gap-4 xl:grid-cols-3">
+        <Panel title="Checkpoint answers" note="Deliberate taps only">
+          {overall.taps === 0 ? (
+            <Empty>No taps yet. They arrive when a teacher’s phone finds a signal.</Empty>
+          ) : (
+            <div className="flex flex-wrap items-center gap-5">
+              <div className="relative size-44" role="img" aria-label={split.map((s) => `${s.name}: ${s.value}`).join(', ')}>
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie data={split} dataKey="value" nameKey="name" innerRadius="62%" outerRadius="100%" paddingAngle={2} stroke="none" isAnimationActive={animate} />
+                    <Tooltip {...tooltip} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <p className="pointer-events-none absolute inset-0 grid place-items-center font-heading text-2xl font-bold">{pct(overall.pct_most)}</p>
+              </div>
+              <ul className="space-y-2 text-sm">
+                {split.map((s) => (
+                  <li key={s.name} className="flex items-center gap-2">
+                    <span className="size-3 rounded-sm" style={{ background: s.fill }} aria-hidden />
+                    {s.name} · <b>{s.value}</b>
+                  </li>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
+              </ul>
+            </div>
+          )}
+        </Panel>
 
-      <section className={`${card} grid gap-3 text-sm sm:grid-cols-3`} aria-label="Content and calls">
-        <p>
-          <span className="block text-2xl font-bold">{data.packs_ready}</span> packs ready to download
-        </p>
-        <p>
-          <span className="block text-2xl font-bold">{Object.entries(data.episodes_by_status).map(([s, n]) => `${n} ${s.replace('_', ' ')}`).join(', ') || 'none'}</span>
-          episodes
-        </p>
-        <p>
-          <span className="block text-2xl font-bold">{pct(data.catchup_calls.pct_answered)}</span> of finished catch-up calls answered
-          {data.catchup_calls.help > 0 && <span className="block text-clay">{data.catchup_calls.help} families asked for help</span>}
-        </p>
-      </section>
+        <Panel title="Taps per day" note="Last 14 days" className="xl:col-span-2">
+          <div className="h-56">
+            <ResponsiveContainer>
+              <BarChart data={days} margin={{ left: -20, right: 16 }}>
+                <CartesianGrid vertical={false} stroke={C.grid} />
+                <XAxis dataKey="label" tick={{ fill: C.muted, fontSize: 12 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
+                <YAxis allowDecimals={false} tick={{ fill: C.muted, fontSize: 12 }} axisLine={false} tickLine={false} />
+                <Tooltip {...tooltip} cursor={{ fill: '#efece3' }} />
+                <Bar dataKey="taps" name="Taps" fill={C.most} radius={[6, 6, 0, 0]} isAnimationActive={animate} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </Panel>
+      </div>
+
+      <Pipeline episodes={episodes} packs={packs} usage={data.episodes} />
+
+      <div className="grid gap-4 xl:grid-cols-3">
+        <Panel title="How each lesson went" note="Checkpoint answers per lesson" className="xl:col-span-2">
+          {lessons.length === 0 ? (
+            <Empty>No lesson has synced taps yet.</Empty>
+          ) : (
+            <div style={{ height: Math.max(160, lessons.length * 52 + 40) }}>
+              <ResponsiveContainer>
+                <BarChart data={lessons} layout="vertical" margin={{ left: 8, right: 8 }}>
+                  <CartesianGrid horizontal={false} stroke={C.grid} />
+                  <XAxis type="number" allowDecimals={false} tick={{ fill: C.muted, fontSize: 12 }} axisLine={false} tickLine={false} />
+                  <YAxis type="category" dataKey="name" width={190} tickFormatter={short} tick={{ fill: C.ink, fontSize: 13 }} axisLine={false} tickLine={false} />
+                  <Tooltip {...tooltip} cursor={{ fill: '#efece3' }} />
+                  <Bar isAnimationActive={animate} dataKey="Most" stackId="a" fill={C.most} />
+                  <Bar isAnimationActive={animate} dataKey="Some" stackId="a" fill={C.some} />
+                  <Bar isAnimationActive={animate} dataKey="Few" stackId="a" fill={C.few} radius={[0, 6, 6, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </Panel>
+
+        <Panel title="Catch-up calls" note={calls.help ? `${calls.help} families asked for help` : undefined}>
+          <ul className="space-y-3.5">
+            {funnel.map((f) => (
+              <li key={f.label} className="space-y-1">
+                <p className="flex justify-between text-sm">
+                  {f.label} <b>{f.n}</b>
+                </p>
+                <div className="h-3 overflow-hidden rounded-full bg-muted">
+                  <div className="h-full rounded-full" style={{ width: `${calls.total ? (100 * f.n) / calls.total : 0}%`, background: f.colour }} />
+                </div>
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      </div>
     </>
   )
 }

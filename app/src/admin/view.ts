@@ -1,5 +1,5 @@
 import type { Summary } from '../studio/api'
-import type { CallOutcome, CallStatus, Day, PackStatus, PackSummary } from './api'
+import type { CallOutcome, CallStatus, Day, EpisodeUsage, PackStatus, PackSummary } from './api'
 
 // Pure helpers for the Admin screens (tested in view.test.ts).
 
@@ -12,9 +12,9 @@ export function dayBars(days: Day[]) {
 }
 
 export const PACK_STATUS: Record<PackStatus, { label: string; tone: string }> = {
-  building: { label: 'Building', tone: 'bg-slate-200 text-ink' },
-  ready: { label: 'Ready', tone: 'bg-leaf/15 text-leaf' },
-  failed: { label: 'Failed', tone: 'bg-clay/15 text-clay' },
+  building: { label: 'Building', tone: 'bg-secondary text-secondary-foreground' },
+  ready: { label: 'Ready', tone: 'bg-ok text-ok-foreground' },
+  failed: { label: 'Failed', tone: 'bg-bad text-bad-foreground' },
 }
 
 export function formatSize(bytes: number | null) {
@@ -51,15 +51,15 @@ export function packFilename(disposition: string | null, packId: number) {
 }
 
 export const CALL_STATUS: Record<CallStatus, { label: string; tone: string }> = {
-  queued: { label: 'Waiting to call', tone: 'bg-slate-200 text-ink' },
-  in_progress: { label: 'On the phone', tone: 'bg-sun/30 text-ink' },
-  completed: { label: 'Answered', tone: 'bg-leaf/15 text-leaf' },
-  no_response: { label: 'No answer', tone: 'bg-clay/15 text-clay' },
+  queued: { label: 'Waiting to call', tone: 'bg-secondary text-secondary-foreground' },
+  in_progress: { label: 'On the phone', tone: 'bg-warn text-warn-foreground' },
+  completed: { label: 'Answered', tone: 'bg-ok text-ok-foreground' },
+  no_response: { label: 'No answer', tone: 'bg-bad text-bad-foreground' },
 }
 
 export const OUTCOME: Record<CallOutcome, { label: string; tone: string }> = {
-  understood: { label: 'Child understood', tone: 'bg-leaf/15 text-leaf' },
-  help: { label: 'Needs help', tone: 'bg-clay/15 text-clay' },
+  understood: { label: 'Child understood', tone: 'bg-ok text-ok-foreground' },
+  help: { label: 'Needs help', tone: 'bg-bad text-bad-foreground' },
 }
 
 /** A phone's keypad, row by row. */
@@ -92,4 +92,34 @@ export function callableEpisodes(packs: PackSummary[]): CallableEpisode[] {
       seen.add(slug)
       return [{ slug, title: p.title ?? slug }]
     })
+}
+
+export interface PipelineCard {
+  episode: Summary
+  pack: PackSummary | null
+  usage: EpisodeUsage | null
+}
+
+/** Kanban columns, left to right. A lesson is "in classrooms" once a phone has synced taps for it. */
+export function pipeline(episodes: Summary[], packs: PackSummary[], usage: EpisodeUsage[]) {
+  const cols = {
+    writing: { key: 'writing', label: 'Writing', empty: 'Nothing being written.', cards: [] as PipelineCard[] },
+    review: { key: 'review', label: 'Needs review', empty: 'All reviewed.', cards: [] as PipelineCard[] },
+    approved: { key: 'approved', label: 'Approved', empty: 'None waiting for voice.', cards: [] as PipelineCard[] },
+    packed: { key: 'packed', label: 'Voiced & packed', empty: 'No packs yet.', cards: [] as PipelineCard[] },
+    used: { key: 'used', label: 'In classrooms', empty: 'No taps synced yet.', cards: [] as PipelineCard[] },
+  }
+  const bySlug = new Map(usage.map((u) => [u.episode_id, u]))
+  for (const episode of [...episodes].sort((a, b) => b.id - a.id)) {
+    const pack = packs.filter((p) => p.episode_id === episode.id && p.status === 'ready').sort((a, b) => b.id - a.id)[0] ?? null
+    const used = pack?.episode_slug ? (bySlug.get(pack.episode_slug) ?? null) : null
+    const card = { episode, pack, usage: used }
+    if (episode.status === 'generating' || episode.status === 'failed') cols.writing.cards.push(card)
+    else if (episode.status === 'in_review') cols.review.cards.push(card)
+    else if (episode.status !== 'approved') continue // rejected lessons leave the pipeline
+    else if (used) cols.used.cards.push(card)
+    else if (pack) cols.packed.cards.push(card)
+    else cols.approved.cards.push(card)
+  }
+  return Object.values(cols)
 }
