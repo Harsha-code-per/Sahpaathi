@@ -24,6 +24,9 @@ Auth: `POST /auth/login` returns a JWT (12 h); send `Authorization: Bearer <toke
 | POST | `/ivr/calls` | admin | `{classroom_id, student_ref, episode_slug}` queues the call for one absent child. The ids are opaque codes (letters, digits, hyphen, at most 40), never names or phone numbers (422 otherwise). Asking again for the same child and episode returns the existing call |
 | POST | `/ivr/calls/{id}/start` | admin | Begins the call: `{play: [{name, url}], gather, hangup, status, outcome}`. Plays the recap, then the menu, and waits for a key. 409 unless queued, or when the episode has no ready pack with call audio. `url` is `/packs/{id}/ivr/{name}` |
 | POST | `/ivr/calls/{id}/press` | admin | `{digit: "0"-"9"\|"*"\|"#"\|null}` (null: nothing pressed in time) returns the next step. **1** hears it again (3 times at most), **2** child understood, **3** needs help; a missed or wrong key repeats the menu once, then the call ends with `no_response`. 409 unless in progress |
+| POST | `/ivr/calls/{id}/dial` | admin | `{phone}` rings a real phone through Exotel ([EXOTEL.md](EXOTEL.md)): starts the call as `/start` does, then Exotel runs the flow. The number is used once and never stored. 503 until the `EXOTEL_*` settings exist; 502 (call back to queued) if Exotel refuses |
+| GET | `/ivr/exotel/gather`, `/ivr/exotel/passthru`, `/ivr/exotel/status/{id}` | `?key=EXOTEL_WEBHOOK_KEY` | Exotel's webhooks: the Programmable Gather JSON, the key pressed (200 hear again, 302 hang up), and the status callback. 404 without the key |
+| GET | `/ivr/exotel/audio/{id}/{start\|menu}.wav` | signed URL | The call audio as 8 kHz mono WAV for Exotel |
 
 The call logic lives in `backend/app/ivr/flow.py` and does not depend on who carries the call: the Admin keypad simulator drives it today, a telephony provider's webhook will drive the same `start` and `press` later. No names or phone numbers are stored; dialling a real phone needs a separate consented contact list.
 

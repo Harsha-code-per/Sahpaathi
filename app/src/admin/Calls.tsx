@@ -5,7 +5,40 @@ import { callableEpisodes, CALL_STATUS, OUTCOME } from './view'
 
 const card = 'rounded-2xl border border-border bg-card p-5'
 const field = 'h-11 w-full rounded-xl border border-input bg-card px-3 text-base text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40'
+const quiet = 'inline-flex min-h-11 items-center justify-center rounded-lg border border-input bg-card px-4 font-semibold outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50'
 const primary = 'inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-4 font-semibold text-primary-foreground outline-none hover:bg-primary/85 focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50'
+
+/** Ring a real phone through Exotel. The number goes to the server once and is never stored. */
+function RingPhone({ call, onDone, onError }: { call: CallSummary; onDone: (msg: string) => void; onError: (e: unknown) => void }) {
+  const [phone, setPhone] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  async function ring(e: SubmitEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setBusy(true)
+    try {
+      await adminApi.dial(call.id, phone.replace(/[\s-]/g, ''))
+      setPhone('')
+      onDone(`Ringing ${phone}. The result appears in this list when the call ends.`)
+    } catch (err) {
+      onError(err)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <form onSubmit={ring} className="flex basis-full flex-wrap items-end gap-2">
+      <label className="min-w-48 flex-1 space-y-1">
+        <span className="text-sm text-muted-foreground">Phone to ring (a team phone for testing). Used once, never saved.</span>
+        <input className={field} type="tel" inputMode="tel" autoComplete="off" required pattern="\+?[0-9 \-]{10,18}" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 98765 43210" />
+      </label>
+      <button className={primary} disabled={busy}>
+        {busy ? 'Ringing…' : 'Ring this phone'}
+      </button>
+    </form>
+  )
+}
 
 export default function Calls({ onSignedOut }: { onSignedOut: () => void }) {
   const [calls, setCalls] = useState<CallSummary[]>([])
@@ -17,6 +50,8 @@ export default function Calls({ onSignedOut }: { onSignedOut: () => void }) {
   const [roll, setRoll] = useState('')
   const [slug, setSlug] = useState('')
   const [busy, setBusy] = useState(false)
+  const [ringing, setRinging] = useState<number | null>(null)
+  const [notice, setNotice] = useState('')
 
   const handle = useCallback(
     (err: unknown) => {
@@ -87,6 +122,7 @@ export default function Calls({ onSignedOut }: { onSignedOut: () => void }) {
       </section>
 
       {error && <p role="alert" className={`${card} text-bad-foreground`}>{error}</p>}
+      {notice && <p role="status" className="rounded-2xl bg-ok p-4 text-ok-foreground">{notice}</p>}
 
       {active && (
         <Phone
@@ -118,9 +154,25 @@ export default function Calls({ onSignedOut }: { onSignedOut: () => void }) {
                   <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${CALL_STATUS[c.status].tone}`}>{CALL_STATUS[c.status].label}</span>
                   {c.outcome && <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${OUTCOME[c.outcome].tone}`}>{OUTCOME[c.outcome].label}</span>}
                   {c.status === 'queued' && (
-                    <button className={primary} onClick={() => setActive(c)}>Call</button>
+                    <>
+                      <button className={quiet} onClick={() => setActive(c)}>Simulate</button>
+                      <button className={primary} onClick={() => setRinging(ringing === c.id ? null : c.id)} aria-expanded={ringing === c.id}>
+                        Ring a phone
+                      </button>
+                    </>
                   )}
                 </div>
+                {ringing === c.id && (
+                  <RingPhone
+                    call={c}
+                    onError={handle}
+                    onDone={(msg) => {
+                      setRinging(null)
+                      setNotice(msg)
+                      void refresh()
+                    }}
+                  />
+                )}
               </li>
             ))}
           </ul>

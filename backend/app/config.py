@@ -15,6 +15,17 @@ class Settings(BaseSettings):
     demo_password: str = ""  # password of the seeded demo accounts (app/seed.py)
     # Lessons, district profiles, samples, voice clips. Repo layout locally; /srv/content in Docker.
     content_dir: Path = Path(__file__).parents[2] / "content"
+    # Real catch-up calls (app/ivr/exotel.py). Empty: only the Admin keypad simulator works.
+    exotel_sid: str = ""
+    exotel_api_key: str = ""
+    exotel_api_token: str = ""
+    exotel_subdomain: str = "api.exotel.com"  # api.in.exotel.com for the Mumbai cluster
+    exotel_caller_id: str = ""  # your ExoPhone
+    exotel_flow_id: str = ""  # App Bazaar > My Apps: the catch-up call flow
+    exotel_webhook_key: str = ""  # a long random string, also put in the flow's URLs as ?key=
+    public_api_url: str = (
+        ""  # this API as Exotel reaches it, e.g. https://sahpaathi-api.onrender.com
+    )
 
     @field_validator("database_url")
     @classmethod

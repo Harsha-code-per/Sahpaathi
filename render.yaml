@@ -22,3 +22,19 @@ services:
         sync: false
       - key: PACK_SIGNING_KEY
         sync: false
+      - key: EXOTEL_SID
+        sync: false
+      - key: EXOTEL_API_KEY
+        sync: false
+      - key: EXOTEL_API_TOKEN
+        sync: false
+      - key: EXOTEL_CALLER_ID
+        sync: false
+      - key: EXOTEL_FLOW_ID
+        sync: false
+      - key: PUBLIC_API_URL
+        sync: false
+      - key: EXOTEL_SUBDOMAIN
+        value: api.exotel.com
+      - key: EXOTEL_WEBHOOK_KEY
+        generateValue: true
