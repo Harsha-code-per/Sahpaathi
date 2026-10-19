@@ -1,13 +1,19 @@
+import { CheckCircle2Icon, ClipboardListIcon, LogOutIcon, PlusIcon, SearchIcon } from 'lucide-react'
 import { useCallback, useEffect, useState, type SubmitEvent } from 'react'
-import { api, ApiError, session, type Catalog, type Summary } from './api'
+import { cn } from 'cn'
+import { AppShell, type SidebarApi } from '@/components/AppShell'
+import { LogoMark } from '@/components/Logo'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { api, ApiError, session, type Catalog, type Status, type Summary } from './api'
 import EpisodeView from './EpisodeView'
 import { LANG_NAMES, STATUS } from './view'
 import type { Lang } from '../lib/types'
 
 const POLL_MS = 5000
 
-const field = 'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-ink focus:border-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/30'
-const primary = 'rounded-lg bg-ink px-4 py-2 font-semibold text-white hover:bg-ink/90 disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-sun focus-visible:outline-none'
+const field =
+  'h-11 w-full rounded-xl border border-input bg-card px-3 text-base text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40'
 
 function Login({ onIn }: { onIn: () => void }) {
   const [email, setEmail] = useState('')
@@ -32,24 +38,31 @@ function Login({ onIn }: { onIn: () => void }) {
   }
 
   return (
-    <main className="grid min-h-screen place-items-center bg-slate-100 p-4 text-ink">
-      <form onSubmit={submit} className="w-full max-w-sm space-y-4 rounded-2xl bg-white p-6 shadow-sm">
-        <div>
-          <h1 className="text-2xl font-bold">Sahpaathi Studio</h1>
-          <p className="mt-1 text-slate-600">Review the lessons Claude writes before they reach a classroom.</p>
+    <main className="grid min-h-dvh place-items-center bg-background p-4">
+      <form onSubmit={submit} className="w-full max-w-sm space-y-5 rounded-3xl border border-border bg-card p-7 shadow-sm">
+        <div className="space-y-3">
+          <span className="grid size-12 place-items-center rounded-xl bg-primary text-primary-foreground">
+            <LogoMark className="size-7" />
+          </span>
+          <h1 className="font-heading text-2xl font-bold">Sahpaathi Studio</h1>
+          <p className="text-muted-foreground">Review the lessons Claude writes before they reach a classroom.</p>
         </div>
-        <label className="block">
-          <span className="text-sm font-medium">Email</span>
+        <label className="block space-y-1.5">
+          <span className="text-sm font-semibold">Email</span>
           <input className={field} type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} />
         </label>
-        <label className="block">
-          <span className="text-sm font-medium">Password</span>
+        <label className="block space-y-1.5">
+          <span className="text-sm font-semibold">Password</span>
           <input className={field} type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
         </label>
-        {error && <p role="alert" className="text-clay">{error}</p>}
-        <button className={`${primary} w-full`} disabled={busy}>
+        {error && (
+          <p role="alert" className="rounded-xl bg-bad px-3 py-2 text-bad-foreground">
+            {error}
+          </p>
+        )}
+        <Button type="submit" className="w-full" disabled={busy}>
           {busy ? 'Logging in…' : 'Log in'}
-        </button>
+        </Button>
       </form>
     </main>
   )
@@ -75,10 +88,9 @@ function NewEpisode({ catalog, onStarted }: { catalog: Catalog; onStarted: (s: S
   }
 
   return (
-    <form onSubmit={submit} className="space-y-3 rounded-2xl bg-white p-4 shadow-sm">
-      <h2 className="font-semibold">Write a new episode</h2>
-      <label className="block">
-        <span className="text-sm text-slate-600">Lesson</span>
+    <form onSubmit={submit} className="space-y-4">
+      <label className="block space-y-1.5">
+        <span className="text-sm font-semibold">Lesson</span>
         <select className={field} value={lesson} onChange={(e) => setLesson(e.target.value)}>
           {catalog.lessons.map((l) => (
             <option key={l.id} value={l.id}>
@@ -87,8 +99,8 @@ function NewEpisode({ catalog, onStarted }: { catalog: Catalog; onStarted: (s: S
           ))}
         </select>
       </label>
-      <label className="block">
-        <span className="text-sm text-slate-600">District and languages</span>
+      <label className="block space-y-1.5">
+        <span className="text-sm font-semibold">District and languages</span>
         <select className={field} value={district} onChange={(e) => setDistrict(e.target.value)}>
           {catalog.districts.map((d) => (
             <option key={d.id} value={d.id}>
@@ -97,36 +109,51 @@ function NewEpisode({ catalog, onStarted }: { catalog: Catalog; onStarted: (s: S
           ))}
         </select>
       </label>
-      {error && <p role="alert" className="text-sm text-clay">{error}</p>}
-      <button className={`${primary} w-full`} disabled={busy || !lesson || !district}>
-        {busy ? 'Starting…' : 'Write episode'}
-      </button>
-      <p className="text-sm text-slate-500">Claude writes it, then a second model reviews it. This takes about five minutes.</p>
+      {error && (
+        <p role="alert" className="rounded-xl bg-bad px-3 py-2 text-sm text-bad-foreground">
+          {error}
+        </p>
+      )}
+      <Button type="submit" className="w-full" disabled={busy || !lesson || !district}>
+        {busy ? 'Starting…' : 'Write lesson'}
+      </Button>
     </form>
   )
 }
 
-function EpisodeList({ items, selected, onSelect }: { items: Summary[]; selected: number | null; onSelect: (id: number) => void }) {
-  if (!items.length) return <p className="px-1 text-slate-500">No episodes yet. Write the first one above.</p>
+type Filter = 'review' | 'approved' | 'all'
+const FILTERS: { key: Filter; label: string; match: (s: Status) => boolean }[] = [
+  { key: 'review', label: 'To review', match: (s) => s === 'in_review' || s === 'generating' || s === 'failed' },
+  { key: 'approved', label: 'Approved', match: (s) => s === 'approved' },
+  { key: 'all', label: 'All', match: () => true },
+]
+
+function EpisodeList(props: { items: Summary[]; selected: number | null; onSelect: (id: number) => void; onDark?: boolean }) {
+  if (!props.items.length) return <p className={cn('px-1 text-sm', props.onDark ? 'text-sidebar-muted' : 'text-muted-foreground')}>No lessons here.</p>
   return (
-    <ul className="space-y-2">
-      {items.map((e) => (
-        <li key={e.id}>
-          <button
-            onClick={() => onSelect(e.id)}
-            aria-current={e.id === selected}
-            className={`w-full rounded-xl p-3 text-left focus-visible:ring-2 focus-visible:ring-ink focus-visible:outline-none bg-white ${e.id === selected ? 'ring-2 ring-ink' : 'hover:bg-slate-50'}`}
-          >
-            <span className="flex items-start justify-between gap-2">
-              <span className="font-medium">{e.title ?? `${e.lesson_id}, ${e.district_id}`}</span>
-              <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS[e.status].tone}`}>{STATUS[e.status].label}</span>
-            </span>
-            <span className="mt-1 block text-sm text-slate-500">
-              {e.district_id} {new Date(e.created_at).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}
-            </span>
-          </button>
-        </li>
-      ))}
+    <ul className="space-y-1">
+      {props.items.map((e) => {
+        const on = e.id === props.selected
+        return (
+          <li key={e.id}>
+            <button
+              onClick={() => props.onSelect(e.id)}
+              aria-current={on}
+              className={cn(
+                'w-full rounded-xl px-3.5 py-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                props.onDark ? 'hover:bg-sidebar-accent' : 'border border-border bg-card hover:bg-muted',
+                on && (props.onDark ? 'bg-sidebar-accent shadow-[inset_3px_0_0_var(--sidebar-primary)]' : 'ring-2 ring-ring'),
+              )}
+            >
+              <span className="line-clamp-2 font-semibold">{e.title ?? `${e.lesson_id}, ${e.district_id}`}</span>
+              <span className={cn('mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.8125rem]', props.onDark ? 'text-sidebar-muted' : 'text-muted-foreground')}>
+                <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS[e.status].tone}`}>{STATUS[e.status].label}</span>
+                {e.district_id} · {new Date(e.created_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
+              </span>
+            </button>
+          </li>
+        )
+      })}
     </ul>
   )
 }
@@ -142,6 +169,9 @@ export default function Studio() {
     history.replaceState(null, '', id === null ? location.pathname : `?episode=${id}`)
   }, [])
   const [error, setError] = useState('')
+  const [filter, setFilter] = useState<Filter>('review')
+  const [query, setQuery] = useState('')
+  const [writingOpen, setWritingOpen] = useState(false)
 
   const logout = useCallback(() => {
     session.clear()
@@ -174,37 +204,110 @@ export default function Studio() {
   if (!signedIn) return <Login onIn={() => setSignedIn(true)} />
 
   const current = items.find((e) => e.id === selected)
-  return (
-    <div className="min-h-screen bg-slate-100 text-ink">
-      <header className="flex items-center justify-between bg-ink px-4 py-3 text-white">
-        <h1 className="text-lg font-bold">
-          Sahpaathi <span className="font-normal text-sun">Studio</span>
-        </h1>
-        <button onClick={logout} className="rounded-lg px-3 py-1 text-sm hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-sun focus-visible:outline-none">
-          Log out
-        </button>
-      </header>
-      {error && <p role="alert" className="bg-clay/10 px-4 py-2 text-clay">{error}</p>}
-      <div className="mx-auto grid max-w-7xl gap-4 p-4 lg:grid-cols-[22rem_1fr]">
-        <aside className={`space-y-4 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:self-start lg:overflow-y-auto ${selected !== null ? 'hidden lg:block' : ''}`}>
-          {catalog && <NewEpisode catalog={catalog} onStarted={(s) => (setItems((l) => [s, ...l]), setSelected(s.id))} />}
-          <EpisodeList items={items} selected={selected} onSelect={setSelected} />
-        </aside>
-        <main className={selected === null ? 'hidden lg:block' : ''}>
-          {selected === null ? (
-            <p className="rounded-2xl bg-white p-6 text-slate-500 shadow-sm">Pick an episode to read it line by line, with the English translation and the AI review beside it.</p>
-          ) : (
-            <EpisodeView
-              key={selected}
-              id={selected}
-              status={current?.status}
-              onBack={() => setSelected(null)}
-              onChanged={refresh}
-              onError={handle}
-            />
-          )}
-        </main>
+  const q = query.trim().toLowerCase()
+  const shown = items.filter(
+    (e) => FILTERS.find((f) => f.key === filter)!.match(e.status) && (!q || [e.title, e.lesson_id, e.district_id].some((t) => t?.toLowerCase().includes(q))),
+  )
+  const count = (f: Filter) => items.filter((e) => FILTERS.find((x) => x.key === f)!.match(e.status)).length
+
+  const sidebar = ({ collapsed, expand, close }: SidebarApi) =>
+    collapsed ? (
+      <div className="flex flex-col items-center gap-2">
+        <Button size="icon" aria-label="Write a new lesson" title="Write a new lesson" onClick={() => setWritingOpen(true)}>
+          <PlusIcon aria-hidden />
+        </Button>
+        {(
+          [
+            ['review', ClipboardListIcon],
+            ['approved', CheckCircle2Icon],
+          ] as const
+        ).map(([f, Icon]) => {
+          const label = `${FILTERS.find((x) => x.key === f)!.label}: ${count(f)}`
+          return (
+            <button
+              key={f}
+              aria-label={label}
+              title={label}
+              onClick={() => (setFilter(f), expand())}
+              className="relative grid size-11 place-items-center rounded-xl text-sidebar-muted outline-none hover:bg-sidebar-accent hover:text-sidebar-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+            >
+              <Icon className="size-5" aria-hidden />
+              <span className="absolute -top-0.5 -right-0.5 rounded-full bg-sidebar-primary px-1.5 text-[0.6875rem] font-bold text-sidebar-primary-foreground">{count(f)}</span>
+            </button>
+          )
+        })}
       </div>
-    </div>
+    ) : (
+      <>
+        <Button onClick={() => (setWritingOpen(true), close())}>
+          <PlusIcon aria-hidden /> Write a new lesson
+        </Button>
+        <div role="group" aria-label="Show" className="flex gap-1">
+          {FILTERS.map((f) => (
+            <button
+              key={f.key}
+              aria-pressed={filter === f.key}
+              onClick={() => setFilter(f.key)}
+              className={cn(
+                'min-h-11 flex-1 rounded-xl px-2 text-sm font-semibold whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring',
+                filter === f.key ? 'bg-sidebar-accent text-sidebar-foreground' : 'text-sidebar-muted hover:text-sidebar-foreground',
+              )}
+            >
+              {f.label} {f.key !== 'all' && count(f.key)}
+            </button>
+          ))}
+        </div>
+        <EpisodeList items={shown} selected={selected} onSelect={(id) => (setSelected(id), close())} onDark />
+      </>
+    )
+
+  const topbar = (
+    <>
+      <label className="flex h-11 min-w-0 flex-1 items-center gap-2 rounded-xl border border-input bg-card px-3 focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/40 md:max-w-sm">
+        <SearchIcon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+        <input className="w-full bg-transparent outline-none" placeholder="Search lessons" aria-label="Search lessons" value={query} onChange={(e) => setQuery(e.target.value)} />
+      </label>
+      <div className="flex-1 max-md:hidden" />
+      <Button variant="ghost" onClick={logout}>
+        <LogOutIcon aria-hidden /> <span className="max-sm:sr-only">Log out</span>
+      </Button>
+    </>
+  )
+
+  return (
+    <AppShell product="Studio" sidebar={sidebar} topbar={topbar}>
+      {error && (
+        <p role="alert" className="mb-4 rounded-xl bg-bad px-4 py-3 text-bad-foreground">
+          {error}
+        </p>
+      )}
+      {selected === null ? (
+        <>
+          <p className="rounded-2xl border border-border bg-card p-6 text-muted-foreground max-md:hidden">
+            Pick a lesson to read it line by line, with the English back-translation and the AI review beside it.
+          </p>
+          {/* Phones have no sidebar: the list is the first screen. */}
+          <div className="md:hidden">
+            <EpisodeList items={shown} selected={selected} onSelect={setSelected} />
+          </div>
+        </>
+      ) : (
+        <EpisodeView key={selected} id={selected} status={current?.status} onBack={() => setSelected(null)} onChanged={refresh} onError={handle} />
+      )}
+
+      <Dialog open={writingOpen} onOpenChange={setWritingOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-heading text-xl">Write a new lesson</DialogTitle>
+            <DialogDescription>Claude writes it, then a second model reviews it. This takes about five minutes.</DialogDescription>
+          </DialogHeader>
+          {catalog ? (
+            <NewEpisode catalog={catalog} onStarted={(s) => (setItems((l) => [s, ...l]), setSelected(s.id), setFilter('review'), setWritingOpen(false))} />
+          ) : (
+            <p className="text-muted-foreground">Loading lessons…</p>
+          )}
+        </DialogContent>
+      </Dialog>
+    </AppShell>
   )
 }

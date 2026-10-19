@@ -1,4 +1,8 @@
+import { ArrowLeftIcon, PencilIcon } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
+import { cn } from 'cn'
+import { Button } from '@/components/ui/button'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import type { Episode, Line } from '../lib/types'
 import { api, ApiError, type Detail, type Edit, type Issue, type Status } from './api'
 import { CRITERIA, LANG_NAMES, STATUS, glossById, issuesByLine, minutes, schoolShare, svgDataUrl } from './view'
@@ -6,18 +10,19 @@ import { CRITERIA, LANG_NAMES, STATUS, glossById, issuesByLine, minutes, schoolS
 const POLL_MS = 5000
 const SPEAKER: Record<Line['speaker'], string | null> = { guide: null, child: 'Child voice', song: 'Sung' }
 const CRITERION_LABEL = Object.fromEntries(CRITERIA.map((c) => [c.key, c.label]))
+const card = 'rounded-2xl border border-border bg-card p-5'
 
 function scoreTone(score: number) {
-  return score >= 4 ? 'text-leaf' : score === 3 ? 'text-ink' : 'text-clay'
+  return score >= 4 ? 'text-ok-foreground' : score === 3 ? 'text-foreground' : 'text-bad-foreground'
 }
 
 function IssueNote({ issue }: { issue: Issue }) {
   return (
-    <div className="mt-2 rounded-lg bg-sun/25 px-3 py-2 text-sm">
+    <div className="mt-3 rounded-xl bg-warn px-4 py-3 text-sm text-foreground">
       <p>
-        <strong>{CRITERION_LABEL[issue.criterion]}:</strong> {issue.problem}
+        <strong className="text-warn-foreground">{CRITERION_LABEL[issue.criterion]}:</strong> {issue.problem}
       </p>
-      <p className="mt-1 text-slate-700">Suggested fix: {issue.fix}</p>
+      <p className="mt-1 text-muted-foreground">Suggested fix: {issue.fix}</p>
     </div>
   )
 }
@@ -55,30 +60,30 @@ function LineEditor({ line, onSave, onDone }: { line: Line; onSave: (text: strin
       <textarea
         lang={line.lang}
         aria-label={`Correct line ${line.id}`}
-        className="block w-full rounded-lg border border-slate-300 p-2 text-lg leading-relaxed focus:border-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/30"
+        className="block w-full rounded-xl border border-input bg-background p-3 text-lg leading-relaxed outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40"
         rows={2}
         value={text}
         onChange={(e) => setText(e.target.value)}
         autoFocus
       />
-      {error && <p role="alert" className="text-sm text-clay">{error}</p>}
+      {error && (
+        <p role="alert" className="text-sm text-bad-foreground">
+          {error}
+        </p>
+      )}
       <div className="flex gap-2">
-        <button
-          onClick={save}
-          disabled={busy || !text.trim() || text === line.text}
-          className="rounded-lg bg-ink px-3 py-1 text-sm font-semibold text-white disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-sun focus-visible:outline-none"
-        >
+        <Button size="sm" onClick={save} disabled={busy || !text.trim() || text === line.text}>
           {busy ? 'Saving…' : 'Save line'}
-        </button>
-        <button onClick={onDone} className="rounded-lg px-3 py-1 text-sm text-slate-600 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-ink focus-visible:outline-none">
+        </Button>
+        <Button size="sm" variant="ghost" onClick={onDone}>
           Cancel
-        </button>
+        </Button>
       </div>
     </div>
   )
 }
 
-/** One spoken line: home language on a sun rule, school language on a leaf rule, gloss beside it. */
+/** One spoken line: home language on a marigold rule, school language on a leaf rule, English beside it. */
 function LineRow({ line, ctx }: { line: Line; ctx: LineCtx }) {
   const [editing, setEditing] = useState(false)
   const home = line.lang === ctx.ep.home_lang && ctx.ep.home_lang !== ctx.ep.school_lang
@@ -86,40 +91,41 @@ function LineRow({ line, ctx }: { line: Line; ctx: LineCtx }) {
   const edit = ctx.edits[line.id]
   const gloss = ctx.gloss.get(line.id)
   return (
-    <li id={`line-${line.id}`} className={`scroll-mt-20 border-l-4 py-2 pl-3 ${home ? 'border-sun' : 'border-leaf'} ${notes.length ? 'bg-sun/10' : ''}`}>
-      <div className="grid gap-x-6 gap-y-1 md:grid-cols-2">
-        {editing && ctx.onEdit ? (
-          <LineEditor line={line} onSave={(text) => ctx.onEdit!(line.id, text)} onDone={() => setEditing(false)} />
-        ) : (
-          <p lang={line.lang} className="text-lg leading-relaxed">
-            {line.text}
+    <li id={`line-${line.id}`} className={cn('scroll-mt-24 border-t border-border py-4 pl-4 first:border-t-0', 'border-l-4', home ? 'border-l-primary' : 'border-l-most')}>
+      <div className="grid gap-x-8 gap-y-2 md:grid-cols-2">
+        <div className="min-w-0 space-y-1.5">
+          {editing && ctx.onEdit ? (
+            <LineEditor line={line} onSave={(text) => ctx.onEdit!(line.id, text)} onDone={() => setEditing(false)} />
+          ) : (
+            <p lang={line.lang} className="text-lg leading-relaxed">
+              {line.text}
+            </p>
+          )}
+          <p className="text-[0.8125rem] text-muted-foreground">
+            {LANG_NAMES[line.lang]}
+            {SPEAKER[line.speaker] && ` · ${SPEAKER[line.speaker]}`}
+            {line.pause_after_sec > 0 && ` · then a ${line.pause_after_sec} s pause`}
+            <span> · {line.id}</span>
           </p>
-        )}
-        <p className="text-slate-600">
-          {edit && gloss && <span className="text-xs font-semibold text-slate-500">English of the original line: </span>}
-          {gloss ?? 'No English translation.'}
-        </p>
+          {edit && (
+            <p className="text-sm text-muted-foreground">
+              <span className="font-semibold text-ok-foreground">Corrected by {edit.by}.</span> Was: <span lang={line.lang}>{edit.before}</span>
+            </p>
+          )}
+          {line.cue && <p className="text-sm">Children: {line.cue}</p>}
+        </div>
+        <div className="flex items-start justify-between gap-3">
+          <p className="leading-relaxed text-muted-foreground">
+            {edit && gloss && <span className="text-xs font-semibold">English of the original line: </span>}
+            {gloss ?? 'No English translation.'}
+          </p>
+          {ctx.onEdit && !editing && (
+            <Button size="icon" variant="ghost" aria-label={`Edit line ${line.id}`} title="Edit line" onClick={() => setEditing(true)}>
+              <PencilIcon aria-hidden />
+            </Button>
+          )}
+        </div>
       </div>
-      {edit && (
-        <p className="mt-1 text-sm text-slate-600">
-          <span className="font-semibold text-leaf">Corrected by {edit.by}.</span> Was: <span lang={line.lang}>{edit.before}</span>
-        </p>
-      )}
-      <p className="mt-1 text-xs text-slate-500">
-        {LANG_NAMES[line.lang]}
-        {SPEAKER[line.speaker] && `, ${SPEAKER[line.speaker]}`}
-        {line.pause_after_sec > 0 && `, then a ${line.pause_after_sec} s pause`}
-        <span className="text-slate-400"> {line.id}</span>
-        {ctx.onEdit && !editing && (
-          <button
-            onClick={() => setEditing(true)}
-            className="ml-2 rounded px-1.5 py-0.5 font-semibold text-ink underline decoration-slate-300 underline-offset-2 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-ink focus-visible:outline-none"
-          >
-            Edit
-          </button>
-        )}
-      </p>
-      {line.cue && <p className="mt-1 text-sm text-slate-700">Children: {line.cue}</p>}
       {notes.map((n, i) => (
         <IssueNote key={i} issue={n} />
       ))}
@@ -129,7 +135,7 @@ function LineRow({ line, ctx }: { line: Line; ctx: LineCtx }) {
 
 function Lines({ lines, ctx }: { lines: Line[]; ctx: LineCtx }) {
   return (
-    <ul className="space-y-1">
+    <ul>
       {lines.map((l) => (
         <LineRow key={l.id} line={l} ctx={ctx} />
       ))}
@@ -142,12 +148,12 @@ function Handover({ ep, index }: { ep: Episode; index: number }) {
   if (ep.home_lang === ep.school_lang) return null
   const school = Math.round(schoolShare(ep, index) * 100)
   return (
-    <div className="mt-2" aria-label={`${100 - school}% ${LANG_NAMES[ep.home_lang]}, ${school}% ${LANG_NAMES[ep.school_lang]}`}>
+    <div className="max-w-md" aria-label={`${100 - school}% ${LANG_NAMES[ep.home_lang]}, ${school}% ${LANG_NAMES[ep.school_lang]}`}>
       <div className="flex h-2 overflow-hidden rounded-full">
-        <span className="bg-sun" style={{ width: `${100 - school}%` }} />
-        <span className="bg-leaf" style={{ width: `${school}%` }} />
+        <span className="bg-primary" style={{ width: `${100 - school}%` }} />
+        <span className="bg-most" style={{ width: `${school}%` }} />
       </div>
-      <p className="mt-1 text-xs text-slate-500">
+      <p className="mt-1 text-xs text-muted-foreground">
         {100 - school}% {LANG_NAMES[ep.home_lang]}, {school}% {LANG_NAMES[ep.school_lang]}
       </p>
     </div>
@@ -160,44 +166,61 @@ const BRANCHES = [
   { part: 'stretch', when: 'If most got it' },
 ] as const
 
+/** Number of review notes on these lines, shown on the part's tab. */
+function flagCount(lines: Line[], issues: Map<string, Issue[]>) {
+  return lines.reduce((n, l) => n + (issues.get(l.id)?.length ?? 0), 0)
+}
+
 function Script({ ep, ctx }: { ep: Episode; ctx: LineCtx }) {
+  const parts = [
+    ...ep.segments.map((s, i) => ({ id: s.id, label: `Part ${i + 1}`, lines: [...s.teach, ...s.easier, ...s.core, ...s.stretch] })),
+    { id: 'analogy', label: 'Analogy', lines: ep.analogy },
+    { id: 'recap', label: 'Call recap', lines: ep.ivr_recap },
+  ]
   return (
-    <div className="space-y-4">
+    <Tabs defaultValue={parts[0].id} className="gap-4">
+      <TabsList variant="line" className="h-auto flex-wrap justify-start">
+        {parts.map((p) => {
+          const flags = flagCount(p.lines, ctx.issues)
+          return (
+            <TabsTrigger key={p.id} value={p.id} className="min-h-11 flex-none px-3 text-[0.9375rem] text-muted-foreground data-active:text-foreground">
+              {p.label}
+              {flags > 0 && (
+                <span className="rounded-full bg-warn px-1.5 text-xs font-bold text-warn-foreground" aria-label={`${flags} notes`}>
+                  {flags}
+                </span>
+              )}
+            </TabsTrigger>
+          )
+        })}
+      </TabsList>
       {ep.segments.map((s, i) => (
-        <section key={s.id} className="rounded-2xl bg-white p-4 shadow-sm">
-          <h3 className="text-lg font-semibold">
-            {i + 1}. {s.title}
-          </h3>
-          <Handover ep={ep} index={i} />
-          <div className="mt-3">
-            <Lines lines={s.teach} ctx={ctx} />
+        <TabsContent key={s.id} value={s.id} keepMounted className={cn(card, 'space-y-4 text-base')}>
+          <div className="space-y-2">
+            <h3 className="font-heading text-xl font-bold">{s.title}</h3>
+            <Handover ep={ep} index={i} />
           </div>
-          <p className="mt-3 rounded-lg bg-ink px-3 py-2 text-white">
-            Teacher checks: <span lang={ep.school_lang}>{s.checkpoint}</span>
+          <Lines lines={s.teach} ctx={ctx} />
+          <p className="rounded-xl bg-sidebar px-4 py-3 text-sidebar-foreground">
+            <span className="font-semibold text-sidebar-primary">Teacher checks:</span> <span lang={ep.school_lang}>{s.checkpoint}</span>
           </p>
           {BRANCHES.map((b) => (
-            <div key={b.part} className="mt-3">
-              <h4 className="text-sm font-semibold text-slate-600">{b.when}</h4>
+            <div key={b.part}>
+              <h4 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">{b.when}</h4>
               <Lines lines={s[b.part]} ctx={ctx} />
             </div>
           ))}
-        </section>
+        </TabsContent>
       ))}
-      <section className="rounded-2xl bg-white p-4 shadow-sm">
-        <h3 className="text-lg font-semibold">Simpler analogy</h3>
-        <p className="text-sm text-slate-500">Plays when the teacher presses “Need a simpler analogy”.</p>
-        <div className="mt-2">
-          <Lines lines={ep.analogy} ctx={ctx} />
-        </div>
-      </section>
-      <section className="rounded-2xl bg-white p-4 shadow-sm">
-        <h3 className="text-lg font-semibold">Catch-up call for absent children</h3>
-        <p className="text-sm text-slate-500">About {Math.round(minutes(ep.ivr_recap))} minutes on a parent's basic phone, the evening of the lesson.</p>
-        <div className="mt-2">
-          <Lines lines={ep.ivr_recap} ctx={ctx} />
-        </div>
-      </section>
-    </div>
+      <TabsContent value="analogy" keepMounted className={cn(card, 'text-base')}>
+        <p className="text-sm text-muted-foreground">Plays when the teacher presses “Need a simpler analogy”.</p>
+        <Lines lines={ep.analogy} ctx={ctx} />
+      </TabsContent>
+      <TabsContent value="recap" keepMounted className={cn(card, 'text-base')}>
+        <p className="text-sm text-muted-foreground">About {Math.round(minutes(ep.ivr_recap))} minutes on a parent's basic phone, the evening of the lesson.</p>
+        <Lines lines={ep.ivr_recap} ctx={ctx} />
+      </TabsContent>
+    </Tabs>
   )
 }
 
@@ -208,11 +231,11 @@ function Decision({ detail, onDecided, onError }: { detail: Detail; onDecided: (
 
   if (detail.status === 'approved' || detail.status === 'rejected') {
     return (
-      <div className="rounded-2xl bg-white p-4 shadow-sm">
+      <div className={card}>
         <p className="font-semibold">
           {STATUS[detail.status].label} by {detail.reviewed_by}
         </p>
-        {detail.review_notes && <p className="mt-1 text-slate-700">{detail.review_notes}</p>}
+        {detail.review_notes && <p className="mt-1 text-muted-foreground">{detail.review_notes}</p>}
       </div>
     )
   }
@@ -231,33 +254,29 @@ function Decision({ detail, onDecided, onError }: { detail: Detail; onDecided: (
   }
 
   return (
-    <div className="sticky bottom-0 rounded-2xl bg-white p-3 shadow-lg ring-1 ring-slate-200 lg:flex lg:flex-wrap lg:items-end lg:gap-3">
-      <label className="block lg:flex-1">
-        <span className="text-sm font-semibold">Your decision</span>
+    <div className="sticky bottom-4 flex flex-wrap items-end gap-3 rounded-2xl border border-border bg-card p-3 shadow-lg">
+      {error && (
+        <p role="alert" className="basis-full text-sm text-bad-foreground">
+          {error}
+        </p>
+      )}
+      <label className="min-w-60 flex-1">
+        <span className="sr-only">Notes for your decision</span>
         <textarea
-          className="mt-1 block w-full rounded-lg border border-slate-300 p-2 focus:border-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/30"
+          className="block min-h-11 w-full rounded-xl border border-input bg-background px-3 py-2.5 outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40"
           rows={1}
           placeholder="Notes: what you checked, or what must change"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
         />
       </label>
-      {error && <p role="alert" className="text-sm text-clay lg:order-first lg:basis-full">{error}</p>}
-      <div className="mt-2 flex gap-2 lg:mt-0">
-        <button
-          disabled={busy}
-          onClick={() => decide('reject')}
-          className="rounded-lg px-4 py-2 font-semibold text-clay ring-1 ring-clay/40 hover:bg-clay/10 disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-clay focus-visible:outline-none"
-        >
+      <div className="flex gap-2 max-sm:w-full">
+        <Button variant="outline" disabled={busy} onClick={() => decide('reject')} className="text-bad-foreground max-sm:flex-1">
           Reject
-        </button>
-        <button
-          disabled={busy}
-          onClick={() => decide('approve')}
-          className="flex-1 rounded-lg bg-leaf px-4 py-2 font-semibold text-white hover:bg-leaf/90 disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-ink focus-visible:outline-none"
-        >
+        </Button>
+        <Button disabled={busy} onClick={() => decide('approve')} className="bg-foreground text-background hover:bg-foreground/85 max-sm:flex-1">
           Approve for voicing
-        </button>
+        </Button>
       </div>
     </div>
   )
@@ -284,7 +303,7 @@ export default function EpisodeView(props: {
     return () => clearInterval(t)
   }, [detail?.status, load])
 
-  if (!detail) return <p className="text-slate-500">Loading…</p>
+  if (!detail) return <p className="text-muted-foreground">Loading…</p>
   const ep = detail.episode
   const edits = detail.edits ?? {}
   const onEdit =
@@ -304,75 +323,73 @@ export default function EpisodeView(props: {
   const main = ep ? ep.segments.flatMap((s) => [...s.teach, ...s.core]) : []
 
   return (
-    <article className="space-y-4">
-      <button onClick={props.onBack} className="rounded-lg px-2 py-1 text-sm text-slate-600 hover:bg-white lg:hidden">
-        ← All episodes
-      </button>
-      <header className="rounded-2xl bg-white p-4 shadow-sm">
-        <div className="flex flex-wrap items-start justify-between gap-2">
-          <h2 className="text-2xl font-bold" lang={ep?.school_lang}>
-            {ep?.title ?? 'Writing this episode…'}
-          </h2>
-          <span className={`rounded-full px-3 py-1 text-sm font-semibold ${STATUS[detail.status].tone}`}>{STATUS[detail.status].label}</span>
+    <article className="space-y-5">
+      <Button variant="ghost" onClick={props.onBack} className="-ml-2 md:hidden">
+        <ArrowLeftIcon aria-hidden /> All lessons
+      </Button>
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0 space-y-2">
+          {ep && (
+            <p className="text-[0.8125rem] font-semibold tracking-wider text-muted-foreground uppercase">
+              Grade {ep.grade} · {ep.district} ·{' '}
+              {ep.home_lang === ep.school_lang ? LANG_NAMES[ep.school_lang] : `${LANG_NAMES[ep.home_lang]} → ${LANG_NAMES[ep.school_lang]}`} · {Math.round(minutes(main))} min
+            </p>
+          )}
+          <h1 className="font-heading text-3xl leading-tight font-bold" lang={ep?.school_lang}>
+            {ep?.title ?? 'Writing this lesson…'}
+          </h1>
+          {detail.status === 'generating' && (
+            <p className="text-muted-foreground" aria-live="polite">
+              Claude is writing and reviewing it. This page updates by itself.
+            </p>
+          )}
+          {detail.status === 'failed' && <p className="text-bad-foreground">{detail.error}</p>}
         </div>
-        {ep && (
-          <p className="mt-1 text-slate-600">
-            Grade {ep.grade} in {ep.district},{' '}
-            {ep.home_lang === ep.school_lang ? `in ${LANG_NAMES[ep.school_lang]}` : `from ${LANG_NAMES[ep.home_lang]} to ${LANG_NAMES[ep.school_lang]}`}. About{' '}
-            {Math.round(minutes(main))} minutes on the main path.
-          </p>
-        )}
-        {detail.status === 'generating' && (
-          <p className="mt-2 text-slate-600" aria-live="polite">
-            Claude is writing and reviewing it. This page updates by itself.
-          </p>
-        )}
-        {detail.status === 'failed' && <p className="mt-2 text-clay">{detail.error}</p>}
+        <span className={`rounded-full px-3 py-1 text-sm font-semibold ${STATUS[detail.status].tone}`}>{STATUS[detail.status].label}</span>
       </header>
 
       {ep && ctx && detail.review && (
         <>
-          <section className="rounded-2xl bg-white p-4 shadow-sm">
-            <h3 className="text-lg font-semibold">AI review</h3>
-            <p className="mt-1 text-slate-600">
-              {detail.passed
-                ? 'No blocking problems found. You still decide.'
-                : `${detail.review.rubric.issues.length} notes are pinned to the lines below. Read them before you decide.`}
-              {detail.status === 'in_review' && ' Press Edit on any line to correct its wording.'}
-            </p>
-            {edited > 0 && (
-              <p className="mt-1 font-semibold text-leaf">
-                {edited} {edited === 1 ? 'line' : 'lines'} corrected by reviewers. The scores and notes are from before the corrections.
-              </p>
-            )}
-            <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-3">
+          <section className="space-y-3" aria-label="AI review">
+            <dl className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:gap-2.5">
               {CRITERIA.map((c) => {
                 const s = detail.review!.rubric.scores[c.key]
                 return (
-                  <div key={c.key} title={s.reason}>
-                    <dt className="text-sm text-slate-500">{c.label}</dt>
-                    <dd className={`text-xl font-bold ${scoreTone(s.score)}`}>{s.score}/5</dd>
+                  <div key={c.key} title={s.reason} className={cn('min-w-0 rounded-xl border bg-card px-3 py-2.5 sm:min-w-28 sm:px-3.5', s.score <= 2 ? 'border-few' : 'border-border')}>
+                    <dt className="text-[0.8125rem] text-muted-foreground">{c.label}</dt>
+                    <dd className={cn('text-lg font-bold', scoreTone(s.score))}>{s.score} / 5</dd>
                   </div>
                 )
               })}
             </dl>
+            <p className="text-muted-foreground">
+              {detail.passed
+                ? 'The AI review found no blocking problems. You still decide.'
+                : `The AI review left ${detail.review.rubric.issues.length} notes, pinned under the lines they are about.`}
+              {detail.status === 'in_review' && ' Use the pencil on any line to correct its wording.'}
+            </p>
+            {edited > 0 && (
+              <p className="font-semibold text-ok-foreground">
+                {edited} {edited === 1 ? 'line' : 'lines'} corrected by reviewers. The scores and notes are from before the corrections.
+              </p>
+            )}
             {general.map((n, i) => (
               <IssueNote key={i} issue={n} />
             ))}
           </section>
 
-          <section className="flex flex-wrap gap-4 rounded-2xl bg-white p-4 shadow-sm">
+          <section className={cn(card, 'flex flex-wrap gap-6')}>
             <div className="min-w-48 flex-1">
-              <h3 className="font-semibold">Before class</h3>
-              <ul className="mt-1 list-disc pl-5 text-slate-700" lang={ep.school_lang}>
+              <h2 className="font-semibold">Before class</h2>
+              <ul className="mt-1 list-disc pl-5 text-muted-foreground" lang={ep.school_lang}>
                 {ep.materials.map((m) => (
                   <li key={m}>{m}</li>
                 ))}
               </ul>
             </div>
             <figure>
-              <img src={svgDataUrl(ep.chalk_sketch_svg)} alt="Blackboard sketch the teacher draws before class" className="h-28 rounded-lg bg-slate-50 p-2" />
-              <figcaption className="mt-1 text-xs text-slate-500">Blackboard sketch</figcaption>
+              <img src={svgDataUrl(ep.chalk_sketch_svg)} alt="Blackboard sketch the teacher draws before class" className="h-28 rounded-xl bg-background p-2" />
+              <figcaption className="mt-1 text-xs text-muted-foreground">Blackboard sketch</figcaption>
             </figure>
           </section>
 

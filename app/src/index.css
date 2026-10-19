@@ -29,6 +29,12 @@
   --text-display: clamp(2.75rem, 6vw, 5.5rem);
   --text-display--line-height: 0.95;
 
+  --color-ok: var(--ok);
+  --color-ok-foreground: var(--ok-foreground);
+  --color-warn: var(--warn);
+  --color-warn-foreground: var(--warn-foreground);
+  --color-bad: var(--bad);
+  --color-bad-foreground: var(--bad-foreground);
   --color-most: var(--most);
   --color-some: var(--some);
   --color-few: var(--few);
@@ -97,6 +103,13 @@
   --most: #3fb8a0;
   --some: #f4b23e;
   --few: #e8704a;
+  /* Status pills and notes: a pale fill with dark text, readable on paper and on the dark sidebar. */
+  --ok: #ddf3ec;
+  --ok-foreground: #145c4d;
+  --warn: #fcefd2;
+  --warn-foreground: #7a5410;
+  --bad: #fbe3da;
+  --bad-foreground: #9a3a1c;
   --chart-1: #3fb8a0;
   --chart-2: #f4b23e;
   --chart-3: #e8704a;

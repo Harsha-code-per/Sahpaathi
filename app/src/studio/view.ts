@@ -6,11 +6,11 @@ import type { Criterion, Issue, Review, Status } from './api'
 export const LANG_NAMES: Record<Lang, string> = { ta: 'Tamil', hi: 'Hindi', or: 'Odia', sat: 'Santali', en: 'English' }
 
 export const STATUS: Record<Status, { label: string; tone: string }> = {
-  generating: { label: 'Writing', tone: 'bg-slate-200 text-ink' },
-  failed: { label: 'Failed', tone: 'bg-clay/15 text-clay' },
-  in_review: { label: 'Needs review', tone: 'bg-sun/30 text-ink' },
-  approved: { label: 'Approved', tone: 'bg-leaf/15 text-leaf' },
-  rejected: { label: 'Rejected', tone: 'bg-clay/15 text-clay' },
+  generating: { label: 'Writing', tone: 'bg-secondary text-secondary-foreground' },
+  failed: { label: 'Failed', tone: 'bg-bad text-bad-foreground' },
+  in_review: { label: 'Needs review', tone: 'bg-warn text-warn-foreground' },
+  approved: { label: 'Approved', tone: 'bg-ok text-ok-foreground' },
+  rejected: { label: 'Rejected', tone: 'bg-bad text-bad-foreground' },
 }
 
 export const CRITERIA: { key: Criterion; label: string }[] = [
