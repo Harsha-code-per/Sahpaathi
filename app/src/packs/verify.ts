@@ -88,7 +88,7 @@ function json(bytes: Uint8Array, name: string): unknown {
 
 /** Verifies a pack against the team's Ed25519 public key (raw 32 bytes, base64). Throws PackError with a teacher-readable reason. */
 export async function verifyPack(zip: Uint8Array, publicKeyB64: string | undefined): Promise<VerifiedPack> {
-  if (!publicKeyB64) throw new PackError('No pack signing key is configured, so packs cannot be checked.')
+  if (!publicKeyB64) throw new PackError('No pack signing key is set up in this app yet, so it cannot check lessons. Please tell your Sahpaathi admin.')
   const files = unzip(zip) as Record<string, Uint8Array<ArrayBuffer>>
 
   if (!files['manifest.json']) throw new PackError('This pack has no manifest.json.')
