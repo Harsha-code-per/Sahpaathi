@@ -13,6 +13,6 @@ export default function Teacher() {
     setLesson(null)
   }
 
-  if (!lesson) return <Library onOpen={setLesson} />
+  if (!lesson) return <Library onOpen={setLesson} pending={pending} />
   return <LessonPlayer key={lesson.episode.id} {...lesson} pending={pending} onTapRecorded={sync} onExit={exit} />
 }

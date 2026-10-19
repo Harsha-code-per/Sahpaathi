@@ -1,4 +1,7 @@
+import { CheckCircle2Icon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import { cn } from 'cn'
+import { Button } from '@/components/ui/button'
 import { isCode, type ClassroomRecord } from '../storage/db'
 import { recordAttendance } from '../sync/outbox'
 import { getClassroom, parseRolls, rollsAsText, saveClassroom } from './classroom'
@@ -7,6 +10,8 @@ import { getClassroom, parseRolls, rollsAsText, saveClassroom } from './classroo
  * Post-lesson attendance: tap the roll numbers who were absent, and ONE catch-up-call event is queued.
  * It leaves the device with the taps whenever the phone next gets signal; in class nothing is sent.
  */
+
+const field = 'min-h-14 rounded-xl border border-input bg-background px-4 text-lg text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40'
 
 /** The setup form: a classroom code and the roll list. Also used by the Library's Change classroom link. */
 export function ClassroomSetup({
@@ -34,28 +39,28 @@ export function ClassroomSetup({
   }
 
   return (
-    <section className="flex flex-col gap-4 rounded-2xl bg-white/10 p-4">
-      <h2 className="text-xl font-semibold text-sun">This classroom</h2>
+    <section className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5">
+      <h2 className="font-heading text-xl font-bold">This classroom</h2>
       <label className="flex flex-col gap-2 text-lg">
-        Classroom code, like G2-A
+        <span className="text-muted-foreground">Classroom code, like G2-A</span>
         <input
           value={code}
           onChange={(e) => setCode(e.target.value)}
-          className={`min-h-14 rounded-xl bg-white/15 px-4 text-lg ${code === '' || isCode(code.trim()) ? '' : 'border-2 border-clay'}`}
+          className={cn(field, code !== '' && !isCode(code.trim()) && 'border-2 border-few')}
         />
       </label>
       <label className="flex flex-col gap-2 text-lg">
-        Roll numbers, like 1-30 or 4, 7, 12
-        <input value={rollsText} onChange={(e) => setRollsText(e.target.value)} className="min-h-14 rounded-xl bg-white/15 px-4 text-lg" />
+        <span className="text-muted-foreground">Roll numbers, like 1-30 or 4, 7, 12</span>
+        <input value={rollsText} onChange={(e) => setRollsText(e.target.value)} className={field} />
       </label>
       {error && (
-        <p role="alert" className="rounded-xl bg-clay/30 p-4 text-lg">
+        <p role="alert" className="rounded-2xl bg-bad p-4 text-lg text-bad-foreground">
           {error}
         </p>
       )}
-      <button className="min-h-14 rounded-2xl bg-leaf text-xl font-bold disabled:opacity-60" disabled={busy} onClick={save}>
+      <Button size="lg" disabled={busy} onClick={save}>
         {busy ? 'Saving…' : 'Save classroom'}
-      </button>
+      </Button>
     </section>
   )
 }
@@ -104,14 +109,18 @@ export default function Attendance({ episodeId, onSaved }: { episodeId: string; 
   }
 
   return (
-    <section className="flex flex-col gap-3">
-      <h2 className="text-xl font-semibold text-sun">Attendance · {classroom.classroom_id}</h2>
-      <p className="text-lg opacity-80">Tap the roll numbers who were absent, then save.</p>
-      <div className="grid grid-cols-5 gap-2 md:grid-cols-10">
+    <section className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 className="font-heading text-xl font-bold">Who was absent?</h2>
+        <span className="text-muted-foreground">Class {classroom.classroom_id}</span>
+      </div>
+      <p className="text-muted-foreground">Tap their roll numbers, then save.</p>
+      <div className="grid grid-cols-6 gap-2 sm:grid-cols-8">
         {classroom.rolls.map((roll) => (
           <button
             key={roll}
-            className={`min-h-14 rounded-xl text-lg font-bold ${absent.has(roll) ? 'bg-clay' : 'bg-white/15'} disabled:opacity-60`}
+            aria-pressed={absent.has(roll)}
+            className={cn('min-h-12 rounded-xl border text-lg font-bold outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60', absent.has(roll) ? 'border-few bg-few text-[#1a0f0b]' : 'border-input bg-background')}
             disabled={saved}
             onClick={() => toggle(roll)}
           >
@@ -120,30 +129,25 @@ export default function Attendance({ episodeId, onSaved }: { episodeId: string; 
         ))}
       </div>
       {error && (
-        <p role="alert" className="rounded-xl bg-clay/30 p-4 text-lg">
+        <p role="alert" className="rounded-2xl bg-bad p-4 text-lg text-bad-foreground">
           {error}
         </p>
       )}
       {saved ? (
-        <p role="status" className="rounded-xl bg-leaf/25 p-4 text-lg">
-          ✓ Attendance saved — {absent.size ? `${absent.size} absent` : 'everyone present'}. It sends at the next signal.
+        <p role="status" className="flex gap-3 rounded-2xl bg-ok p-4 text-lg text-ok-foreground">
+          <CheckCircle2Icon className="mt-0.5 size-6 shrink-0" aria-hidden />
+          <span>
+            Saved: {absent.size ? `${absent.size} absent` : 'everyone present'}. It sends at the next signal{absent.size ? ', and each absent child gets a catch-up call tonight' : ''}.
+          </span>
         </p>
       ) : (
-        <div className="flex gap-3">
-          <button
-            className="min-h-14 flex-1 rounded-2xl border-2 border-white/40 text-lg font-semibold disabled:opacity-60"
-            disabled={busy}
-            onClick={() => save([])}
-          >
-            Everyone present
-          </button>
-          <button
-            className="min-h-14 flex-1 rounded-2xl bg-leaf text-lg font-bold disabled:opacity-60"
-            disabled={busy}
-            onClick={() => save([...absent])}
-          >
-            Save attendance
-          </button>
+        <div className="flex flex-col gap-2">
+          <Button size="lg" disabled={busy} onClick={() => save([...absent])}>
+            {absent.size ? `Save · ${absent.size} absent` : 'Save attendance'}
+          </Button>
+          <Button size="lg" variant="ghost" disabled={busy} onClick={() => save([])}>
+            Everyone was here
+          </Button>
         </div>
       )}
     </section>
