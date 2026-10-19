@@ -129,7 +129,9 @@ def dashboard(_: Admin, db: DB) -> Dashboard:
     per_day: Counter = Counter()
     cutoff = datetime(start.year, start.month, start.day, tzinfo=UTC)
     for (at,) in db.execute(select(SyncEvent.at).where(SyncEvent.at >= cutoff)):
-        per_day[at.astimezone(UTC).date()] += 1
+        # SQLite hands the time back without its zone; astimezone() would then read it as the
+        # server's local time and move early-morning UTC taps to the day before.
+        per_day[(at if at.tzinfo else at.replace(tzinfo=UTC)).astimezone(UTC).date()] += 1
 
     return Dashboard(
         overall=_understanding(overall),
