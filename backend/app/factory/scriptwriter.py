@@ -73,6 +73,9 @@ words), lots of repetition and praise for effort.
 and songs, short stories, actions with free physical props, slate writing, pair work.
 - Every time children must answer or act, set pause_after_sec to the time they need (3-8 s to say \
 an answer, 10-30 s for a task) and put a short `cue` describing what the children should be doing.
+- Ask, wait, then confirm. Never state an answer the children are about to work out (a count, a \
+comparison, a sum) before the pause in which they answer it; give it right after the pause. A \
+"child" line may model how to answer only before the children's own first try of a new kind of task.
 - The teacher is busy with the other grade. Children manage every activity on their own; never \
 ask the teacher for help during a segment.
 
@@ -99,7 +102,11 @@ seeds or pebbles in their mouths).
 Structure:
 - Segments: 3-5 segments that together teach the learning outcome. `teach` is always played.
 - `checkpoint`: one yes/no question the teacher can answer by glancing at the children for a \
-second (e.g. "Are most children holding up 7 pebbles?").
+second (e.g. "Are most children holding up 7 pebbles?"). It checks exactly what that segment's \
+`teach` part just practised, with the same numbers, never something taught later.
+- `materials`: enough for the largest amount any activity asks for (if one task needs 20 pebbles \
+per child, say 20, not 15). The `ivr_recap` asks only for what a home has and never asks the child \
+to count past the number of things it told them to fetch.
 - After the teacher's tap: `easier` (few got it) re-teaches with smaller numbers, more concrete \
 props and slower pace; `core` (some got it) gives more practice at the same level; `stretch` \
 (most got it) extends one small step further. Each 1-3 minutes.
@@ -169,6 +176,8 @@ def write_episode(
     """
     client = client or anthropic.Anthropic(api_key=settings.anthropic_api_key or None)
     messages: list = [{"role": "user", "content": _brief(lesson, district, phrase_bank)}]
+    episode_id = f"g{lesson.grade}-{lesson.id}-{district.id}"
+    valid: Episode | None = None  # the last attempt that passed the contract and tier-1 rules
     error = ""
     for attempt in range(2):
         with client.beta.messages.stream(
@@ -193,11 +202,13 @@ def write_episode(
             error = "\n".join(rules.check(episode))
         except ValidationError as e:
             error = str(e)
-        if not error and feedback:
-            soft = feedback(episode)  # always run, so the caller has the final episode's review
-            error = "\n".join(soft) if attempt == 0 else ""
         if not error:
-            return episode.model_copy(update={"id": f"g{lesson.grade}-{lesson.id}-{district.id}"})
+            valid = episode
+            if feedback:
+                soft = feedback(episode)  # always run, so the caller has the final episode's review
+                error = "\n".join(soft) if attempt == 0 else ""
+        if not error:
+            return episode.model_copy(update={"id": episode_id})
         log.info("repair needed: %s", error)
         messages += [
             {"role": "assistant", "content": message.content},
@@ -207,6 +218,9 @@ def write_episode(
                 f"episode.\n{error}",
             },
         ]
+    if valid is not None:  # the repair broke a hard rule: the first attempt is still usable
+        log.info("repair broke the contract or a rule, keeping the first attempt: %s", error)
+        return valid.model_copy(update={"id": episode_id})
     raise ScriptwriterError(f"episode still invalid after repair: {error}")
 
 

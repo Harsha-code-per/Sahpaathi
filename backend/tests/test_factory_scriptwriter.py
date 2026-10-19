@@ -66,3 +66,10 @@ def test_rule_failure_gets_repair_turn_with_rule_message():
     client = _client((unbridged, "end_turn"), (SAMPLE, "end_turn"))
     write_episode(LESSON, DISTRICT, client=client)
     assert "at least 50% school language" in client.requests[1]["messages"][-1]["content"]
+
+
+def test_repair_that_breaks_the_contract_keeps_the_valid_first_attempt():
+    client = _client((SAMPLE, "end_turn"), ("{}", "end_turn"))
+    episode = write_episode(LESSON, DISTRICT, client=client, feedback=lambda ep: ["too long"])
+    assert len(client.requests) == 2  # the soft problem earned the repair, which came back broken
+    assert episode.id == "g1-numbers-to-20-chennai-migrant"

@@ -77,6 +77,13 @@ class Review(BaseModel):
         low = [c for c, s in self.rubric.scores if s.score < PASS_SCORE]
         return not low and not any(i.criterion == "safety" for i in self.rubric.issues)
 
+    @property
+    def rank(self) -> tuple:
+        """Higher is better: passed, no safety issue, weakest score, total, fewer issues."""
+        scores = [s.score for _, s in self.rubric.scores]
+        safe = not any(i.criterion == "safety" for i in self.rubric.issues)
+        return (self.passed, safe, min(scores), sum(scores), -len(self.rubric.issues))
+
     def problems(self) -> list[str]:
         """Phrased as instructions for the scriptwriter's repair turn; empty when passed."""
         if self.passed:
@@ -173,16 +180,23 @@ def generate(
     phrase_bank: list[str] | None = None,
     client: anthropic.Anthropic | None = None,
 ) -> tuple[Episode, Review]:
-    """Scriptwriter + tier 1 rules + tiers 2-3 review, with one shared repair turn."""
+    """Scriptwriter + tier 1 rules + tiers 2-3 review, with one shared repair turn.
+
+    A repair can fix the flagged lines and break others, so the better-reviewed of the two
+    attempts is kept (ties go to the repair).
+    """
     client = client or anthropic.Anthropic(api_key=settings.anthropic_api_key or None)
-    reviews: list[Review] = []
+    reviewed: list[tuple[Episode, Review]] = []
 
     def feedback(episode: Episode) -> list[str]:
-        reviews.append(review(episode, lesson, district, client))
-        return reviews[-1].problems()
+        reviewed.append((episode, review(episode, lesson, district, client)))
+        return reviewed[-1][1].problems()
 
-    episode = write_episode(lesson, district, phrase_bank, client, feedback=feedback)
-    return episode, reviews[-1]
+    final = write_episode(lesson, district, phrase_bank, client, feedback=feedback)
+    best, best_review = max(reversed(reviewed), key=lambda pair: pair[1].rank)
+    if best is not reviewed[-1][0]:
+        log.info("the repair reviewed worse, keeping the first attempt")
+    return best.model_copy(update={"id": final.id}), best_review
 
 
 if __name__ == "__main__":

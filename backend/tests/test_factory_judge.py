@@ -78,3 +78,21 @@ def test_failed_review_earns_one_repair_then_never_blocks():
     # Second review still fails, but the episode is returned for the human reviewer to decide.
     assert not result.passed and result.rubric.scores.pedagogy.score == 3
     assert episode.id == "g1-numbers-to-20-chennai-migrant"
+
+
+def test_repair_that_reviews_worse_keeps_the_first_attempt():
+    fixed = Episode.model_validate_json(SAMPLE).model_copy(update={"title": "Repaired"})
+    accuracy = Issue(line_id="s1-t1", criterion="accuracy", problem="Says 7.", fix="Say 3.")
+    client = stub_client(
+        writer=[(SAMPLE, "end_turn"), (fixed.model_dump_json(), "end_turn")],
+        judge=[GLOSS, _rubric(low="pedagogy"), GLOSS, _rubric(low="accuracy", issues=(accuracy,))],
+    )
+    episode, result = generate(LESSON, DISTRICT, client=client)
+    assert episode.title == EPISODE.title and episode.id == "g1-numbers-to-20-chennai-migrant"
+    assert result.rubric.scores.accuracy.score == 5  # the review shown is the kept episode's
+
+
+def test_review_rank_puts_safety_before_scores():
+    unsafe = Review(rubric=_rubric(issues=(SEED_ISSUE,)), gloss=[])
+    low = Review(rubric=_rubric(low="pedagogy"), gloss=[])
+    assert low.rank > unsafe.rank
