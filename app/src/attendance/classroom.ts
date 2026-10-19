@@ -1,4 +1,4 @@
-import { getDB, isCode, type ClassroomRecord } from '../storage/db'
+import { getDB, isCode, MAX_ABSENT, type ClassroomRecord } from '../storage/db'
 
 // Which classroom this phone belongs to. One add-only record keyed 'current'; saving again replaces it.
 // Roll codes are opaque on purpose (POST /sync contract, PR #32): letters, digits and hyphen, never names.
@@ -11,7 +11,7 @@ export async function getClassroom(): Promise<ClassroomRecord | null> {
 
 /** Validates the setup and stores it; anything the teacher typed by mistake fails here, before the grid. */
 export async function saveClassroom(c: { classroom_id: string; rolls: string[] }): Promise<ClassroomRecord> {
-  if (!isCode(c.classroom_id)) throw new Error('The classroom code can only use letters, digits and hyphen, up to 40 characters, like G2-A.')
+  if (!isCode(c.classroom_id)) throw new Error('The classroom code can only use letters, digits and hyphen, starting with a letter or digit, up to 40 characters, like G2-A.')
   if (c.rolls.length === 0) throw new Error('Add roll numbers, like 1-30 or 4, 7, 12.')
   const bad = c.rolls.find((r) => !isCode(r))
   if (bad) throw new Error(`"${bad}" is not a roll number: use codes like 17 or R4, no names.`)
@@ -20,10 +20,10 @@ export async function saveClassroom(c: { classroom_id: string; rolls: string[] }
   return record
 }
 
-/** Rolls over this would freeze a cheap phone before anyone could tap; a grade has far fewer anyway. */
-const MAX_ROLLS = 999
+/** The server takes at most 100 absent rolls per save, so a class can't list more; it also keeps the grid tappable. */
+const MAX_ROLLS = MAX_ABSENT
 
-const TOO_MANY = 'That list is over 999 rolls. A grade has far fewer, so please check the range.'
+const TOO_MANY = `That list is over ${MAX_ROLLS} rolls. A class has fewer, so please check the range.`
 
 /** Turns the teacher's roll list ("1-30" or "1,3,7") into roll codes; throws in plain words on a typo. */
 export function parseRolls(text: string): string[] {

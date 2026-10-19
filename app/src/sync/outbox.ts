@@ -1,4 +1,4 @@
-import { getDB, isCode, type AttendanceEvent, type OutboxEvent, type TapEvent } from '../storage/db'
+import { getDB, isCode, MAX_ABSENT, type AttendanceEvent, type OutboxEvent, type TapEvent } from '../storage/db'
 
 // Everything the classroom produces is written here first and only leaves the device via flushOutbox (client.ts).
 
@@ -15,7 +15,8 @@ export async function recordAttendance(
 ) {
   // A bad code must not sit in the outbox failing /sync on every retry, so check before anything is saved.
   const bad = [e.classroom_id, ...e.absent].find((c) => !isCode(c))
-  if (bad) throw new Error(`"${bad}" is not a classroom or roll code: letters, digits and hyphen only, up to 40 characters.`)
+  if (bad) throw new Error(`"${bad}" is not a classroom or roll code: letters, digits and hyphen, starting with a letter or digit, up to 40 characters.`)
+  if (e.absent.length > MAX_ABSENT) throw new Error(`At most ${MAX_ABSENT} children can be marked absent at once.`)
   const event: AttendanceEvent = { kind: 'attendance', event_id: crypto.randomUUID(), at: now.toISOString(), ...e }
   await (await getDB()).add('outbox', event)
   return event

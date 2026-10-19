@@ -73,4 +73,12 @@ describe('recordAttendance', () => {
     await expect(recordAttendance({ classroom_id: 'G2-A', episode_id: 'ep1', absent: ['+919876543210'] })).rejects.toThrow(/classroom or roll code/)
     expect(await pendingCount()).toBe(0)
   })
+
+  it('matches the server: no leading hyphen, at most 100 absent', async () => {
+    await expect(recordAttendance({ classroom_id: '-G2', episode_id: 'ep1', absent: [] })).rejects.toThrow(/classroom or roll code/)
+    const rolls = (n: number) => Array.from({ length: n }, (_, i) => String(i + 1))
+    await expect(recordAttendance({ classroom_id: 'G2-A', episode_id: 'ep1', absent: rolls(101) })).rejects.toThrow(/At most 100/)
+    expect((await recordAttendance({ classroom_id: 'G2-A', episode_id: 'ep1', absent: rolls(100) })).absent).toHaveLength(100)
+    expect(await pendingCount()).toBe(1)
+  })
 })

@@ -20,6 +20,8 @@ describe('isCode', () => {
     expect(isCode('+919876543210')).toBe(false)
     expect(isCode('')).toBe(false)
     expect(isCode('A'.repeat(41))).toBe(false)
+    expect(isCode('-5')).toBe(false) // the server needs a letter or digit first
+    expect(isCode('G-')).toBe(true)
   })
 })
 
@@ -43,12 +45,14 @@ describe('parseRolls', () => {
   })
 
   it('rejects a list that would freeze the phone', () => {
-    expect(() => parseRolls('1-1000')).toThrow(/999/)
+    expect(parseRolls('1-100')).toHaveLength(100)
+    expect(() => parseRolls('1-101')).toThrow(/over 100 rolls/)
+    expect(() => parseRolls('-5')).toThrow(/not a roll number/)
   })
 
   it('rejects a huge typo range at once, without expanding it', () => {
     const t = performance.now()
-    expect(() => parseRolls('1-30000000')).toThrow(/999/)
+    expect(() => parseRolls('1-30000000')).toThrow(/over 100 rolls/)
     expect(performance.now() - t).toBeLessThan(50)
   })
 })

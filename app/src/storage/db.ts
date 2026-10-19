@@ -26,8 +26,11 @@ export interface AttendanceEvent {
   at: string
 }
 
-/** The opaque codes the sync API accepts for classrooms and rolls, so no names or phone numbers slip in. */
-export const isCode = (s: string) => /^[A-Za-z0-9-]{1,40}$/.test(s)
+/** The opaque codes the sync API accepts for classrooms and rolls (backend REF), so no names or phone numbers slip in. */
+export const isCode = (s: string) => /^[A-Za-z0-9][A-Za-z0-9-]{0,39}$/.test(s)
+
+/** POST /sync takes at most this many absent rolls in one attendance event. */
+export const MAX_ABSENT = 100
 
 export type OutboxEvent = TapEvent | AttendanceEvent
 
