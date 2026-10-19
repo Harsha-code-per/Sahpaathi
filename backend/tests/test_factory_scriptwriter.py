@@ -73,3 +73,10 @@ def test_repair_that_breaks_the_contract_keeps_the_valid_first_attempt():
     episode = write_episode(LESSON, DISTRICT, client=client, feedback=lambda ep: ["too long"])
     assert len(client.requests) == 2  # the soft problem earned the repair, which came back broken
     assert episode.id == "g1-numbers-to-20-chennai-migrant"
+
+
+def test_repair_cut_off_by_max_tokens_keeps_the_valid_first_attempt():
+    client = _client((SAMPLE, "end_turn"), ("", "max_tokens"))
+    episode = write_episode(LESSON, DISTRICT, client=client, feedback=lambda ep: ["too long"])
+    assert episode.id == "g1-numbers-to-20-chennai-migrant"
+    assert client.requests[0]["max_tokens"] == 128000

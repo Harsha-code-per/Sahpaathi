@@ -182,7 +182,8 @@ def write_episode(
     for attempt in range(2):
         with client.beta.messages.stream(
             model=MODEL,
-            max_tokens=64000,
+            # A first attempt uses 45-58k tokens (mostly thinking); 64k cut off 2 of 8 in a batch.
+            max_tokens=128000,
             system=SYSTEM,
             messages=messages,
             output_config={
@@ -195,7 +196,10 @@ def write_episode(
             message = stream.get_final_message()
         log.info("%s %s usage=%s", message.model, message.stop_reason, message.usage)
         if message.stop_reason in ("refusal", "max_tokens"):
-            raise ScriptwriterError(f"generation stopped: {message.stop_reason}")
+            error = f"generation stopped: {message.stop_reason}"
+            if valid is not None:  # a failed repair: the valid first attempt is kept below
+                break
+            raise ScriptwriterError(error)
         text = next(b.text for b in message.content if b.type == "text")
         try:
             episode = Episode.model_validate_json(text)
