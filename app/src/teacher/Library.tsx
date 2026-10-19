@@ -1,4 +1,4 @@
-import { CloudCheckIcon, CloudUploadIcon, DownloadIcon, PencilIcon, PlayIcon, Share2Icon, Trash2Icon } from 'lucide-react'
+import { CloudCheckIcon, CloudDownloadIcon, CloudUploadIcon, DownloadIcon, PencilIcon, PlayIcon, Share2Icon, Trash2Icon } from 'lucide-react'
 import { useCallback, useEffect, useState, type ChangeEvent } from 'react'
 import { cn } from 'cn'
 import { LogoMark } from '@/components/Logo'
@@ -10,6 +10,7 @@ import { sharePack } from '../packs/share'
 import { deletePack, importPack, listPacks, loadPackFiles } from '../packs/store'
 import { PackError } from '../packs/verify'
 import type { ClassroomRecord, StoredPack } from '../storage/db'
+import GetLessons from './GetLessons'
 import { samplePack } from './samplePack'
 
 export interface OpenLesson {
@@ -107,6 +108,7 @@ export default function Library({ onOpen, pending }: { onOpen: (lesson: OpenLess
   const [busy, setBusy] = useState(false)
   const [classroom, setClassroom] = useState<ClassroomRecord | null>(null)
   const [editingClassroom, setEditingClassroom] = useState(false)
+  const [getting, setGetting] = useState(false)
 
   const refresh = useCallback(
     () =>
@@ -222,13 +224,27 @@ export default function Library({ onOpen, pending }: { onOpen: (lesson: OpenLess
           {newest && <LessonCard episode={samplePack.episode} badge="Built-in sample" onOpen={() => onOpen(samplePack)} />}
         </ul>
 
+        {getting ? (
+          <GetLessons
+            have={new Set(packs.map((p) => p.id))}
+            onImported={(p) => {
+              setNotice({ kind: 'ok', text: `Added “${p.episode.title}”.` })
+              refresh()
+            }}
+          />
+        ) : (
+          <Button size="lg" variant="outline" className="h-16 text-lg" onClick={() => setGetting(true)}>
+            <CloudDownloadIcon className="size-5" aria-hidden /> Get new lessons
+          </Button>
+        )}
+
         <label
           className={cn(
             'flex min-h-16 items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-input text-lg font-semibold focus-within:ring-2 focus-within:ring-ring',
             busy ? 'opacity-60' : 'cursor-pointer hover:border-primary',
           )}
         >
-          <DownloadIcon className="size-5" aria-hidden /> {busy ? 'Checking the pack…' : 'Add a lesson pack'}
+          <DownloadIcon className="size-5" aria-hidden /> {busy ? 'Checking the pack…' : 'Add a pack from a file'}
           <input type="file" accept=".sahpaathi,application/zip" className="sr-only" disabled={busy} onChange={onFile} />
         </label>
       </div>
