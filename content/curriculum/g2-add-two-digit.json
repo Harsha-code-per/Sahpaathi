@@ -1,0 +1,9 @@
+{
+  "id": "add-two-digit",
+  "grade": 2,
+  "subject": "numeracy",
+  "nipun_lo": "Grade 2 goal: reads and writes numbers up to 999 and adds and subtracts numbers up to 99; this episode covers adding two-digit numbers with a total up to 99",
+  "chapter": "NCERT Class 2 Mathematics: addition of two-digit numbers",
+  "notes": "Add tens to tens and ones to ones, using bundles of ten sticks and loose sticks. 23 + 14: 2 tens and 1 ten make 3 tens, 3 ones and 4 ones make 7 ones, so 37. Then sums where the ones make ten or more: 28 + 15, 8 ones and 5 ones make 13 ones, bundle 10 ones into a new ten, so 4 tens and 3 ones, 43. Check by counting on in tens then ones. Every total stays at 99 or below.",
+  "duration_min": 15
+}

@@ -1,0 +1,9 @@
+{
+  "id": "place-value-hundreds",
+  "grade": 3,
+  "subject": "numeracy",
+  "nipun_lo": "Grade 3 goal: reads and writes numbers up to 9999 and solves simple multiplication problems; this episode covers hundreds, tens and ones up to 999",
+  "chapter": "NCERT Class 3 Mathematics: numbers up to 999 (hundreds, tens and ones)",
+  "notes": "Ten ones make a ten; ten tens make a hundred. Show it with sticks: bundles of 10, and a big bundle of 10 tens for 100. A three-digit number is hundreds, tens and ones: 346 is 3 hundreds, 4 tens and 6 ones. Read and say numbers from their parts and the reverse, including numbers with a zero inside, such as 405 (4 hundreds, no tens, 5 ones). Compare two three-digit numbers by looking at the hundreds first, then the tens, then the ones. Every number stays at 999 or below.",
+  "duration_min": 15
+}
