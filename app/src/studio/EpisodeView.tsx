@@ -91,7 +91,7 @@ function LineRow({ line, ctx }: { line: Line; ctx: LineCtx }) {
   const edit = ctx.edits[line.id]
   const gloss = ctx.gloss.get(line.id)
   return (
-    <li id={`line-${line.id}`} className={cn('scroll-mt-24 border-t border-border py-4 pl-4 first:border-t-0', 'border-l-4', home ? 'border-l-primary' : 'border-l-most')}>
+    <li id={`line-${line.id}`} className={cn('relative scroll-mt-24 border-t border-border py-4 pl-6 first:border-t-0 before:absolute before:top-[1.4rem] before:left-1 before:size-2.5 before:rounded-full', home ? 'before:bg-primary' : 'before:bg-most')}>
       <div className="grid gap-x-8 gap-y-2 md:grid-cols-2">
         <div className="min-w-0 space-y-1.5">
           {editing && ctx.onEdit ? (
