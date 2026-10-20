@@ -17,7 +17,99 @@ Sahpaathi brings back Interactive Radio Instruction (IRI) using frontier AI:
 | Absenteeism leaves gaps | An IVR catch-up call to the parent's basic phone |
 
 ## Status
-Build stage in progress (18 Oct – 1 Nov 2026). Plan and ownership: [docs/TEAM_PLAN.md](docs/TEAM_PLAN.md).
+Build stage (18 Oct – 1 Nov 2026), submission target Sat 31 Oct. Plan and ownership: [docs/TEAM_PLAN.md](docs/TEAM_PLAN.md). Live: **https://sahpaathi.vercel.app** · API docs: **https://sahpaathi-api.onrender.com/docs**.
+
+## System design
+**AI where it is strong, in the cloud, once per language × grade. Zero internet in the classroom.** Full layer-by-layer table: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+```mermaid
+flowchart LR
+  subgraph Cloud["Cloud content factory (once per language × grade)"]
+    A[Chapter + NIPUN outcome<br/>+ district profile] --> B[Claude Sonnet 5.5<br/>episode JSON]
+    B --> C{Guardrails}
+    C --> C2[Rules + arithmetic check<br/>Haiku 5.5 rubric + back-translation]
+    C2 --> D[Native-speaker review<br/>Studio]
+    D -->|approved| E[Voice: Sarvam Bulbul v3<br/>+ Santali phrase-bank splicer]
+    E --> F[Pack: opus 16 kbps<br/>sha256 + Ed25519 signature]
+  end
+  F -->|any signal, weekly| G
+  subgraph Class["Classroom: fully offline"]
+    G[Teacher phone PWA] -->|Bluetooth / AUX| H[₹500 speaker]
+    G -->|Most / Some / Few tap| G
+  end
+  G -->|taps + attendance when signal appears| J[(FastAPI + Postgres)]
+  J --> K[Exotel IVR catch-up call] --> L[Parent's basic phone]
+  J --> M[CRP dashboard]
+```
+
+### One lesson, end to end
+```mermaid
+sequenceDiagram
+  actor R as Reviewer
+  participant S as Studio (/studio)
+  participant API as FastAPI
+  participant AI as Claude Sonnet / Haiku
+  participant V as Sarvam TTS + ffmpeg
+  actor T as Teacher
+  participant P as Phone PWA
+  R->>S: Pick lesson + district
+  S->>API: POST /episodes
+  API->>AI: Write, rule-check, review, one repair
+  AI-->>API: Episode JSON + scores
+  R->>S: Read lines + back-translation, approve
+  S->>API: POST /episodes/{id}/pack
+  API->>V: Voice lines, normalise to -16 LUFS, sign
+  V-->>API: Signed pack (under 2 MB)
+  T->>P: Get new lessons (resumable download)
+  P->>P: Verify Ed25519 + hashes, store in IndexedDB
+  Note over P: Offline from here on
+  T->>P: Most / Some / Few after each segment
+  P->>API: Sync taps + attendance when online
+  API-->>API: Queue catch-up call per absentee
+```
+
+### What the speaker does in class
+```mermaid
+stateDiagram-v2
+  [*] --> Segment
+  Segment --> Checkpoint: segment audio ends
+  Checkpoint --> Easier: tap Few
+  Checkpoint --> Core: tap Some, or 10 s fallback
+  Checkpoint --> Stretch: tap Most
+  Easier --> Segment
+  Core --> Segment
+  Stretch --> Segment
+  Segment --> [*]: last segment
+```
+The branch audio is pre-decoded on the phone, so switching is instant and needs no network.
+
+### Guardrails: how wrong output is caught
+1. **Schema + rules + arithmetic:** Pydantic contract, rule checks and a deterministic arithmetic checker (`backend/app/factory/rules.py`).
+2. **Rubric review:** Haiku 5.5 scores pedagogy, age fit, accuracy, language bridge, localisation and safety; one automatic repair.
+3. **Back-translation:** a blind English back-translation exposes drift in the home language.
+4. **Human gate:** nothing is voiced until a native-speaker reviewer approves it in the Studio.
+5. **Pack integrity:** every pack is Ed25519-signed with sha256 hashes; the app refuses any pack that fails verification. Voice lines are checked to -16 LUFS ±1.5 LU, under 45 s each, packs under 2 MB.
+
+### Deployment topology
+```mermaid
+flowchart LR
+  U[Browser / Android Chrome] --> V[Vercel<br/>React PWA]
+  V -->|VITE_API_URL, CORS allow-list| R[Render<br/>FastAPI in Docker + ffmpeg]
+  R --> N[(Neon Postgres<br/>episodes, packs, taps)]
+  R --> AN[Anthropic API]
+  R --> SA[Sarvam TTS]
+  R <--> EX[Exotel IVR webhooks]
+```
+Packs are stored in Postgres (under 2 MB each); move them to object storage if they outgrow it. Details: [docs/API.md](docs/API.md).
+
+### Works without a network
+| Part | Needs network? |
+|---|---|
+| Teacher player, branching, analogy, attendance, mic hint | No |
+| Getting new lessons | Any signal, once a week; resumes after a 2G drop |
+| Syncing taps and attendance | Queued locally until a signal appears |
+| Catch-up call | The parent needs plain voice signal only |
+| Writing and reviewing episodes (Studio) | Yes, not on the classroom path |
 
 ## Repository
 ```
