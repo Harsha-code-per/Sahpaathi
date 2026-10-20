@@ -89,7 +89,7 @@ function EpisodeList(props: { items: Summary[]; selected: number | null; onSelec
               className={cn(
                 'w-full rounded-xl px-3.5 py-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring',
                 props.onDark ? 'hover:bg-sidebar-accent' : 'border border-border bg-card hover:bg-muted',
-                on && (props.onDark ? 'bg-sidebar-accent shadow-[inset_3px_0_0_var(--sidebar-primary)]' : 'ring-2 ring-ring'),
+                on && (props.onDark ? 'bg-sidebar-accent' : 'ring-2 ring-ring'),
               )}
             >
               <span className="line-clamp-2 font-semibold">{e.title ?? `${e.lesson_id}, ${e.district_id}`}</span>
@@ -140,6 +140,13 @@ export default function Studio() {
     api.catalog().then(setCatalog, handle)
     refresh()
   }, [signedIn, refresh, handle])
+
+  // Open on the tab that has something in it: with nothing to review, show the approved lessons.
+  const [picked, setPicked] = useState(false)
+  if (!picked && items.length) {
+    setPicked(true)
+    if (!items.some((e) => FILTERS[0].match(e.status))) setFilter('approved')
+  }
 
   const writing = items.some((e) => e.status === 'generating')
   useEffect(() => {
@@ -242,9 +249,25 @@ export default function Studio() {
       )}
       {selected === null ? (
         <>
-          <p className="rounded-2xl border border-border bg-card p-6 text-muted-foreground max-md:hidden">
-            Pick a lesson to read it line by line, with the English back-translation and the AI review beside it.
-          </p>
+          <section className="relative overflow-hidden rounded-3xl border border-border bg-card p-8 shadow-[0_1px_2px_rgba(23,37,36,0.04),0_14px_34px_-14px_rgba(23,37,36,0.14)] max-md:hidden">
+            <span aria-hidden className="pointer-events-none absolute -top-10 -right-10 grid size-56 place-items-center">
+              <span className="desk-ping absolute inset-0 rounded-full border-2 border-[#f4b23e]" />
+              <span className="desk-ping absolute inset-0 rounded-full border-2 border-[#f4b23e] [animation-delay:-1.4s]" />
+              <span className="size-10 rounded-full bg-[#f4b23e]/70" />
+            </span>
+            <h1 className="max-w-xl font-heading text-3xl leading-tight font-bold">Pick a lesson to read it line by line.</h1>
+            <p className="mt-3 max-w-xl text-muted-foreground">Each line sits beside its English back-translation and the AI review. Correct what is wrong, then approve or reject.</p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Button onClick={() => setWritingOpen(true)}>
+                <PlusIcon aria-hidden /> Write a new lesson
+              </Button>
+              {shown[0] && (
+                <Button variant="outline" onClick={() => setSelected(shown[0].id)}>
+                  Open {shown[0].title ?? 'the first lesson'}
+                </Button>
+              )}
+            </div>
+          </section>
           {/* Phones have no sidebar: the list is the first screen. */}
           <div className="md:hidden">
             <EpisodeList items={shown} selected={selected} onSelect={setSelected} />

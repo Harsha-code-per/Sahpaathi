@@ -45,7 +45,6 @@ export default function Scene() {
       <div className="scene-stage sticky top-0 grid h-dvh items-center overflow-hidden">
         <div className="mx-auto grid w-full max-w-7xl items-center gap-10 px-5 md:px-8 lg:grid-cols-2">
           <div data-scene-copy className="space-y-5">
-            <p className="text-[0.8125rem] font-bold tracking-[0.12em] text-[#8a5a00] uppercase">In the teacher’s hand</p>
             <h2 id="scene-title" className="font-heading text-4xl leading-tight font-extrabold md:text-6xl">
               One phone runs the lesson. One speaker fills the room.
             </h2>
@@ -66,8 +65,9 @@ export default function Scene() {
                 data-float
                 aria-hidden
                 className={`absolute rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold shadow-[0_10px_30px_rgba(23,37,36,0.15)] ${['top-[8%] -left-2', 'top-[44%] -right-4', 'bottom-[10%] -left-4'][i]}`}
-                style={{ borderLeft: `6px solid ${color}` }}
+                
               >
+                <span className="mr-2 inline-block size-2.5 rounded-full align-middle" style={{ background: color }} />
                 {label}
               </span>
             ))}

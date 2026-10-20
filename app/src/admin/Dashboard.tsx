@@ -1,6 +1,7 @@
 import { RefreshCwIcon } from 'lucide-react'
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { Bar, BarChart, CartesianGrid, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { CountUp } from '@/components/CountUp'
 import { Button } from '@/components/ui/button'
 import type { Summary } from '../studio/api'
 import { adminApi, ApiError, type Dashboard as Data, type PackSummary } from './api'
@@ -10,17 +11,20 @@ import { pct } from './view'
 // Chart colours are the theme tokens (index.css); SVG attributes need the values themselves.
 const C = { most: '#3fb8a0', some: '#f4b23e', few: '#e8704a', ink: '#172524', muted: '#55625f', grid: '#e3dfd3' }
 const tooltip = { contentStyle: { borderRadius: 12, border: `1px solid ${C.grid}`, fontFamily: 'inherit' } }
-const card = 'rounded-2xl border border-border bg-card p-5'
+const card = 'rounded-2xl border border-border bg-card p-5 shadow-[0_1px_2px_rgba(23,37,36,0.04),0_14px_34px_-14px_rgba(23,37,36,0.14)]'
 
-function Tile(props: { label: string; value: string; note: ReactNode; tone?: string; children?: ReactNode }) {
+function Tile(props: { label: string; value: string; note: ReactNode; lead?: boolean; children?: ReactNode }) {
+  const { lead } = props
   return (
-    <div className={`${card} flex flex-col gap-1`}>
-      <p className="text-sm font-semibold text-muted-foreground">{props.label}</p>
+    <div className={`${card} flex flex-col gap-1 ${lead ? 'border-transparent bg-sidebar text-sidebar-foreground' : ''}`}>
+      <p className={`text-sm font-semibold ${lead ? 'text-sidebar-muted' : 'text-muted-foreground'}`}>{props.label}</p>
       <div className="flex items-end justify-between gap-3">
-        <p className={`font-heading text-4xl font-bold ${props.tone ?? ''}`}>{props.value}</p>
+        <p className={`font-heading text-5xl leading-none font-bold ${lead ? 'text-sidebar-primary' : ''}`}>
+          <CountUp value={props.value} />
+        </p>
         {props.children}
       </div>
-      <p className="text-[0.8125rem] text-muted-foreground">{props.note}</p>
+      <p className={`text-[0.8125rem] ${lead ? 'text-sidebar-muted' : 'text-muted-foreground'}`}>{props.note}</p>
     </div>
   )
 }
@@ -37,7 +41,16 @@ function Panel({ title, note, children, className = '' }: { title: string; note?
   )
 }
 
-const Empty = ({ children }: { children: ReactNode }) => <p className="grid min-h-40 place-items-center text-center text-muted-foreground">{children}</p>
+const Empty = ({ children }: { children: ReactNode }) => (
+  <div className="grid min-h-40 place-items-center content-center gap-4 text-center text-muted-foreground">
+    <span aria-hidden className="relative grid size-14 place-items-center">
+      <span className="desk-ping absolute inset-0 rounded-full border-2 border-[#f4b23e]" />
+      <span className="desk-ping absolute inset-0 rounded-full border-2 border-[#f4b23e] [animation-delay:-1.4s]" />
+      <span className="size-4 rounded-full bg-[#f4b23e]" />
+    </span>
+    <p className="max-w-xs">{children}</p>
+  </div>
+)
 
 const short = (t: string) => (t.length > 26 ? `${t.slice(0, 25)}…` : t)
 const shortDate = (d: string) => new Date(d).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
@@ -94,7 +107,7 @@ export default function Dashboard({ onSignedOut }: { onSignedOut: () => void }) 
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Tile label="“Most got it”" value={pct(overall.pct_most)} tone="text-ok-foreground" note={`of ${overall.taps} teacher taps`} />
+        <Tile lead label="“Most got it”" value={pct(overall.pct_most)} note={`of ${overall.taps} teacher taps`} />
         <Tile label="Teacher taps" value={String(overall.taps)} note={`${data.auto_fallbacks} checkpoints had no tap, so Core played`}>
           <div className="h-10 w-28" aria-hidden>
             <ResponsiveContainer>

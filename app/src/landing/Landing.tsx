@@ -23,10 +23,6 @@ const STEPS = [
   ['Nobody left behind', 'Absent children get the recap that evening, as a call to a parent’s basic phone. Keys 1, 2 and 3 answer back.'],
 ]
 
-function Eyebrow({ children }: { children: ReactNode }) {
-  return <p className="text-[0.8125rem] font-bold tracking-[0.12em] text-[#8a5a00] uppercase">{children}</p>
-}
-
 function Stat({ value, children }: { value: string; children: ReactNode }) {
   return (
     <div className="space-y-2">
@@ -77,9 +73,6 @@ export default function Landing() {
       <main>
         <section data-hero className="mx-auto grid max-w-7xl items-center gap-12 px-5 pt-10 pb-24 md:px-8 lg:grid-cols-[1.15fr_1fr] lg:pt-16">
           <div data-hero-copy className="space-y-7">
-            <div className="landing-rise">
-              <Eyebrow>Offline AI co-teacher · Challenge 01</Eyebrow>
-            </div>
             <h1 className="font-heading text-display font-extrabold tracking-tight">
               <Words text="A second teacher, in a ₹500 speaker." cls="" />
             </h1>
@@ -161,7 +154,6 @@ export default function Landing() {
         <section id="how" data-hscroll className="scroll-mt-8 overflow-hidden py-24">
           <div className="mx-auto max-w-7xl space-y-12 px-5 md:px-8">
             <div className="space-y-4">
-              <Eyebrow>How it works</Eyebrow>
               <h2 className="max-w-3xl font-heading text-4xl leading-tight font-extrabold md:text-5xl">Written by Claude. Checked four times. Played offline.</h2>
             </div>
             <ol data-track className="grid gap-4 sm:grid-cols-2 lg:flex lg:w-max lg:gap-6">
@@ -179,7 +171,6 @@ export default function Landing() {
         <section className="border-y border-border bg-card py-24">
           <div className="landing-reveal mx-auto grid max-w-7xl items-center gap-12 px-5 md:px-8 lg:grid-cols-2">
             <div className="space-y-4">
-              <Eyebrow>Built for zero signal</Eyebrow>
               <h2 className="font-heading text-4xl leading-tight font-extrabold md:text-5xl">Measured on slow 3G and a slow phone.</h2>
               <p className="text-muted-foreground">Lessons, branches, the analogy button and attendance all work in airplane mode. Taps and attendance send themselves when a signal returns.</p>
             </div>
