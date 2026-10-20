@@ -19,10 +19,14 @@ export default function Pipeline({ episodes, packs, usage }: { episodes: Summary
       </div>
       <div className="-mx-1 overflow-x-auto px-1 pb-1">
         <ol className="grid min-w-[60rem] grid-cols-5 gap-3">
-          {columns.map((col) => (
+          {columns.map((col, i) => (
             <li key={col.key} className="flex max-h-[30rem] flex-col gap-2.5 overflow-y-auto rounded-2xl bg-muted p-3 [scrollbar-width:thin]">
               <h3 className="sticky -top-3 -mx-3 -mt-3 flex items-center justify-between bg-muted px-3 pt-3 pb-1 font-semibold">
-                {col.label} <span className="text-sm text-muted-foreground">{col.cards.length}</span>
+                <span className="flex items-center gap-2">
+                  <span aria-hidden className="size-2.5 rounded-full" style={{ background: ['#3d4db7', '#f4b23e', '#3fb8a0', '#0e6f61', '#e8704a'][i % 5] }} />
+                  {col.label}
+                </span>
+                <span className="text-sm text-muted-foreground">{col.cards.length}</span>
               </h3>
               {col.cards.length === 0 && <p className="px-1 text-sm text-muted-foreground">{col.empty}</p>}
               {col.cards.map((c) => (

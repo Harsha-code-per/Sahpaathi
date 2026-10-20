@@ -46,3 +46,26 @@ html {
 .desk-num {
   font-variant-numeric: tabular-nums;
 }
+
+/* Desk palette: sage paper, deep lagoon sidebar, marigold for action. Scoped here so the landing keeps its own ground.
+   Tints and their text colours are paired for contrast (ink or the deep hue on the pale fill, all above 4.5:1). */
+.desk {
+  --background: #eff3ec;
+  --foreground: #10241f;
+  --card: #fdfefb;
+  --border: #dce4d8;
+  --input: #cbd6c6;
+  --muted: #e7ede3;
+  --secondary: #e7ede3;
+  --accent: #e7ede3;
+  --muted-foreground: #4b5d58;
+  --sidebar: #10302b;
+  --sidebar-accent: #1a463f;
+  --sidebar-border: #255750;
+  --sidebar-muted: #9cc2b8;
+  --tint-mint: #ddf2e9;
+  --tint-sun: #fdefcb;
+  --tint-sky: #e4e8f8;
+  --lagoon: #0e6f61;
+  --indigo: #3d4db7;
+}

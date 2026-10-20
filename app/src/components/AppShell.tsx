@@ -41,7 +41,7 @@ export function AppShell(props: { product: string; sidebar: (api: SidebarApi) =>
   const label = collapsed ? 'Expand sidebar' : 'Collapse sidebar'
 
   return (
-    <div className="flex min-h-dvh bg-background text-foreground">
+    <div className="desk flex min-h-dvh bg-background text-foreground">
       <aside
         className={cn(
           'sticky top-0 hidden h-dvh shrink-0 flex-col gap-4 overflow-x-hidden overflow-y-auto bg-sidebar [scrollbar-color:var(--sidebar-accent)_transparent] [scrollbar-width:thin] p-4 text-sidebar-foreground transition-[width] duration-200 ease-out md:flex',
