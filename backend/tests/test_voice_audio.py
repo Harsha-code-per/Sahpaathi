@@ -59,7 +59,7 @@ def test_short_peaky_line_still_lands_on_target(tmp_path):
     src = tmp_path / "peaky.wav"
     subprocess.run(
         ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-f", "lavfi", "-i",
-         "aevalsrc=0.04*sin(2*PI*300*t)+if(lt(mod(t\,0.25)\,0.003)\,0.95\,0):d=1.5:s=24000",
+         r"aevalsrc=0.04*sin(2*PI*300*t)+if(lt(mod(t\,0.25)\,0.003)\,0.95\,0):d=1.5:s=24000",
          str(src)],
         check=True,
     )  # fmt: skip
