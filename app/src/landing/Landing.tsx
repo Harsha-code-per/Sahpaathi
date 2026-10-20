@@ -2,8 +2,8 @@ import { ArrowRightIcon, BookOpenCheckIcon, LayoutDashboardIcon, PlayIcon } from
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { LogoMark } from '@/components/Logo'
 import './landing.css'
-import Film from './Film'
 import { setupMotion } from './motion'
+import Scene from './Scene'
 
 const REPO = 'https://github.com/Harsha-code-per/Sahpaathi'
 
@@ -112,7 +112,7 @@ export default function Landing() {
             </div>
           </div>
 
-          <div className="relative mx-auto grid aspect-square w-full max-w-md place-items-center" aria-hidden>
+          <div data-orb className="relative mx-auto grid aspect-square w-full max-w-md place-items-center" aria-hidden>
             {[0, 1, 2].map((d) => (
               <span
                 key={d}
@@ -137,7 +137,7 @@ export default function Landing() {
           </div>
         </section>
 
-        <Film />
+        <Scene />
 
         <section className="bg-[#f2efe6] py-24 text-[#172524]">
           <div className="mx-auto max-w-7xl space-y-12 px-5 md:px-8">
@@ -158,21 +158,22 @@ export default function Landing() {
           </div>
         </section>
 
-        <section id="how" data-flow className="mx-auto max-w-7xl scroll-mt-8 space-y-12 px-5 py-24 md:px-8">
-          <div className="landing-reveal space-y-4">
-            <Eyebrow>How it works</Eyebrow>
-            <h2 className="max-w-3xl font-heading text-4xl leading-tight font-extrabold md:text-5xl">Written by Claude. Checked four times. Played offline.</h2>
+        <section id="how" data-hscroll className="scroll-mt-8 overflow-hidden py-24">
+          <div className="mx-auto max-w-7xl space-y-12 px-5 md:px-8">
+            <div className="space-y-4">
+              <Eyebrow>How it works</Eyebrow>
+              <h2 className="max-w-3xl font-heading text-4xl leading-tight font-extrabold md:text-5xl">Written by Claude. Checked four times. Played offline.</h2>
+            </div>
+            <ol data-track className="grid gap-4 sm:grid-cols-2 lg:flex lg:w-max lg:gap-6">
+              {STEPS.map(([title, text], i) => (
+                <li key={title} data-step className="space-y-3 rounded-3xl border border-border bg-card p-6 shadow-[0_10px_30px_rgba(23,37,36,0.06)] lg:w-[26rem] lg:shrink-0 lg:space-y-5 lg:p-9">
+                  <p className="font-heading text-5xl font-extrabold text-[#8a5a00] lg:text-7xl">0{i + 1}</p>
+                  <h3 className="text-lg font-bold lg:text-2xl">{title}</h3>
+                  <p className="leading-relaxed text-muted-foreground lg:text-lg">{text}</p>
+                </li>
+              ))}
+            </ol>
           </div>
-          <div data-path aria-hidden className="hidden h-[3px] origin-left rounded-full bg-[#f4b23e] lg:block" />
-          <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {STEPS.map(([title, text], i) => (
-              <li key={title} data-step className="space-y-3 rounded-3xl border border-border bg-card p-6 shadow-[0_10px_30px_rgba(23,37,36,0.06)]">
-                <p className="font-heading text-5xl font-extrabold text-[#8a5a00]">0{i + 1}</p>
-                <h3 className="text-lg font-bold">{title}</h3>
-                <p className="leading-relaxed text-muted-foreground">{text}</p>
-              </li>
-            ))}
-          </ol>
         </section>
 
         <section className="border-y border-border bg-card py-24">
