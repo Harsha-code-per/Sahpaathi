@@ -42,3 +42,40 @@
     animation-range: entry 5% cover 25%;
   }
 }
+
+/* Film: clips 2 and 3 and beats 2 and 3 start hidden; motion.ts fades them in on scroll. */
+.film-clip:not(:first-child),
+.film-beat:not(:first-child) {
+  opacity: 0;
+}
+
+/* Reduced motion: no pin, no scrubbing. A still frame, then all three beats in order. */
+@media (prefers-reduced-motion: reduce) {
+  .film {
+    height: auto;
+  }
+  .film-stage {
+    position: static;
+    height: auto;
+    padding-bottom: 2rem;
+  }
+  .film-clip {
+    position: static;
+    height: 56vw;
+    max-height: 70dvh;
+    display: none;
+  }
+  .film-clip:first-child {
+    display: block;
+  }
+  .film ol {
+    position: static;
+    display: grid;
+    gap: 1rem;
+    padding: 1.5rem 1.25rem 0;
+  }
+  .film-beat {
+    position: static;
+    opacity: 1 !important;
+  }
+}
