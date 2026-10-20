@@ -53,7 +53,7 @@ export default function Admin() {
             tab === t.id ? 'bg-sidebar-accent text-sidebar-foreground' : 'text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground',
           )}
         >
-          <t.icon className="size-5 shrink-0" aria-hidden />
+          <t.icon className={cn('size-5 shrink-0', tab === t.id && 'text-sidebar-primary')} aria-hidden />
           {!collapsed && t.label}
         </button>
       ))}

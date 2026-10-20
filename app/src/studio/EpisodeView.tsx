@@ -12,6 +12,11 @@ const SPEAKER: Record<Line['speaker'], string | null> = { guide: null, child: 'C
 const CRITERION_LABEL = Object.fromEntries(CRITERIA.map((c) => [c.key, c.label]))
 const card = 'rounded-2xl border border-border bg-card p-5'
 
+/** Score chips are tinted by quality (mint 5, sun 4, plain 3, rose 2 or lower), always beside the number. */
+function scoreFill(score: number) {
+  return score >= 5 ? 'bg-[var(--tint-mint)]' : score === 4 ? 'bg-[var(--tint-sun)]' : score === 3 ? 'bg-card' : 'bg-bad'
+}
+
 function scoreTone(score: number) {
   return score >= 4 ? 'text-ok-foreground' : score === 3 ? 'text-foreground' : 'text-bad-foreground'
 }
@@ -355,7 +360,7 @@ export default function EpisodeView(props: {
               {CRITERIA.map((c) => {
                 const s = detail.review!.rubric.scores[c.key]
                 return (
-                  <div key={c.key} title={s.reason} className={cn('min-w-0 rounded-xl border bg-card px-3 py-2.5 sm:min-w-28 sm:px-3.5', s.score <= 2 ? 'border-few' : 'border-border')}>
+                  <div key={c.key} title={s.reason} className={cn('min-w-0 rounded-xl border px-3 py-2.5 sm:min-w-28 sm:px-3.5', scoreFill(s.score), s.score <= 2 ? 'border-few' : 'border-black/5')}>
                     <dt className="text-[0.8125rem] text-muted-foreground">{c.label}</dt>
                     <dd className={cn('text-lg font-bold', scoreTone(s.score))}>{s.score} / 5</dd>
                   </div>

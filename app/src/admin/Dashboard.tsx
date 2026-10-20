@@ -1,6 +1,6 @@
 import { RefreshCwIcon } from 'lucide-react'
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
-import { Bar, BarChart, CartesianGrid, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { Bar, BarChart, Cell, CartesianGrid, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { CountUp } from '@/components/CountUp'
 import { Button } from '@/components/ui/button'
 import type { Summary } from '../studio/api'
@@ -9,17 +9,24 @@ import Pipeline from './Pipeline'
 import { pct } from './view'
 
 // Chart colours are the theme tokens (index.css); SVG attributes need the values themselves.
-const C = { most: '#3fb8a0', some: '#f4b23e', few: '#e8704a', ink: '#172524', muted: '#55625f', grid: '#e3dfd3' }
+const C = { most: '#3fb8a0', some: '#f4b23e', few: '#e8704a', ink: '#10241f', muted: '#4b5d58', lagoon: '#0e6f61', grid: '#dce4d8' }
 const tooltip = { contentStyle: { borderRadius: 12, border: `1px solid ${C.grid}`, fontFamily: 'inherit' } }
 const card = 'rounded-2xl border border-border bg-card p-5 shadow-[0_1px_2px_rgba(23,37,36,0.04),0_14px_34px_-14px_rgba(23,37,36,0.14)]'
 
-function Tile(props: { label: string; value: string; note: ReactNode; lead?: boolean; children?: ReactNode }) {
+const TINT = {
+  mint: ['bg-[var(--tint-mint)]!', 'text-[var(--lagoon)]'],
+  sun: ['bg-[var(--tint-sun)]!', 'text-[#8a5a00]'],
+  sky: ['bg-[var(--tint-sky)]!', 'text-[var(--indigo)]'],
+} as const
+
+function Tile(props: { label: string; value: string; note: ReactNode; lead?: boolean; tint?: keyof typeof TINT; children?: ReactNode }) {
   const { lead } = props
+  const [fill, ink] = props.tint ? TINT[props.tint] : ['', '']
   return (
-    <div className={`${card} flex flex-col gap-1 ${lead ? 'border-transparent bg-sidebar text-sidebar-foreground' : ''}`}>
+    <div className={`${card} flex flex-col gap-1 ${lead ? 'border-transparent bg-sidebar text-sidebar-foreground' : `${fill} border-black/5`}`}>
       <p className={`text-sm font-semibold ${lead ? 'text-sidebar-muted' : 'text-muted-foreground'}`}>{props.label}</p>
       <div className="flex items-end justify-between gap-3">
-        <p className={`font-heading text-5xl leading-none font-bold ${lead ? 'text-sidebar-primary' : ''}`}>
+        <p className={`font-heading text-5xl leading-none font-bold ${lead ? 'text-sidebar-primary' : ink}`}>
           <CountUp value={props.value} />
         </p>
         {props.children}
@@ -108,17 +115,17 @@ export default function Dashboard({ onSignedOut }: { onSignedOut: () => void }) 
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Tile lead label="“Most got it”" value={pct(overall.pct_most)} note={`of ${overall.taps} teacher taps`} />
-        <Tile label="Teacher taps" value={String(overall.taps)} note={`${data.auto_fallbacks} checkpoints had no tap, so Core played`}>
+        <Tile tint="mint" label="Teacher taps" value={String(overall.taps)} note={`${data.auto_fallbacks} checkpoints had no tap, so Core played`}>
           <div className="h-10 w-28" aria-hidden>
             <ResponsiveContainer>
               <LineChart data={days} accessibilityLayer={false}>
-                <Line dataKey="taps" stroke={C.most} strokeWidth={2.5} dot={false} isAnimationActive={false} />
+                <Line dataKey="taps" stroke={C.lagoon} strokeWidth={2.5} dot={false} isAnimationActive={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </Tile>
-        <Tile label="Catch-up calls answered" value={pct(calls.pct_answered)} note={`${calls.completed} of ${calls.completed + calls.no_response} finished calls`} />
-        <Tile label="Packs ready" value={String(data.packs_ready)} note="signed, ready to download" />
+        <Tile tint="sun" label="Catch-up calls answered" value={pct(calls.pct_answered)} note={`${calls.completed} of ${calls.completed + calls.no_response} finished calls`} />
+        <Tile tint="sky" label="Packs ready" value={String(data.packs_ready)} note="signed, ready to download" />
       </div>
 
       <div className="grid gap-4 xl:grid-cols-3">
@@ -155,8 +162,12 @@ export default function Dashboard({ onSignedOut }: { onSignedOut: () => void }) 
                 <CartesianGrid vertical={false} stroke={C.grid} />
                 <XAxis dataKey="label" tick={{ fill: C.muted, fontSize: 12 }} axisLine={false} tickLine={false} interval="preserveStartEnd" />
                 <YAxis allowDecimals={false} tick={{ fill: C.muted, fontSize: 12 }} axisLine={false} tickLine={false} />
-                <Tooltip {...tooltip} cursor={{ fill: '#efece3' }} />
-                <Bar dataKey="taps" name="Taps" fill={C.most} radius={[6, 6, 0, 0]} isAnimationActive={animate} />
+                <Tooltip {...tooltip} cursor={{ fill: '#e7ede3' }} />
+                <Bar dataKey="taps" name="Taps" fill={C.most} radius={[6, 6, 0, 0]} isAnimationActive={animate}>
+                  {days.map((d, i) => (
+                    <Cell key={d.date} fill={i === days.length - 1 ? C.some : C.most} />
+                  ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
