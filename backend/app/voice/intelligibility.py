@@ -2,7 +2,8 @@
 
 Input CSV columns: listener,room,line,ok   (room = quiet|noisy, ok = 1 heard word for word, 0 not)
 Run: python -m app.voice.intelligibility results.csv
-Prints one line per listener and room, then the per-room verdict. Paste the summary into docs/TESTING_LOG.md.
+Prints one line per listener and room, then the per-room verdict.
+Paste the summary into docs/TESTING_LOG.md.
 """
 
 import csv
@@ -25,7 +26,7 @@ def score(rows: list[dict]) -> dict[tuple[str, str], list[int]]:
 
 
 def verdict(scores: dict[tuple[str, str], list[int]]) -> dict[str, bool]:
-    """A room passes when every listener reaches its target (scaled if fewer than 10 lines were played)."""
+    """A room passes when every listener reaches its target (scaled if under 10 lines played)."""
     ok: dict[str, bool] = {}
     for (room, _), (heard, played) in scores.items():
         ok[room] = ok.get(room, True) and heard * 10 >= TARGET[room] * played
