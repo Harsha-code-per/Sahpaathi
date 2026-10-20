@@ -2,6 +2,7 @@ import { ArrowRightIcon, BookOpenCheckIcon, LayoutDashboardIcon, PlayIcon } from
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { LogoMark } from '@/components/Logo'
 import './landing.css'
+import Film from './Film'
 import { setupMotion } from './motion'
 
 const REPO = 'https://github.com/Harsha-code-per/Sahpaathi'
@@ -135,6 +136,8 @@ export default function Landing() {
             ))}
           </div>
         </section>
+
+        <Film />
 
         <section className="bg-[#f2efe6] py-24 text-[#172524]">
           <div className="mx-auto max-w-7xl space-y-12 px-5 md:px-8">

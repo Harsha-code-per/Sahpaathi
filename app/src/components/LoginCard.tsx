@@ -3,6 +3,7 @@ import { useState, type SubmitEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { ApiError } from '@/studio/api'
 import { LogoMark } from './Logo'
+import './login.css'
 
 const field =
   'h-11 w-full rounded-xl border border-input bg-card px-3 text-base text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40'
@@ -28,8 +29,14 @@ export function LoginCard(props: { product: string; blurb: string; login: (email
   }
 
   return (
-    <main className="grid min-h-dvh place-items-center bg-background p-4">
-      <form onSubmit={submit} className="w-full max-w-sm space-y-5 rounded-3xl border border-border bg-card p-7 shadow-[0_20px_50px_rgba(23,37,36,0.1)]">
+    <main className="relative isolate grid min-h-dvh place-items-center overflow-hidden bg-background p-4">
+      <div aria-hidden className="login-bg absolute inset-0 -z-10">
+        {[1, 3].map((n) => (
+          <video key={n} src={`/media/landing-${n}.mp4`} muted loop playsInline autoPlay preload="metadata" />
+        ))}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(248,246,239,0.92),rgba(248,246,239,0.55)_55%,rgba(248,246,239,0.25))]" />
+      </div>
+      <form onSubmit={submit} className="w-full max-w-sm space-y-5 rounded-3xl border border-border bg-card/95 p-7 shadow-[0_20px_50px_rgba(23,37,36,0.1)]">
         <div className="space-y-3">
           <span className="grid size-12 place-items-center rounded-xl bg-primary text-primary-foreground">
             <LogoMark className="size-7" />

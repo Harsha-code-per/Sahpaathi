@@ -36,6 +36,16 @@ export function setupMotion(root: HTMLElement): () => void {
       { scaleX: 0 },
       { scaleX: 1, ease: 'none', scrollTrigger: { trigger: '[data-flow]', start: 'top 75%', end: 'center 60%', scrub: 0.6 } },
     )
+    // Film: scroll crossfades the three clips and their beat cards (timeline units: one per clip).
+    const clips = gsap.utils.toArray<HTMLElement>('[data-film-clip]')
+    const beats = gsap.utils.toArray<HTMLElement>('[data-film-beat]')
+    const film = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: '[data-film]', start: 'top top', end: 'bottom bottom', scrub: 0.6 } })
+    clips.forEach((c, i) => i && film.to(c, { opacity: 1, duration: 0.5 }, i - 0.25))
+    beats.forEach((b, i) => {
+      if (i) film.fromTo(b, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.4 }, i - 0.1)
+      if (i < beats.length - 1) film.to(b, { opacity: 0, y: -30, duration: 0.4 }, i + 0.7)
+    })
+    film.to({}, { duration: 0.3 }) // hold the last beat
     gsap.from('[data-step]', { opacity: 0, y: 40, duration: 0.8, ease: 'power2.out', stagger: 0.12, scrollTrigger: { trigger: '[data-flow]', start: 'top 80%' } })
   }, root)
 
