@@ -1,3 +1,4 @@
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useState, type SubmitEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { ApiError } from '@/studio/api'
@@ -12,6 +13,7 @@ export function LoginCard(props: { product: string; blurb: string; login: (email
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [show, setShow] = useState(false)
 
   async function submit(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -27,7 +29,7 @@ export function LoginCard(props: { product: string; blurb: string; login: (email
 
   return (
     <main className="grid min-h-dvh place-items-center bg-background p-4">
-      <form onSubmit={submit} className="w-full max-w-sm space-y-5 rounded-3xl border border-border bg-card p-7 shadow-sm">
+      <form onSubmit={submit} className="w-full max-w-sm space-y-5 rounded-3xl border border-border bg-card p-7 shadow-[0_20px_50px_rgba(23,37,36,0.1)]">
         <div className="space-y-3">
           <span className="grid size-12 place-items-center rounded-xl bg-primary text-primary-foreground">
             <LogoMark className="size-7" />
@@ -41,7 +43,17 @@ export function LoginCard(props: { product: string; blurb: string; login: (email
         </label>
         <label className="block space-y-1.5">
           <span className="text-sm font-semibold">Password</span>
-          <input className={field} type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+          <span className="relative block">
+            <input className={`${field} pr-12`} type={show ? 'text' : 'password'} autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+            <button
+              type="button"
+              aria-label={show ? 'Hide password' : 'Show password'}
+              onClick={() => setShow(!show)}
+              className="absolute top-0 right-0 grid size-11 place-items-center rounded-xl text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/40"
+            >
+              {show ? <EyeOffIcon className="size-5" aria-hidden /> : <EyeIcon className="size-5" aria-hidden />}
+            </button>
+          </span>
         </label>
         {error && (
           <p role="alert" className="rounded-xl bg-bad px-3 py-2 text-bad-foreground">
