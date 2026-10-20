@@ -109,6 +109,7 @@ def test_no_key_after_the_repeats_or_a_dropped_call_is_no_response(api, voiced, 
     assert calls[first]["outcome"] is None
 
 
+@needs_ffmpeg
 def test_a_failed_dial_leaves_the_call_queued(api, voiced, monkeypatch, exo):
     from fastapi import HTTPException
 
