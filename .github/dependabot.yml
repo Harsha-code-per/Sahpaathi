@@ -1,0 +1,23 @@
+# Weekly dependency updates, grouped so they arrive as a few PRs, not dozens. Each one goes through CI
+# (and so the browser smoke test) before auto-merge takes it.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /app
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 3
+    groups:
+      app:
+        patterns: ["*"]
+        update-types: [minor, patch]
+  - package-ecosystem: pip
+    directory: /backend
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 3
+    groups:
+      backend:
+        patterns: ["*"]
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: monthly }

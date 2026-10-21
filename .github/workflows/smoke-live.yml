@@ -1,0 +1,39 @@
+name: smoke-live
+
+# After every deploy, check the live site really serves: each page, the API, and that a missing code file
+# is a 404 (not the HTML page, which is what white-screened open tabs). Opens an issue if anything fails.
+on:
+  workflow_run:
+    workflows: [deploy-app]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  live:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      APP: https://sahpaathi.vercel.app
+      API: https://sahpaathi-api.onrender.com
+    steps:
+      - name: Pages, API and assets
+        run: |
+          set -e
+          for p in / /teacher /studio /admin /tutor; do
+            curl -sf --retry 3 -o /dev/null "$APP$p" && echo "ok $p"
+          done
+          curl -sf --retry 5 --retry-delay 20 --max-time 120 "$API/health" && echo " ok api"
+          js=$(curl -sf "$APP/" | grep -o '/assets/index-[^"]*\.js' | head -1)
+          curl -sf -o /dev/null -w "%{content_type}\n" "$APP$js" | grep -q javascript && echo "ok $js"
+          code=$(curl -s -o /dev/null -w "%{http_code}" "$APP/assets/does-not-exist-123.js")
+          test "$code" = 404 && echo "ok missing asset is 404"
+      - if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create --repo "${{ github.repository }}" --title "Live smoke check failed after deploy" \
+            --body "The post-deploy check failed: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
