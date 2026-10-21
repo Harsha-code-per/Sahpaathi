@@ -41,6 +41,7 @@ warns when the device is offline and links to the classroom mode.
 | Interrupt at any time: explain again, like I'm 5, another language, a doubt; the lesson keeps its place | Built |
 | Breaks and games after about 10 turns or 2 parts, or when the learner is tired: riddle, quick maths, number pattern, memory game, stretch | Built |
 | Voice: browser speech recognition in, Sarvam voice out | Built; not tried with a real microphone or the real voice yet. Odia recognition in Chrome is weak |
+| Perception agents: with the learner's opt-in, a LangGraph graph of four agents (face, posture, surroundings, response) reads on-device camera and microphone numbers and makes the teacher gently ask "is everything okay?" when the learner seems puzzled, tired or distracted, or the room is noisy | Built; tested with synthetic numbers and a fake camera. **Not yet tested with real faces**, and it needs legal review and parental consent before children use it. See [SENSE.md](SENSE.md) |
 | The four lesson guardrails on the tutor's answers | **Not applied.** The tutor is checked by its rules and prompt only |
 | Learner accounts, progress saved between visits, parental consent (DPDP Act 2023) | **Not built.** Nothing is stored; the lesson lives in the browser. Needed before real children use it |
 

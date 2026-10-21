@@ -24,7 +24,7 @@ Sahpaathi brings back Interactive Radio Instruction (IRI) using frontier AI:
 | Does | Plays signed lesson packs, branches on the teacher's *Most / Some / Few* taps, takes attendance, calls absent children's parents | Talks like a teacher: plans a topic or textbook page into parts, teaches, quizzes, reteaches, answers doubts in any of four languages, takes breaks with riddles and games |
 | Open | [`/teacher`](https://sahpaathi.vercel.app/teacher) | [`/tutor`](https://sahpaathi.vercel.app/tutor) |
 
-They share one curriculum and are kept separate on purpose; a hybrid is planned. What is built and what is not, in each: [docs/MODES.md](docs/MODES.md).
+They share one curriculum and are kept separate on purpose; a hybrid is planned. In the online mode a learner can opt in to let the teacher notice (on their own device, numbers only) when they look puzzled or tired or it is noisy, and ask if they are okay: [docs/SENSE.md](docs/SENSE.md). What is built and what is not, in each: [docs/MODES.md](docs/MODES.md).
 
 ## Status
 Build stage (18 Oct – 1 Nov 2026), submission target Sat 31 Oct. Plan and ownership: [docs/TEAM_PLAN.md](docs/TEAM_PLAN.md). Live: **https://sahpaathi.vercel.app** · API docs: **https://sahpaathi-api.onrender.com/docs**.

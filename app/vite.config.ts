@@ -31,13 +31,13 @@ export default defineConfig({
         // Fonts too, so every script renders offline (about 370 KB, fetched in the background after the first visit).
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         // Only the subsets we show: Latin for Figtree/Bricolage, one script file per Noto family.
-        // The desk tools and the landing page load online only: a classroom phone never downloads them (recharts alone is ~120 KB gz).
+        // The desk tools, the landing page and the AI teacher load online only: a classroom phone never downloads them (recharts alone is ~120 KB gz).
         globIgnores: [
           '**/*{cyrillic,greek,vietnamese}*',
           '**/noto-sans-*-latin-*',
           '**/apple-touch-icon.png',
           '**/icon-512*.png',
-          '**/assets/{Admin,Studio,Landing}-*',
+          '**/assets/{Admin,Studio,Landing,Tutor,vision_bundle}-*', // online-only: the AI teacher and its on-device camera models
         ],
       },
     }),
