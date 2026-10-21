@@ -11,7 +11,7 @@
   animation: rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
-/* Cinematic hero: spotlight that follows the pointer, a light cone, film grain and a vignette. */
+/* Cinematic hero: a fixed spotlight behind the speaker, a light cone, film grain and a vignette. */
 .cine {
   --mx: 68%;
   --my: 46%;
@@ -45,13 +45,12 @@
   top: 12%;
   width: 46%;
   height: 62%;
-  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
   transform-style: preserve-3d;
 }
 .spk-body {
   position: absolute;
-  inset: 7% 0 0;
-  border-radius: 46% / 8%;
+  inset: 7% 0 0; /* the flat top of the cylinder sits at the middle of the cap below */
+  border-radius: 0 0 50% 50% / 0 0 6% 6%;
   background: linear-gradient(90deg, #040807, #243a36 24%, #4a6560 46%, #2b4440 62%, #101b19 84%, #040807);
   box-shadow: inset 0 -1.5rem 2rem rgba(0, 0, 0, 0.55), 0 2.5rem 4rem rgba(0, 0, 0, 0.6);
 }
@@ -75,13 +74,33 @@
   box-shadow: 0 0 0.9rem 0.2rem rgba(244, 178, 62, 0.8);
   animation: led 2.4s ease-in-out infinite;
 }
+/* The top face: an ellipse exactly as wide as the body, centred on its top edge, so the two read as one
+   cylinder. A thin lit ring sits inside it, like the light ring on a smart speaker. */
 .spk-cap {
   position: absolute;
   inset: 0 0 auto;
   height: 14%;
   border-radius: 50%;
-  background: radial-gradient(ellipse at 50% 40%, #587670, #1a2a28 70%);
-  box-shadow: 0 0 0 0.18rem #f4b23e, 0 0 1.6rem 0.2rem rgba(244, 178, 62, 0.55);
+  background: radial-gradient(ellipse at 50% 35%, #5f7d77, #243936 62%, #121f1d);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 -3px 7px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+.spk-cap::before {
+  content: '';
+  position: absolute;
+  inset: 17% 11%;
+  border-radius: 50%;
+  border: 2px solid rgba(244, 178, 62, 0.85);
+  box-shadow: 0 0 0.55rem rgba(244, 178, 62, 0.45), inset 0 0 0.45rem rgba(244, 178, 62, 0.25);
+  animation: led 2.4s ease-in-out infinite;
+}
+.spk-cap::after {
+  content: '';
+  position: absolute;
+  inset: 38% 40%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 35%, #31504b, #0c1514);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.12);
 }
 .spk-base {
   position: absolute;

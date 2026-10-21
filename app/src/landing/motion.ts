@@ -18,26 +18,11 @@ export function setupMotion(root: HTMLElement): () => void {
   const hero = root.querySelector<HTMLElement>('[data-hero]')
   const watch = new IntersectionObserver(([e]) => hero?.classList.toggle('cine-off', !e.isIntersecting))
   if (hero) watch.observe(hero)
-  let offMove = () => {}
   const ctx = gsap.context(() => {
     // Opening shot: the letterbox bars slide away, the speaker rises into the light.
     gsap.to('[data-bar]', { scaleY: 0, duration: 1.4, ease: 'expo.inOut', delay: 0.15, transformOrigin: (i: number) => (i === 0 ? 'top' : 'bottom') })
     gsap.from('[data-speaker]', { translate: '0px 80px', opacity: 0, duration: 1.6, ease: 'expo.out', delay: 0.3 })
     gsap.from('.spk-word', { opacity: 0, duration: 1, stagger: 0.15, delay: 1.1 })
-    // The spotlight and the speaker follow the pointer (not on touch screens). CSS variables, so the speaker's own transform stays CSS-driven.
-    if (window.matchMedia('(pointer: fine)').matches) {
-      const hero = root.querySelector<HTMLElement>('[data-hero]')!
-      const speaker = root.querySelector<HTMLElement>('[data-speaker]')!
-      const move = (e: PointerEvent) => {
-        const r = hero.getBoundingClientRect()
-        const x = (e.clientX - r.left) / r.width
-        const y = (e.clientY - r.top) / r.height
-        gsap.to(speaker, { '--ry': `${(x - 0.5) * 36}deg`, '--rx': `${(0.5 - y) * 14}deg`, duration: 0.8, ease: 'power3', overwrite: 'auto' })
-        gsap.to(hero, { '--mx': `${x * 100}%`, '--my': `${y * 100}%`, duration: 0.6, ease: 'power3', overwrite: 'auto' })
-      }
-      hero.addEventListener('pointermove', move)
-      offMove = () => hero.removeEventListener('pointermove', move)
-    }
     // Scores count up from zero as each number scrolls into view.
     gsap.utils.toArray<HTMLElement>('[data-count]').forEach((el) => {
       const m = /^([\d,.]+)(.*)$/.exec(el.dataset.count ?? '')
@@ -95,7 +80,6 @@ export function setupMotion(root: HTMLElement): () => void {
   }, root)
 
   return () => {
-    offMove()
     watch.disconnect()
     ctx.revert()
     gsap.ticker.remove(tick)
