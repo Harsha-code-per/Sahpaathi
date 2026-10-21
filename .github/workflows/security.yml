@@ -28,7 +28,7 @@ jobs:
           python-version: "3.12"
       - name: Backend dependencies (pip-audit)
         run: pip install -q pip-audit && pip-audit -r backend/requirements.txt
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
       - name: App dependencies (npm audit, shipped code only)
