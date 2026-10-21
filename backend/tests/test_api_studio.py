@@ -172,3 +172,51 @@ def test_reviewer_corrects_a_line_and_the_original_is_kept(api, monkeypatch):
     assert api.patch(url, json={"text": "x"}, headers=auth(api, "teacher")).status_code == 403
     api.post(f"/api/v1/episodes/{eid}/review", json={"decision": "approve"}, headers=h)
     assert api.patch(url, json={"text": "x"}, headers=h).status_code == 409  # approved is final
+
+
+def test_reviewer_gets_the_headings_in_english_once(api, monkeypatch):
+    from app.factory import judge
+
+    with SessionLocal() as db:
+        rec = EpisodeRecord(
+            lesson_id="g1-numbers-to-20",
+            district_id="chennai-migrant",
+            created_by_id=1,
+            status="in_review",
+            episode=EPISODE.model_dump(mode="json"),
+            review=REVIEW.model_dump(mode="json"),
+        )
+        db.add(rec)
+        db.commit()
+        rid = rec.id
+    calls = []
+
+    def fake(episode, client=None):
+        calls.append(episode.title)
+        return judge.Headings(
+            title="Numbers to 20",
+            materials=["pebbles"],
+            segments=[
+                judge.SegmentHeading(id=s.id, title="Part", checkpoint="Can most show 7?")
+                for s in episode.segments
+            ],
+        )
+
+    monkeypatch.setattr(judge, "headings_in_english", fake)
+    episodes._english_headings.clear()
+    h = auth(api, "reviewer")
+    first = api.get(f"/api/v1/episodes/{rid}/english", headers=h)
+    assert first.status_code == 200 and first.json()["title"] == "Numbers to 20"
+    assert api.get(f"/api/v1/episodes/{rid}/english", headers=h).json() == first.json()
+    assert len(calls) == 1  # translated once, then remembered
+    assert (
+        api.get(f"/api/v1/episodes/{rid}/english", headers=auth(api, "teacher")).status_code == 403
+    )
+    assert api.get("/api/v1/episodes/9999/english", headers=h).status_code == 404
+
+    def boom(episode, client=None):
+        raise RuntimeError("down")
+
+    monkeypatch.setattr(judge, "headings_in_english", boom)
+    episodes._english_headings.clear()
+    assert api.get(f"/api/v1/episodes/{rid}/english", headers=h).status_code == 503

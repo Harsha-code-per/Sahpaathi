@@ -60,3 +60,34 @@ export function minutes(lines: Line[]) {
 export function svgDataUrl(svg: string) {
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`
 }
+
+/** Which language the Studio is read in. English is the default for reviewers; the original is one click away. */
+export type View = 'english' | 'original'
+const VIEW_KEY = 'sahpaathi.studio.view'
+
+export function storedView(): View {
+  try {
+    return localStorage.getItem(VIEW_KEY) === 'original' ? 'original' : 'english'
+  } catch {
+    return 'english'
+  }
+}
+
+export function storeView(v: View) {
+  try {
+    localStorage.setItem(VIEW_KEY, v)
+  } catch {
+    // the choice just is not remembered
+  }
+}
+
+/** "Grade 1: Numbers to 20" and the district, from the catalog, which is already in English. */
+export function englishName(
+  catalog: { lessons: { id: string; grade: number; chapter: string }[]; districts: { id: string; name: string }[] } | null,
+  lessonId: string,
+  districtId: string,
+) {
+  const lesson = catalog?.lessons.find((l) => l.id === lessonId)
+  const district = catalog?.districts.find((d) => d.id === districtId)
+  return { title: lesson ? `Grade ${lesson.grade}: ${lesson.chapter}` : null, district: district?.name ?? districtId }
+}

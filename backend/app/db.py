@@ -6,12 +6,16 @@ from sqlalchemy.pool import StaticPool
 
 from app.config import settings
 
-# SQLite is only for tests: one shared in-memory connection so every session sees the same data.
+# SQLite is for tests and a local walkthrough. An in-memory database needs one shared connection
+# so every session sees the same data; a file database gets a normal pool, so parallel requests
+# do not share (and break) one connection.
 _sqlite = settings.database_url.startswith("sqlite")
+_memory = _sqlite and (":memory:" in settings.database_url or settings.database_url.endswith("://"))
 engine = create_engine(
     settings.database_url,
     pool_pre_ping=not _sqlite,
-    **({"connect_args": {"check_same_thread": False}, "poolclass": StaticPool} if _sqlite else {}),
+    **({"connect_args": {"check_same_thread": False}} if _sqlite else {}),
+    **({"poolclass": StaticPool} if _memory else {}),
 )
 SessionLocal = sessionmaker(engine, expire_on_commit=False)
 
