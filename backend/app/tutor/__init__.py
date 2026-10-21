@@ -11,18 +11,20 @@ Because anyone can call it, daily caps on turns and on spoken replies protect th
 
 import logging
 import tempfile
-from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Annotated
 
 import anthropic
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from pydantic import ValidationError
+from sqlalchemy.orm import Session
 
+from app import db as database
 from app.config import settings
 from app.tutor import engine, sense
 from app.tutor.brain import ClaudeBrain, EmptyReply
 from app.tutor.models import Plan, PlanIn, SpeakIn, TurnIn, TurnOut
+from app.usage import client_ip, spend
 from app.voice.sarvam import SarvamTTS
 from app.voice.settings import VoiceSettings
 from app.voice.tts import TTSError
@@ -31,22 +33,14 @@ log = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/tutor", tags=["tutor"])
 
 PLAN_COST = 5  # a plan uses the larger model once: count it as five turns against the daily cap
+TOO_MUCH = "The teacher has answered a lot of questions today. Please try again tomorrow."
 
-_used: dict[tuple[date, str], int] = {}
+DB = Annotated[Session, Depends(database.get_db)]
 
 
-def _spend(kind: str, limit: int, n: int = 1) -> None:
-    """Count `n` calls against today's (UTC) cap for `kind`. In memory: a restart resets it, which is
-    fine for a single free-tier instance and a demo."""
-    today = datetime.now(UTC).date()
-    for key in [k for k in _used if k[0] != today]:
-        del _used[key]
-    if _used.get((today, kind), 0) + n > limit:
-        raise HTTPException(
-            status.HTTP_429_TOO_MANY_REQUESTS,
-            "The teacher has answered a lot of questions today. Please try again tomorrow.",
-        )
-    _used[(today, kind)] = _used.get((today, kind), 0) + n
+def _spend(db: Session, request: Request, kind: str, everyone: int, each: int, n: int = 1) -> None:
+    """Today's caps for `kind`: one shared by everyone, one per caller (app/usage.py)."""
+    spend(db, kind, [("all", everyone), (client_ip(request), each)], TOO_MUCH, n)
 
 
 def get_client() -> anthropic.Anthropic:
@@ -73,10 +67,25 @@ def _busy(e: Exception) -> HTTPException:
 
 
 @router.post("/plan")
-def make_plan(body: PlanIn, brain: Brain) -> Plan:
+def make_plan(body: PlanIn, brain: Brain, request: Request, db: DB) -> Plan:
     if not body.topic.strip() and body.document is None:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Tell me what to teach.")
-    _spend("chat", settings.tutor_daily_turns, PLAN_COST)
+    if body.document is not None:
+        _spend(
+            db,
+            request,
+            "file_plan",
+            settings.tutor_daily_file_plans,
+            settings.tutor_ip_daily_file_plans,
+        )
+    _spend(
+        db,
+        request,
+        "chat",
+        settings.tutor_daily_turns,
+        settings.tutor_ip_daily_turns,
+        PLAN_COST,
+    )
     try:
         return brain.plan(body.topic.strip(), body.document, body.language, body.style)
     except (anthropic.APIError, ValidationError, EmptyReply, ValueError) as e:
@@ -84,8 +93,8 @@ def make_plan(body: PlanIn, brain: Brain) -> Plan:
 
 
 @router.post("/turn")
-def turn(body: TurnIn, brain: Brain) -> TurnOut:
-    _spend("chat", settings.tutor_daily_turns)
+def turn(body: TurnIn, brain: Brain, request: Request, db: DB) -> TurnOut:
+    _spend(db, request, "chat", settings.tutor_daily_turns, settings.tutor_ip_daily_turns)
     try:
         return engine.step(brain, body)
     except engine.LessonError as e:
@@ -101,15 +110,20 @@ def read_signals(body: sense.SenseIn) -> sense.Insight:
     Off (404) unless SENSE_ENABLED is set: see docs/SENSE.md before turning it on."""
     if not settings.sense_enabled:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found.")
-    return sense.analyse(body)
+    return sense.analyse(body)  # the first call loads LangGraph (app/tutor/sense/__init__.py)
 
 
 @router.post("/speak")
-def speak(body: SpeakIn, voice: Annotated[SarvamTTS | None, Depends(get_voice)]) -> Response:
+def speak(
+    body: SpeakIn,
+    voice: Annotated[SarvamTTS | None, Depends(get_voice)],
+    request: Request,
+    db: DB,
+) -> Response:
     """The reply as a Sarvam voice (WAV). 503 means "no voice here": the app speaks it itself."""
     if voice is None:
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "No server voice is set up.")
-    _spend("speak", settings.tutor_daily_voice)
+    _spend(db, request, "speak", settings.tutor_daily_voice, settings.tutor_ip_daily_voice)
     with tempfile.TemporaryDirectory() as tmp:
         try:
             wav = voice.synthesize(body.text, body.language, "guide", Path(tmp) / "reply.wav")

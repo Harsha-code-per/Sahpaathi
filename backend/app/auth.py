@@ -8,7 +8,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
 import jwt
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
 from sqlalchemy import select
@@ -17,6 +17,7 @@ from sqlalchemy.orm import Session
 from app.config import settings
 from app.db import get_db
 from app.models import User
+from app.usage import client_ip, spend
 
 TOKEN_HOURS = 12
 _SCRYPT = {"n": 2**14, "r": 8, "p": 1}
@@ -87,7 +88,16 @@ class LoginOut(BaseModel):
 
 
 @router.post("/login")
-def login(body: LoginIn, db: Annotated[Session, Depends(get_db)]) -> LoginOut:
+def login(body: LoginIn, request: Request, db: Annotated[Session, Depends(get_db)]) -> LoginOut:
+    # Per IP, per 10 minutes: slows password guessing, and each check costs 16 MB of scrypt memory.
+    now = datetime.now(UTC)
+    window = f"{client_ip(request)}@{now:%H}:{now.minute // 10}"
+    spend(
+        db,
+        "login",
+        [(window, settings.login_attempts_per_10_min)],
+        "Too many sign-in attempts. Wait ten minutes and try again.",
+    )
     user = db.scalar(select(User).where(User.email == body.email.strip().lower()))
     if user is None or not verify_password(body.password, user.password_hash):
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Wrong email or password.")
