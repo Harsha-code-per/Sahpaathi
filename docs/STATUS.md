@@ -1,8 +1,8 @@
 # Sahpaathi status (21 Oct 2026)
 
-**Short answer:** the **offline classroom product is complete**, and everything in the original build plan works. The plan agreed on 18 Oct left **Online Mode** for the Top 10 stage; **a prototype of it was built early on 21 Oct and sits in open pull requests** (section 2). Whether it ships in the 31 Oct submission is a **decision for the team** (section 2). What stands between us and a winning submission is mostly **evidence and people**, not code.
+**Short answer:** the **offline classroom product is complete**, and everything in the original build plan works. The plan agreed on 18 Oct left **Online Mode** for the Top 10 stage; **a prototype of it was built early on 21 Oct and is now in `main` and live**, with its camera sensing switched off (section 2). What stands between us and a winning submission is mostly **evidence and people**, not code.
 
-Live: app https://sahpaathi.vercel.app (all four routes load), API https://sahpaathi-api.onrender.com (healthy, CORS works). CI green on main. Merged since the first version of this report: the cinematic landing (#68), the demo-account **Fill in** button (#69), speed-ups (#72). Open: #73 (hero performance), #74 (deploy from GitHub Actions), and the Online Mode stack #75, #76, #77, #78 (section 2). **Every open PR shows a red X only because of the Vercel check:** it blocks commits from accounts that are not on the Vercel team; the app, backend and docker checks pass.
+Live: app https://sahpaathi.vercel.app (all four routes load), API https://sahpaathi-api.onrender.com (healthy, CORS works). CI green on main. Merged since the first version of this report: the cinematic landing (#68), the demo-account **Fill in** button (#69), speed-ups (#72). Also merged: deploy from GitHub Actions (#74, #81: every merge to main now deploys the app), the Online Mode stack (#75–#79, #82) and **auto-merge** (#83: a PR into main merges itself once the backend and app checks pass; a draft or the `hold` label opts out). Ignore the red Vercel X on PRs: the Actions deploy replaces it.
 
 ## 1. The original plan, item by item
 
@@ -23,8 +23,18 @@ Live: app https://sahpaathi.vercel.app (all four routes load), API https://sahpa
 
 **Deliberately cut, on the roadmap:** RAG over the curriculum, a job queue, mesh pods and micro-capsules. (Online Mode was cut too, then prototyped early: section 2.)
 
-## 2. Online Mode
-A 1-on-1 AI teacher for connected older learners at `/tutor`: it plans, teaches, quizzes and reteaches, with voice and file attach, plus a switch between the two modes on the landing page. **Camera/mic sensing** (LangGraph perception agents, on-device, detect-never-record) is merged but **off by default** (`SENSE_ENABLED` / `VITE_SENSE_ENABLED`): it needs legal review and parental consent under the DPDP Act 2023 before children use it. Turn both on only for an adults-only demo.
+## 2. Online Mode: built early as a prototype, live with the camera off
+Planned on 18 Oct as a 1-on-1 AI tutor for connected learners, to be prototyped only in the Top 10 stage on a separate branch. **A working prototype was built on 21 Oct** and is in `main`. Plan and feature-by-feature status: [MODES.md](MODES.md); the camera part: [SENSE.md](SENSE.md).
+
+| Piece | PR | Status |
+|---|---|---|
+| The AI teacher at `/tutor`: chat, study mode (topic, PDF or photo analysed into parts), teach, quiz, hint, reteach, breaks and games, four languages, voice in and out | #75 | ✅ Built and tested (about 40 backend tests on the engine, breaks and API, and real-Claude runs in a real browser). Voice not tried with a real microphone |
+| Two modes made visible: landing section, mode switch, offline warning, docs | #76 | ✅ Built |
+| The `langgraph` dependency (the repo asks for dependencies in a tiny separate PR) | #77 | ✅ CI green, Docker image builds |
+| Opt-in camera and microphone sensing: four LangGraph agents plus an orchestrator, on-device, a gentle "are you okay?" check-in, auto-deletion, consent gate, training tools | #78 | 🟡 Merged, **off by default** (`SENSE_ENABLED` / `VITE_SENSE_ENABLED`, #82). Built and tested with synthetic numbers and a fake camera. **Not tested with real faces**; rule-based; needs legal review (DPDP Act 2023) before any child uses it |
+| Deploy from GitHub Actions, to avoid the Vercel block | #74 | ✅ Running: every merge to main deploys |
+
+**Decided (M1, 21 Oct):** ship the AI teacher in the submission, labelled a **prototype** in the deck and video; the camera/mic sensing stays **off** on the live site (the panel is not even in the build). Switch both flags on only for an adults-only demo. Open caveats: the AI teacher's answers don't go through the four guardrails, and there are no learner accounts or verifiable parental consent yet.
 
 ## 3. Submission checklist (due 1 Nov; target 31 Oct, 18:00 IST)
 
@@ -38,7 +48,7 @@ A 1-on-1 AI teacher for connected older learners at `/tutor`: it plans, teaches,
 | **Deck** | 🟡 draft; needs testing pages, guardrail numbers, costs, honest Santali status |
 | Repo public, evaluator access, secrets scan, tag `v1.0-build` | ❌ submission day |
 | Native-speaker check of the app text and voices (and the AI teacher's Hindi, Tamil and Odia, which no native speaker has reviewed) | ❌ |
-| Online Mode decision (above), then a one-line honest label in the deck and video: prototype, rule-based sensing, not tested with real faces | ❌ |
+| A one-line honest label in the deck and video: prototype, rule-based sensing, not tested with real faces | ❌ |
 | Real phone and ₹500 speaker test (3 m) | ❌ |
 
 ## 4. Where we stand on each criterion
@@ -73,7 +83,7 @@ A 1-on-1 AI teacher for connected older learners at `/tutor`: it plans, teaches,
 - 30 Oct: final deck (testing pages, guardrail and cost slides) and video recording.
 - 31 Oct: README password, secrets scan, repo public, evaluator access, tag `v1.0-build`, submit by 18:00.
 
-**If Top 10 (10 Nov):** the consent flow for Online Mode sensing, a 10–12 slide finale deck, a rehearsed live demo with a recorded fallback, more classroom pilots.
+**If Top 10 (10 Nov):** a parental-consent flow so Online Mode sensing can be switched on, a 10–12 slide finale deck, a rehearsed live demo with a recorded fallback, more classroom pilots.
 
 ## 6. The one thing that matters most
 **Teacher evidence in the testing log this week**, each finding tied to a change we shipped. The product is complete enough to win; the 35% criterion is decided by proof that real teachers used it and that we improved it from what they said.
