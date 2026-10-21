@@ -159,6 +159,10 @@ export default function Studio() {
     return (
       <LoginCard
         product="Studio"
+        demo={[
+          { role: 'Reviewer', email: 'reviewer@sahpaathi.test' },
+          { role: 'Admin', email: 'admin@sahpaathi.test' },
+        ]}
         blurb="Review the lessons Claude writes before they reach a classroom."
         login={async (email, password) => {
           const res = await api.login(email, password)
