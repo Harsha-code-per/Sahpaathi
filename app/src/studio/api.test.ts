@@ -17,7 +17,10 @@ beforeEach(() => store.clear())
 
 describe('call', () => {
   it('returns the JSON body', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => json(200, { ok: 1 })))
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => json(200, { ok: 1 })),
+    )
     await expect(call('/x')).resolves.toEqual({ ok: 1 })
   })
 
@@ -25,19 +28,28 @@ describe('call', () => {
     session.set('a.b.c')
     const heard = vi.fn()
     window.addEventListener(SIGNED_OUT, heard)
-    vi.stubGlobal('fetch', vi.fn(async () => json(401, { detail: 'Please log in again.' })))
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => json(401, { detail: 'Please log in again.' })),
+    )
     await expect(call('/x')).rejects.toMatchObject({ status: 401, message: 'Please log in again.' })
     expect(session.get()).toBeNull()
     expect(heard).toHaveBeenCalledOnce()
   })
 
   it('explains an HTML answer (missing API URL) instead of failing to parse it', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => new Response('<!doctype html>', { status: 200, headers: { 'content-type': 'text/html' } })))
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('<!doctype html>', { status: 200, headers: { 'content-type': 'text/html' } })),
+    )
     await expect(call('/x')).rejects.toBeInstanceOf(ApiError)
   })
 
   it('gives a clear message when the server is too slow', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => Promise.reject(new DOMException('slow', 'TimeoutError'))))
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => Promise.reject(new DOMException('slow', 'TimeoutError'))),
+    )
     await expect(call('/x')).rejects.toThrow(/took too long/)
   })
 })

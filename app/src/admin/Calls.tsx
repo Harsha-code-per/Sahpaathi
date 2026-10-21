@@ -6,9 +6,12 @@ import { badge } from '../studio/view'
 import { callableEpisodes, CALL_STATUS, OUTCOME } from './view'
 
 const card = 'rounded-2xl border border-border bg-card p-5'
-const field = 'h-11 w-full rounded-xl border border-input bg-card px-3 text-base text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40'
-const quiet = 'inline-flex min-h-11 items-center justify-center rounded-lg border border-input bg-card px-4 font-semibold outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50'
-const primary = 'inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-4 font-semibold text-primary-foreground outline-none hover:bg-primary/85 focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50'
+const field =
+  'h-11 w-full rounded-xl border border-input bg-card px-3 text-base text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40'
+const quiet =
+  'inline-flex min-h-11 items-center justify-center rounded-lg border border-input bg-card px-4 font-semibold outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50'
+const primary =
+  'inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-4 font-semibold text-primary-foreground outline-none hover:bg-primary/85 focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50'
 
 /** Ring a real phone through Exotel. The number goes to the server once and is never stored. */
 function RingPhone({ call, onDone, onError }: { call: CallSummary; onDone: (msg: string) => void; onError: (e: unknown) => void }) {
@@ -33,7 +36,17 @@ function RingPhone({ call, onDone, onError }: { call: CallSummary; onDone: (msg:
     <form onSubmit={ring} className="flex basis-full flex-wrap items-end gap-2">
       <label className="min-w-48 flex-1 space-y-1">
         <span className="text-sm text-muted-foreground">Phone to ring (a team phone for testing). Used once, never saved.</span>
-        <input className={field} type="tel" inputMode="tel" autoComplete="off" required pattern="\+?[0-9 \-]{10,18}" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 98765 43210" />
+        <input
+          className={field}
+          type="tel"
+          inputMode="tel"
+          autoComplete="off"
+          required
+          pattern="\+?[0-9 \-]{10,18}"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="+91 98765 43210"
+        />
       </label>
       <button className={primary} disabled={busy}>
         {busy ? 'Ringing…' : 'Ring this phone'}
@@ -95,7 +108,9 @@ export default function Calls({ onSignedOut }: { onSignedOut: () => void }) {
   return (
     <>
       <section className={`${card} space-y-3`} aria-labelledby="absent">
-        <h2 id="absent" className="font-semibold">Mark a child absent</h2>
+        <h2 id="absent" className="font-semibold">
+          Mark a child absent
+        </h2>
         <p className="text-sm text-muted-foreground">
           The teacher's phone sends this by itself when attendance is taken. Use it here to try a call. Give a roll number only, never a name or a phone number.
         </p>
@@ -112,19 +127,31 @@ export default function Calls({ onSignedOut }: { onSignedOut: () => void }) {
             <span className="text-sm font-medium">Missed episode</span>
             <select className={field} value={chosen} onChange={(e) => setSlug(e.target.value)}>
               {episodes.map((ep) => (
-                <option key={ep.slug} value={ep.slug}>{ep.title}</option>
+                <option key={ep.slug} value={ep.slug}>
+                  {ep.title}
+                </option>
               ))}
             </select>
           </label>
-          <button className={primary} disabled={busy || !chosen}>Queue call</button>
+          <button className={primary} disabled={busy || !chosen}>
+            Queue call
+          </button>
         </form>
         {loaded && episodes.length === 0 && (
           <p className="text-sm text-muted-foreground">No episode has a ready pack yet. Build one on the Packs tab first; its recap is what the family hears.</p>
         )}
       </section>
 
-      {error && <p role="alert" className={`${card} text-bad-foreground`}>{error}</p>}
-      {notice && <p role="status" className="rounded-2xl bg-ok p-4 text-ok-foreground">{notice}</p>}
+      {error && (
+        <p role="alert" className={`${card} text-bad-foreground`}>
+          {error}
+        </p>
+      )}
+      {notice && (
+        <p role="status" className="rounded-2xl bg-ok p-4 text-ok-foreground">
+          {notice}
+        </p>
+      )}
 
       {active && (
         <Phone
@@ -139,7 +166,9 @@ export default function Calls({ onSignedOut }: { onSignedOut: () => void }) {
       )}
 
       <section className={card} aria-labelledby="calls">
-        <h2 id="calls" className="mb-3 font-semibold">Catch-up calls</h2>
+        <h2 id="calls" className="mb-3 font-semibold">
+          Catch-up calls
+        </h2>
         {!loaded ? (
           <div className="space-y-2">
             <p className="text-muted-foreground">Loading…</p>
@@ -152,7 +181,9 @@ export default function Calls({ onSignedOut }: { onSignedOut: () => void }) {
             {calls.map((c) => (
               <li key={c.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
                 <div className="min-w-0">
-                  <p className="font-medium">Roll {c.student_ref} <span className="font-normal text-muted-foreground">({c.classroom_id})</span></p>
+                  <p className="font-medium">
+                    Roll {c.student_ref} <span className="font-normal text-muted-foreground">({c.classroom_id})</span>
+                  </p>
                   <p className="text-sm text-muted-foreground">{c.episode_slug}</p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -160,7 +191,9 @@ export default function Calls({ onSignedOut }: { onSignedOut: () => void }) {
                   {c.outcome && <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${badge(OUTCOME, c.outcome).tone}`}>{badge(OUTCOME, c.outcome).label}</span>}
                   {c.status === 'queued' && (
                     <>
-                      <button className={quiet} onClick={() => setActive(c)}>Simulate</button>
+                      <button className={quiet} onClick={() => setActive(c)}>
+                        Simulate
+                      </button>
                       <button className={primary} onClick={() => setRinging(ringing === c.id ? null : c.id)} aria-expanded={ringing === c.id}>
                         Ring a phone
                       </button>

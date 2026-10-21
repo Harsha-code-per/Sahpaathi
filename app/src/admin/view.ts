@@ -63,7 +63,12 @@ export const OUTCOME: Record<CallOutcome, { label: string; tone: string }> = {
 }
 
 /** A phone's keypad, row by row. */
-export const KEYPAD = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9'], ['*', '0', '#']]
+export const KEYPAD = [
+  ['1', '2', '3'],
+  ['4', '5', '6'],
+  ['7', '8', '9'],
+  ['*', '0', '#'],
+]
 
 /** Seconds a parent has to press a key before the menu repeats. */
 export const KEY_WAIT_SEC = 8
@@ -116,7 +121,8 @@ export function pipeline(episodes: Summary[], packs: PackSummary[], usage: Episo
     const card = { episode, pack, usage: used }
     if (episode.status === 'generating' || episode.status === 'failed') cols.writing.cards.push(card)
     else if (episode.status === 'in_review') cols.review.cards.push(card)
-    else if (episode.status !== 'approved') continue // rejected lessons leave the pipeline
+    else if (episode.status !== 'approved')
+      continue // rejected lessons leave the pipeline
     else if (used) cols.used.cards.push(card)
     else if (pack) cols.packed.cards.push(card)
     else cols.approved.cards.push(card)

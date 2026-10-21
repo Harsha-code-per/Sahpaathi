@@ -82,9 +82,7 @@ export interface Baseline {
 }
 
 export function makeBaseline(faces: RawFace[], poses: RawPose[]): Baseline {
-  const face = faces.length
-    ? (Object.fromEntries((Object.keys(faces[0]) as (keyof RawFace)[]).map((k) => [k, median(faces.map((f) => f[k]))])) as unknown as RawFace)
-    : null
+  const face = faces.length ? (Object.fromEntries((Object.keys(faces[0]) as (keyof RawFace)[]).map((k) => [k, median(faces.map((f) => f[k]))])) as unknown as RawFace) : null
   const pose = poses.length ? { headRise: median(poses.map((p) => p.headRise)), shoulderWidth: median(poses.map((p) => p.shoulderWidth)), handDist: 9 } : null
   return { face, pose }
 }

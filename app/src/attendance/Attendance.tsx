@@ -12,16 +12,11 @@ import { useT } from '../teacher/i18n'
  * It leaves the device with the taps whenever the phone next gets signal; in class nothing is sent.
  */
 
-const field = 'min-h-14 rounded-xl border border-input bg-background px-4 text-lg text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40'
+const field =
+  'min-h-14 rounded-xl border border-input bg-background px-4 text-lg text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40'
 
 /** The setup form: a classroom code and the roll list. Also used by the Library's Change classroom link. */
-export function ClassroomSetup({
-  classroom,
-  onSaved,
-}: {
-  classroom: ClassroomRecord | null
-  onSaved: (c: ClassroomRecord) => void
-}) {
+export function ClassroomSetup({ classroom, onSaved }: { classroom: ClassroomRecord | null; onSaved: (c: ClassroomRecord) => void }) {
   const { t } = useT()
   const [code, setCode] = useState(classroom?.classroom_id ?? '')
   const [rollsText, setRollsText] = useState(classroom ? rollsAsText(classroom.rolls) : '')
@@ -45,11 +40,7 @@ export function ClassroomSetup({
       <h2 className="font-heading text-xl font-bold">{t.thisClassroom}</h2>
       <label className="flex flex-col gap-2 text-lg">
         <span className="text-muted-foreground">{t.codeLabel}</span>
-        <input
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          className={cn(field, code !== '' && !isCode(code.trim()) && 'border-2 border-few')}
-        />
+        <input value={code} onChange={(e) => setCode(e.target.value)} className={cn(field, code !== '' && !isCode(code.trim()) && 'border-2 border-few')} />
       </label>
       <label className="flex flex-col gap-2 text-lg">
         <span className="text-muted-foreground">{t.rollsLabel}</span>
@@ -123,7 +114,10 @@ export default function Attendance({ episodeId, onSaved }: { episodeId: string; 
           <button
             key={roll}
             aria-pressed={absent.has(roll)}
-            className={cn('min-h-12 rounded-xl border text-lg font-bold outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60', absent.has(roll) ? 'border-few bg-few text-[#1a0f0b]' : 'border-input bg-background')}
+            className={cn(
+              'min-h-12 rounded-xl border text-lg font-bold outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60',
+              absent.has(roll) ? 'border-few bg-few text-[#1a0f0b]' : 'border-input bg-background',
+            )}
             disabled={saved}
             onClick={() => toggle(roll)}
           >

@@ -14,7 +14,13 @@ export function ModeSwitch({ current, tone = 'light' }: { current: ModeId; tone?
             aria-current={active ? 'page' : undefined}
             className={cn(
               'rounded-full px-3 py-1.5 whitespace-nowrap outline-none focus-visible:ring-2 focus-visible:ring-ring',
-              active ? (tone === 'dark' ? 'bg-[#f2efe6] text-[#0b1413]' : 'bg-foreground text-background') : tone === 'dark' ? 'text-[#a9b8b3] hover:text-[#f2efe6]' : 'text-muted-foreground hover:text-foreground',
+              active
+                ? tone === 'dark'
+                  ? 'bg-[#f2efe6] text-[#0b1413]'
+                  : 'bg-foreground text-background'
+                : tone === 'dark'
+                  ? 'text-[#a9b8b3] hover:text-[#f2efe6]'
+                  : 'text-muted-foreground hover:text-foreground',
             )}
           >
             <span className="max-sm:hidden">{MODES[id].label}</span>

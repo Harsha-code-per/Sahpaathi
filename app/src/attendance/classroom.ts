@@ -53,7 +53,7 @@ export function rollsAsText(rolls: string[]): string {
   const isNumber = (r: string) => /^\d+$/.test(r)
   const nums = [...new Set(rolls.filter(isNumber).map(Number))].sort((a, b) => a - b)
   const parts: string[] = []
-  for (let i = 0; i < nums.length; ) {
+  for (let i = 0; i < nums.length;) {
     let j = i
     while (j + 1 < nums.length && nums[j + 1] === nums[j] + 1) j++
     parts.push(i === j ? String(nums[i]) : `${nums[i]}-${nums[j]}`)

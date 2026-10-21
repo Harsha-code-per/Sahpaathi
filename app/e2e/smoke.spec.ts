@@ -83,7 +83,10 @@ test('studio: a reviewer signs in and opens a lesson', async ({ page }) => {
   const errors = watch(page)
   await page.goto('/studio')
   await signIn(page, 'Reviewer')
-  await page.getByRole('button', { name: /chennai-migrant/ }).first().click()
+  await page
+    .getByRole('button', { name: /chennai-migrant/ })
+    .first()
+    .click()
   await expect(page.getByLabel('AI review')).toBeVisible()
   await healthy(page, errors)
 })

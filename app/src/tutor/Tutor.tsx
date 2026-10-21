@@ -248,7 +248,17 @@ export default function Tutor() {
     setError('')
     try {
       const { lang, style } = settings.current
-      const out = await turn({ messages: prior, text, begin, plan: planRef.current, progress: progressRef.current, language: lang, style, signal: hint && hint.signal !== 'focused' ? hint.signal : null, reasons: hint?.reasons })
+      const out = await turn({
+        messages: prior,
+        text,
+        begin,
+        plan: planRef.current,
+        progress: progressRef.current,
+        language: lang,
+        style,
+        signal: hint && hint.signal !== 'focused' ? hint.signal : null,
+        reasons: hint?.reasons,
+      })
       if (mine !== generation.current) return
       progressRef.current = out.progress
       setProgress(out.progress)
@@ -383,7 +393,17 @@ export default function Tutor() {
             <div className="flex items-baseline gap-2">
               <h2 className="font-heading text-lg font-bold">{plan.title}</h2>
               <span className="text-sm text-[#a9b8b3]">about {plan.parts.reduce((m, p) => m + p.minutes, 0)} min</span>
-              <button type="button" onClick={() => { stop(); planRef.current = null; progressRef.current = FRESH; setPlan(null); setProgress(FRESH) }} className="ml-auto text-sm text-[#a9b8b3] underline-offset-4 hover:underline">
+              <button
+                type="button"
+                onClick={() => {
+                  stop()
+                  planRef.current = null
+                  progressRef.current = FRESH
+                  setPlan(null)
+                  setProgress(FRESH)
+                }}
+                className="ml-auto text-sm text-[#a9b8b3] underline-offset-4 hover:underline"
+              >
                 End lesson
               </button>
             </div>
@@ -392,7 +412,11 @@ export default function Tutor() {
                 const done = progress.mode === 'done' || i < progress.part
                 const now = !done && i === progress.part
                 return (
-                  <li key={p.title} className={`flex items-center gap-2 text-base ${now ? 'font-semibold text-[#f4b23e]' : done ? 'text-[#3fb8a0]' : 'text-[#a9b8b3]'}`} aria-current={now ? 'step' : undefined}>
+                  <li
+                    key={p.title}
+                    className={`flex items-center gap-2 text-base ${now ? 'font-semibold text-[#f4b23e]' : done ? 'text-[#3fb8a0]' : 'text-[#a9b8b3]'}`}
+                    aria-current={now ? 'step' : undefined}
+                  >
                     <span className="grid size-5 place-items-center rounded-full border border-current text-xs">{done ? <CheckIcon className="size-3" aria-hidden /> : i + 1}</span>
                     {p.title}
                     {now && inLesson && part && (
@@ -406,14 +430,13 @@ export default function Tutor() {
           </section>
         )}
 
-        {progress.mode === 'game' && progress.game?.kind === 'memory' && (
-          <MemoryGame onDone={(tries) => void submit(`I finished the memory game in ${tries} tries.`)} />
-        )}
+        {progress.mode === 'game' && progress.game?.kind === 'memory' && <MemoryGame onDone={(tries) => void submit(`I finished the memory game in ${tries} tries.`)} />}
 
         <div className="flex-1 space-y-3 overflow-y-auto py-2" aria-live="polite">
           {shown.length === 0 && (
             <p className="py-10 text-center text-lg text-[#a9b8b3]">
-              Just talk, like to a person. To learn something, turn on <b>Study</b> and say the topic, or attach a chapter, a PDF or a photo of a page. I will split it into parts, teach each one, ask you questions, and teach it again until you get it.
+              Just talk, like to a person. To learn something, turn on <b>Study</b> and say the topic, or attach a chapter, a PDF or a photo of a page. I will split it into parts,
+              teach each one, ask you questions, and teach it again until you get it.
             </p>
           )}
           {shown.map((t, i) => (
@@ -432,7 +455,11 @@ export default function Tutor() {
 
         {!online && (
           <p role="status" className="rounded-xl bg-[#3a2f12] px-3 py-2 text-[#f4d58a]">
-            You are offline, so the AI teacher cannot answer. Open the <a href="/teacher" className="font-semibold underline underline-offset-4">offline classroom</a>: it works without internet.
+            You are offline, so the AI teacher cannot answer. Open the{' '}
+            <a href="/teacher" className="font-semibold underline underline-offset-4">
+              offline classroom
+            </a>
+            : it works without internet.
           </p>
         )}
         {error && (
@@ -470,14 +497,28 @@ export default function Tutor() {
           </p>
         )}
         <p className="text-center text-sm text-[#a9b8b3]" aria-live="polite">
-          {study && !plan ? 'Study mode: say or type what you want to learn' : canListen ? STATUS[phase] : 'This browser cannot listen. Type your question, or open this page in Chrome.'}
+          {study && !plan
+            ? 'Study mode: say or type what you want to learn'
+            : canListen
+              ? STATUS[phase]
+              : 'This browser cannot listen. Type your question, or open this page in Chrome.'}
         </p>
         <form onSubmit={typed} className="flex items-center gap-1 rounded-full border border-white/20 bg-white/5 p-2 pl-2">
           <input ref={file} type="file" accept="application/pdf,image/*,.txt,text/plain" onChange={pick} className="sr-only" aria-label="Attach a file" tabIndex={-1} />
-          <button type="button" aria-label="Attach a PDF, photo or text file" onClick={() => file.current?.click()} className="grid size-10 place-items-center rounded-full outline-none hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-ring">
+          <button
+            type="button"
+            aria-label="Attach a PDF, photo or text file"
+            onClick={() => file.current?.click()}
+            className="grid size-10 place-items-center rounded-full outline-none hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-ring"
+          >
             <PaperclipIcon className="size-5" aria-hidden />
           </button>
-          <button type="button" aria-pressed={study} onClick={() => setStudy(!study)} className="inline-flex h-10 items-center gap-1.5 rounded-full px-3 text-sm font-semibold outline-none hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-ring aria-pressed:bg-[#f2efe6] aria-pressed:text-[#0b1413]">
+          <button
+            type="button"
+            aria-pressed={study}
+            onClick={() => setStudy(!study)}
+            className="inline-flex h-10 items-center gap-1.5 rounded-full px-3 text-sm font-semibold outline-none hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-ring aria-pressed:bg-[#f2efe6] aria-pressed:text-[#0b1413]"
+          >
             <BookOpenIcon className="size-4" aria-hidden /> Study
           </button>
           <input
@@ -488,7 +529,11 @@ export default function Tutor() {
             className="h-11 min-w-0 flex-1 bg-transparent px-2 text-lg outline-none placeholder:text-[#a9b8b3]"
           />
           {draft.trim() || attached ? (
-            <button type="submit" aria-label={attached ? 'Teach me from this file' : 'Send'} className="grid size-12 place-items-center rounded-full bg-[#f2efe6] text-[#0b1413] outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <button
+              type="submit"
+              aria-label={attached ? 'Teach me from this file' : 'Send'}
+              className="grid size-12 place-items-center rounded-full bg-[#f2efe6] text-[#0b1413] outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
               <ArrowUpIcon className="size-6" aria-hidden />
             </button>
           ) : (
@@ -499,7 +544,15 @@ export default function Tutor() {
               data-phase={phase}
               className="tutor-voice relative grid size-12 place-items-center rounded-full bg-[#3fb8a0] text-[#0b1413] outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              {phase === 'idle' ? <AudioLinesIcon className="size-6" aria-hidden /> : phase === 'thinking' ? <span className="tutor-dots" aria-hidden /> : phase === 'listening' ? <SquareIcon className="size-5 fill-current" aria-hidden /> : <AudioLinesIcon className="tutor-bars size-6" aria-hidden />}
+              {phase === 'idle' ? (
+                <AudioLinesIcon className="size-6" aria-hidden />
+              ) : phase === 'thinking' ? (
+                <span className="tutor-dots" aria-hidden />
+              ) : phase === 'listening' ? (
+                <SquareIcon className="size-5 fill-current" aria-hidden />
+              ) : (
+                <AudioLinesIcon className="tutor-bars size-6" aria-hidden />
+              )}
             </button>
           )}
         </form>

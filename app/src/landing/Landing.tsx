@@ -31,7 +31,9 @@ const STEPS = [
 function Stat({ value, children }: { value: string; children: ReactNode }) {
   return (
     <div className="space-y-2">
-      <p data-count={value} className="font-heading text-5xl leading-none font-extrabold text-[#8a5a00] tabular-nums">{value}</p>
+      <p data-count={value} className="font-heading text-5xl leading-none font-extrabold text-[#8a5a00] tabular-nums">
+        {value}
+      </p>
       <p className="text-muted-foreground">{children}</p>
     </div>
   )
@@ -67,24 +69,24 @@ export default function Landing() {
         <div aria-hidden data-bar className="pointer-events-none absolute inset-x-0 top-0 z-30 h-[16%] bg-black" />
         <div aria-hidden data-bar className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-[16%] bg-black" />
 
-      <header className="relative z-20 mx-auto flex max-w-7xl items-center gap-4 px-5 py-5 md:px-8">
-        <a href="/" className="flex items-center gap-3 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring">
-          <span className="grid size-10 place-items-center rounded-xl bg-primary text-primary-foreground">
-            <LogoMark className="size-6" />
-          </span>
-          <span className="font-heading text-xl font-bold">Sahpaathi</span>
-        </a>
-        <div className="flex-1" />
-        <a href="#modes" className="text-[#a9b8b3] hover:text-[#f2efe6] max-sm:hidden">
-          Two modes
-        </a>
-        <a href="#how" className="text-[#a9b8b3] hover:text-[#f2efe6] max-sm:hidden">
-          How it works
-        </a>
-        <a href="#try" className="inline-flex h-11 items-center rounded-xl bg-[#f2efe6] px-4 font-semibold text-[#0b1413] hover:bg-white">
-          Try it
-        </a>
-      </header>
+        <header className="relative z-20 mx-auto flex max-w-7xl items-center gap-4 px-5 py-5 md:px-8">
+          <a href="/" className="flex items-center gap-3 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            <span className="grid size-10 place-items-center rounded-xl bg-primary text-primary-foreground">
+              <LogoMark className="size-6" />
+            </span>
+            <span className="font-heading text-xl font-bold">Sahpaathi</span>
+          </a>
+          <div className="flex-1" />
+          <a href="#modes" className="text-[#a9b8b3] hover:text-[#f2efe6] max-sm:hidden">
+            Two modes
+          </a>
+          <a href="#how" className="text-[#a9b8b3] hover:text-[#f2efe6] max-sm:hidden">
+            How it works
+          </a>
+          <a href="#try" className="inline-flex h-11 items-center rounded-xl bg-[#f2efe6] px-4 font-semibold text-[#0b1413] hover:bg-white">
+            Try it
+          </a>
+        </header>
 
         <section className="relative z-20 mx-auto grid max-w-7xl items-center gap-12 px-5 pt-10 pb-28 md:px-8 lg:min-h-[calc(100dvh-5rem)] lg:grid-cols-[1.05fr_1fr] lg:pt-12">
           <div data-hero-copy className="space-y-7">
@@ -164,7 +166,10 @@ export default function Landing() {
                       </li>
                     ))}
                   </ul>
-                  <a href={m.path} className="inline-flex h-14 items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-lg font-bold text-primary-foreground outline-none hover:bg-primary/85 focus-visible:ring-2 focus-visible:ring-ring">
+                  <a
+                    href={m.path}
+                    className="inline-flex h-14 items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-lg font-bold text-primary-foreground outline-none hover:bg-primary/85 focus-visible:ring-2 focus-visible:ring-ring"
+                  >
                     {m.cta} <ArrowRightIcon className="size-5" aria-hidden />
                   </a>
                 </article>
@@ -182,15 +187,9 @@ export default function Landing() {
               <Words text="One teacher. Three grades. Two languages. One room." cls="w" />
             </h2>
             <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
-              <Stat value="1,04,125">
-                single-teacher schools in India (UDISE+ 2024–25)
-              </Stat>
-              <Stat value="24,680">
-                villages with no mobile coverage (Department of Telecommunications)
-              </Stat>
-              <Stat value="0 KB">
-                of data Sahpaathi needs during a lesson
-              </Stat>
+              <Stat value="1,04,125">single-teacher schools in India (UDISE+ 2024–25)</Stat>
+              <Stat value="24,680">villages with no mobile coverage (Department of Telecommunications)</Stat>
+              <Stat value="0 KB">of data Sahpaathi needs during a lesson</Stat>
             </div>
           </div>
         </section>
@@ -218,7 +217,9 @@ export default function Landing() {
           <div className="landing-reveal mx-auto grid max-w-7xl items-center gap-12 px-5 md:px-8 lg:grid-cols-2">
             <div className="space-y-4">
               <h2 className="font-heading text-4xl leading-tight font-extrabold md:text-5xl">Measured on slow 3G and a slow phone.</h2>
-              <p className="text-muted-foreground">Lessons, branches, the analogy button and attendance all work in airplane mode. Taps and attendance send themselves when a signal returns.</p>
+              <p className="text-muted-foreground">
+                Lessons, branches, the analogy button and attendance all work in airplane mode. Taps and attendance send themselves when a signal returns.
+              </p>
             </div>
             <div className="grid gap-8 sm:grid-cols-3">
               <Stat value="0.5 s">to open, every day after the first</Stat>
@@ -242,7 +243,11 @@ export default function Landing() {
                 ['/admin', LayoutDashboardIcon, 'Admin', 'Lesson pipeline, how classrooms are doing, and the catch-up call simulator.'],
               ] as const
             ).map(([href, Icon, title, text]) => (
-              <a key={href} href={href} className="landing-reveal group space-y-3 rounded-3xl border border-border bg-card p-6 outline-none hover:border-primary focus-visible:ring-2 focus-visible:ring-ring">
+              <a
+                key={href}
+                href={href}
+                className="landing-reveal group space-y-3 rounded-3xl border border-border bg-card p-6 outline-none hover:border-primary focus-visible:ring-2 focus-visible:ring-ring"
+              >
                 <Icon className="size-7 text-primary" aria-hidden />
                 <h3 className="flex items-center gap-2 text-xl font-bold">
                   {title} <ArrowRightIcon className="size-5 transition-transform group-hover:translate-x-1" aria-hidden />

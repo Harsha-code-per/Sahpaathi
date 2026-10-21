@@ -82,9 +82,7 @@ const en = {
   tapRolls: 'Tap their roll numbers, then save.',
   cantSaveAttendance: 'Could not save attendance. Please try again.',
   savedAttendance: (n: number) =>
-    n
-      ? `Saved: ${n} absent. It sends at the next signal, and each absent child gets a catch-up call tonight.`
-      : 'Saved: everyone present. It sends at the next signal.',
+    n ? `Saved: ${n} absent. It sends at the next signal, and each absent child gets a catch-up call tonight.` : 'Saved: everyone present. It sends at the next signal.',
   saveAbsent: (n: number) => `Save · ${n} absent`,
   saveAttendance: 'Save attendance',
   everyoneHere: 'Everyone was here',
@@ -234,9 +232,7 @@ const hi: Strings = {
   tapRolls: 'उनके रोल नंबर दबाएँ, फिर सेव करें।',
   cantSaveAttendance: 'हाज़िरी सेव नहीं हुई। फिर कोशिश करें।',
   savedAttendance: (n) =>
-    n
-      ? `सेव हो गया: ${n} अनुपस्थित। अगले सिग्नल पर भेजा जाएगा, और हर अनुपस्थित बच्चे को आज शाम पाठ दोहराने वाली कॉल आएगी।`
-      : 'सेव हो गया: सब उपस्थित। अगले सिग्नल पर भेजा जाएगा।',
+    n ? `सेव हो गया: ${n} अनुपस्थित। अगले सिग्नल पर भेजा जाएगा, और हर अनुपस्थित बच्चे को आज शाम पाठ दोहराने वाली कॉल आएगी।` : 'सेव हो गया: सब उपस्थित। अगले सिग्नल पर भेजा जाएगा।',
   saveAbsent: (n) => `सेव करें · ${n} अनुपस्थित`,
   saveAttendance: 'हाज़िरी सेव करें',
   everyoneHere: 'सब आए थे',

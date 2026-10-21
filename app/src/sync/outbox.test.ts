@@ -9,8 +9,7 @@ beforeEach(async () => {
   globalThis.indexedDB = new IDBFactory()
 })
 
-const tapAt = (iso: string, segment_id = 's1') =>
-  recordTap({ episode_id: 'ep1', segment_id, tap: 'most', auto: false }, new Date(iso))
+const tapAt = (iso: string, segment_id = 's1') => recordTap({ episode_id: 'ep1', segment_id, tap: 'most', auto: false }, new Date(iso))
 
 /** Outbox events are a union now, so segment-based assertions narrow to taps. */
 const tapSegments = (es: OutboxEvent[]) => es.filter((e): e is TapEvent => e.kind === 'tap').map((e) => e.segment_id)

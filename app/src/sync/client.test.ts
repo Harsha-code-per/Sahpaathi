@@ -19,8 +19,7 @@ async function queue(n: number) {
 }
 
 const ok = () => vi.fn<typeof fetch>(async () => new Response(null, { status: 200 }))
-const sentEvents = (f: ReturnType<typeof ok>, call = 0) =>
-  (JSON.parse(f.mock.calls[call][1]!.body as string) as { events: OutboxEvent[] }).events
+const sentEvents = (f: ReturnType<typeof ok>, call = 0) => (JSON.parse(f.mock.calls[call][1]!.body as string) as { events: OutboxEvent[] }).events
 
 /** Outbox events are a union now, so segment-based assertions narrow to taps. */
 const tapSegments = (es: OutboxEvent[]) => es.filter((e): e is TapEvent => e.kind === 'tap').map((e) => e.segment_id)

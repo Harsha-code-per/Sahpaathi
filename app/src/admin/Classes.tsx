@@ -53,10 +53,20 @@ export default function Classes({ view, onView, onSignedOut }: { view: DataView;
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <Tile lead label="Classrooms reporting" value={String(t.classrooms)} note={`${t.lessons_played} lesson plays across ${t.episodes} lesson${t.episodes === 1 ? '' : 's'}`} />
+            <Tile
+              lead
+              label="Classrooms reporting"
+              value={String(t.classrooms)}
+              note={`${t.lessons_played} lesson plays across ${t.episodes} lesson${t.episodes === 1 ? '' : 's'}`}
+            />
             <Tile tint="mint" label="“Most got it”" value={t.taps ? pct((100 * understood) / t.taps) : '–'} note={`of ${t.taps} teacher taps`} />
             <Tile tint="sun" label="Need a visit" value={String(needing)} note={`${watching} more to watch`} />
-            <Tile tint="sky" label="Teacher rating" value={data.feedback.avg_rating ? data.feedback.avg_rating.toFixed(1) : '–'} note={data.feedback.count ? `from ${data.feedback.count} ratings of 5` : 'no ratings yet'} />
+            <Tile
+              tint="sky"
+              label="Teacher rating"
+              value={data.feedback.avg_rating ? data.feedback.avg_rating.toFixed(1) : '–'}
+              note={data.feedback.count ? `from ${data.feedback.count} ratings of 5` : 'no ratings yet'}
+            />
           </div>
 
           <Panel title="Which classes need support" note="Sorted so the ones to visit come first">
@@ -79,7 +89,11 @@ export default function Classes({ view, onView, onSignedOut }: { view: DataView;
                       </p>
                     </div>
                     <div className="space-y-1.5">
-                      <div className="flex h-3.5 overflow-hidden rounded-full bg-muted" role="img" aria-label={`Most ${pct(c.pct_most)}, some ${pct(c.pct_some)}, few ${pct(c.pct_few)} of ${c.taps} taps`}>
+                      <div
+                        className="flex h-3.5 overflow-hidden rounded-full bg-muted"
+                        role="img"
+                        aria-label={`Most ${pct(c.pct_most)}, some ${pct(c.pct_some)}, few ${pct(c.pct_few)} of ${c.taps} taps`}
+                      >
                         <span style={{ width: `${bar.most}%`, background: C.most }} />
                         <span style={{ width: `${bar.some}%`, background: C.some }} />
                         <span style={{ width: `${bar.few}%`, background: C.few }} />
@@ -146,7 +160,9 @@ export default function Classes({ view, onView, onSignedOut }: { view: DataView;
                   </LineChart>
                 </ResponsiveContainer>
               </div>
-              <p className="text-sm text-muted-foreground">Weeks with no taps have no point. A line that moves is not proof that lessons work: classes and lessons change from week to week.</p>
+              <p className="text-sm text-muted-foreground">
+                Weeks with no taps have no point. A line that moves is not proof that lessons work: classes and lessons change from week to week.
+              </p>
             </Panel>
           </div>
 
@@ -163,7 +179,10 @@ export default function Classes({ view, onView, onSignedOut }: { view: DataView;
                           {r} <StarIcon className="size-3" aria-hidden />
                         </span>
                         <span className="h-2.5 flex-1 overflow-hidden rounded-full bg-muted">
-                          <span className="block h-full rounded-full" style={{ width: `${(100 * (data.feedback.ratings[String(r)] ?? 0)) / data.feedback.count}%`, background: r >= 4 ? C.most : r === 3 ? C.some : C.few }} />
+                          <span
+                            className="block h-full rounded-full"
+                            style={{ width: `${(100 * (data.feedback.ratings[String(r)] ?? 0)) / data.feedback.count}%`, background: r >= 4 ? C.most : r === 3 ? C.some : C.few }}
+                          />
                         </span>
                         <b className="w-8 text-right">{data.feedback.ratings[String(r)] ?? 0}</b>
                       </li>
@@ -184,10 +203,12 @@ export default function Classes({ view, onView, onSignedOut }: { view: DataView;
               <h2 className="font-heading text-lg font-bold">How to read this board</h2>
               <ul className="space-y-2.5 text-sm text-muted-foreground">
                 <li className="flex gap-2.5">
-                  <UsersIcon className="mt-0.5 size-4 shrink-0" aria-hidden /> A class is only a code like <code className="whitespace-nowrap">G2-A</code>. There are no names and no phone numbers anywhere on this screen.
+                  <UsersIcon className="mt-0.5 size-4 shrink-0" aria-hidden /> A class is only a code like <code className="whitespace-nowrap">G2-A</code>. There are no names and
+                  no phone numbers anywhere on this screen.
                 </li>
                 <li className="flex gap-2.5">
-                  <AlertTriangleIcon className="mt-0.5 size-4 shrink-0" aria-hidden /> “Needs support” means about a third or more of the checkpoints were “Few got it”. It is a reason to visit, not a verdict on a teacher.
+                  <AlertTriangleIcon className="mt-0.5 size-4 shrink-0" aria-hidden /> “Needs support” means about a third or more of the checkpoints were “Few got it”. It is a
+                  reason to visit, not a verdict on a teacher.
                 </li>
                 <li className="flex gap-2.5">
                   <CalendarCheckIcon className="mt-0.5 size-4 shrink-0" aria-hidden /> Percentages need at least 8 deliberate taps. Fewer shows “not enough taps yet”.

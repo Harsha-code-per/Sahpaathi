@@ -104,8 +104,7 @@ export const adminApi = {
   /** Rings a real phone through Exotel. The number is used once by the server and not stored. */
   dial: (id: number, phone: string) => call<CallSummary>(`/ivr/calls/${id}/dial`, { method: 'POST', body: JSON.stringify({ phone }) }),
   /** `digit` is "0" to "9", "*" or "#"; null means nothing was pressed in time. */
-  press: (id: number, digit: string | null) =>
-    call<CallStep>(`/ivr/calls/${id}/press`, { method: 'POST', body: JSON.stringify({ digit }) }),
+  press: (id: number, digit: string | null) => call<CallStep>(`/ivr/calls/${id}/press`, { method: 'POST', body: JSON.stringify({ digit }) }),
 }
 
 /** Fetches call audio with the login token and returns a URL an <audio> element can play. */
