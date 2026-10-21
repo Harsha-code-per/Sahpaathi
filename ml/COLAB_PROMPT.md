@@ -64,7 +64,10 @@ CELLS TO WRITE
    Platt (sigmoid) calibration if it helps. Then choose the probability threshold at which the teacher should
    ask "is everything okay?". The cost of a wrong alert is small (one extra gentle question) but too many alerts
    annoy the learner, so choose the threshold that gives at least 70% precision, and report the recall at that
-   threshold and how many alerts per 100 windows that means. Show the precision-recall curve.
+   threshold and how many alerts per 100 windows that means. Show the precision-recall curve. The threshold must
+   lie between 0.40 and 0.90 (a server enforces this); if 70% precision cannot be reached inside that range, or
+   the held-out AUC is above 0.98 (suspiciously perfect: the data may be invented or leaking), say so in a large
+   warning and DO NOT write weights.json.
 6. Fairness and robustness checks (only with the numbers available): AUC per session (min, median, max), and
    a table of how the score changes if `face_missing` > 0.5 (face often out of view). Print a plain sentence on
    what the results do and do not show. Never claim the model works for any group of people.
@@ -82,9 +85,11 @@ CELLS TO WRITE
    Round weights to 5 decimals. Use only the features that vary. Then verify the export: reload weights.json,
    recompute the probability for 5 random rows with plain numpy (sigmoid(bias + sum(coef * x))), and assert it
    matches the sklearn pipeline's predict_proba within 1e-6. Print "EXPORT VERIFIED" only if the assert passes.
-8. Read the model: print the top 8 weights by absolute size with a one-line plain-English meaning each (for
+8. Read the model (this is the sanity check): print the top 8 weights by absolute size with a one-line plain-English meaning each (for
    example "brow_down: a lowered brow raises the chance of confused"), and flag any weight whose sign looks
-   backwards (for example a LARGER eye_squint lowering the chance) as a reason to collect more data.
+   backwards (for example closed eyes, slouching or looking away LOWERING the chance of confused, or a larger
+   eye_squint lowering it) as a reason NOT to ship the file, and print a clear "DO NOT USE" line if more than two
+   weights look backwards.
 9. Download and clean up: `files.download('weights.json')`, then delete every uploaded CSV and any other file
    we created except weights.json, and print what was deleted.
 10. OPTIONAL, run only if I add HF_TOKEN in Secrets and say "run the audio part": evaluate (do NOT train)
