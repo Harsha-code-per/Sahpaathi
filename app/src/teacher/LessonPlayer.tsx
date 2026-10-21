@@ -7,6 +7,7 @@ import Attendance from '../attendance/Attendance'
 import LessonPrep from './LessonPrep'
 import { CHECKPOINT_TIMEOUT_SEC, advance, analogy, currentLine, start, tap, type Phase } from './player'
 import { recordTap } from '../sync/outbox'
+import LessonFeedback from './LessonFeedback'
 import { useChoralHint } from '../sensing/useChoralHint'
 import { SyncBadge } from './Library'
 import { useT } from './i18n'
@@ -287,6 +288,7 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
               <h2 className="font-heading text-2xl font-bold">{t.finished}</h2>
             </div>
             <Attendance episodeId={episode.id} onSaved={onTapRecorded} />
+            <LessonFeedback episodeId={episode.id} onSaved={onTapRecorded} />
             <Button variant="ghost" size="lg" onClick={() => setPhase(start(episode))}>
               <RotateCcwIcon aria-hidden /> {t.playAgain}
             </Button>
