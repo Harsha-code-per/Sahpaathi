@@ -21,6 +21,8 @@ Make up a long random string for the webhook key (Render generates `EXOTEL_WEBHO
 ## 3. Settings on Render
 `EXOTEL_SID`, `EXOTEL_API_KEY`, `EXOTEL_API_TOKEN`, `EXOTEL_SUBDOMAIN`, `EXOTEL_CALLER_ID`, `EXOTEL_FLOW_ID`, `EXOTEL_WEBHOOK_KEY`, and `PUBLIC_API_URL` (the backend URL above). `render.yaml` lists them for new services; on the existing service add them under Environment.
 
+**`EXOTEL_ALLOWED_NUMBERS`** (comma-separated, e.g. `+919800000001,+919800000002`): the only numbers a real call may ring. The demo admin login is public for evaluators, so without this list nobody can be called; `EXOTEL_DAILY_CALLS` (default 20) caps calls per day. Numbers match on their last 10 digits, so `09800000001` and `+919800000001` are the same.
+
 ## 4. Try it
 Admin → Catch-up calls → a queued call → **Ring a phone**, with a team phone. The call needs a lesson pack built after call audio existed (Admin → Lesson packs → Build). The list shows the result when the call ends: answered with the key pressed, or no answer.
 

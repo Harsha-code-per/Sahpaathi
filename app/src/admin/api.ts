@@ -80,6 +80,8 @@ export interface CallSummary {
   outcome: CallOutcome | null
   plays: number
   created_at: string
+  /** A call to an invented SAMPLE classroom (backend app/sample_data.py). */
+  sample?: boolean
 }
 
 /** One thing to do on the call: play these in order, then wait for a key if `gather`. */

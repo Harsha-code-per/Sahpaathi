@@ -12,7 +12,7 @@ services:
         sync: false
       - key: JWT_SECRET
         generateValue: true
-      - key: CORS_ORIGINS # JSON list, e.g. ["https://sahpaathi.vercel.app"]
+      - key: CORS_ORIGINS # https://sahpaathi.vercel.app (comma-separated, or a JSON list)
         sync: false
       - key: ANTHROPIC_API_KEY
         sync: false
@@ -38,5 +38,7 @@ services:
         sync: false
       - key: EXOTEL_SUBDOMAIN
         value: api.exotel.com
+      - key: EXOTEL_ALLOWED_NUMBERS # the only numbers real calls may ring (team phones), comma-separated
+        sync: false
       - key: EXOTEL_WEBHOOK_KEY
         generateValue: true

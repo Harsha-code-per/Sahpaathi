@@ -31,6 +31,7 @@ from app.config import settings
 from app.ivr import flow
 from app.ivr.routes import DB, Admin, CallOut, _get, _out, begin
 from app.models import CatchupCall, PackRecord
+from app.usage import spend
 
 router = APIRouter(prefix="/api/v1/ivr", tags=["ivr"])
 Part = Literal["start", "menu"]  # start = recap then menu; menu = the 1-2-3 question alone
@@ -108,6 +109,20 @@ def dial(call_id: int, body: DialIn, _: Admin, db: DB) -> CallOut:
             status.HTTP_503_SERVICE_UNAVAILABLE,
             "Real calls are not set up yet: add the EXOTEL_* settings and PUBLIC_API_URL.",
         )
+    # The demo admin login is public, so real calls go only to listed numbers, a few a day.
+    if body.phone.lstrip("+")[-10:] not in {
+        n.lstrip("+")[-10:] for n in settings.exotel_allowed_numbers
+    }:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            "This number is not on the call list (EXOTEL_ALLOWED_NUMBERS), so it was not called.",
+        )
+    spend(
+        db,
+        "call",
+        [("all", settings.exotel_daily_calls)],
+        f"Today's limit of {settings.exotel_daily_calls} real calls is reached. Try tomorrow.",
+    )
     call, _ = begin(db, call_id)
     try:
         place_call(body.phone, call.id)

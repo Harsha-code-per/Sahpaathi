@@ -189,6 +189,7 @@ export default function Calls({ onSignedOut }: { onSignedOut: () => void }) {
                 <div className="flex items-center gap-2">
                   <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${badge(CALL_STATUS, c.status).tone}`}>{badge(CALL_STATUS, c.status).label}</span>
                   {c.outcome && <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${badge(OUTCOME, c.outcome).tone}`}>{badge(OUTCOME, c.outcome).label}</span>}
+                  {c.sample && <span className="rounded-full border border-dashed border-border px-2 py-0.5 text-xs font-semibold">Sample</span>}
                   {c.status === 'queued' && (
                     <>
                       <button className={quiet} onClick={() => setActive(c)}>

@@ -21,6 +21,7 @@ from app.auth import require
 from app.config import settings
 from app.factory.schema import Episode
 from app.models import EpisodeRecord, PackRecord, User
+from app.usage import spend
 from app.voice.build import CACHE_DIR, MultiVoice, build_episode_pack
 from app.voice.sarvam import SarvamTTS
 from app.voice.settings import VoiceSettings
@@ -127,6 +128,12 @@ def build_pack(episode_id: int, user: Admin, db: DB, tasks: BackgroundTasks) -> 
     )
     if building is not None:
         raise HTTPException(status.HTTP_409_CONFLICT, "A pack is already being built for this.")
+    spend(
+        db,
+        "pack",
+        [("all", settings.pack_daily_builds)],
+        f"Today's limit of {settings.pack_daily_builds} pack builds is reached. Try tomorrow.",
+    )
     pack = PackRecord(episode_id=episode_id, created_by_id=user.id)
     db.add(pack)
     db.commit()
