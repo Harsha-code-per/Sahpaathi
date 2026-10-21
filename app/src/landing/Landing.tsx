@@ -7,13 +7,13 @@ import Scene from './Scene'
 
 const REPO = 'https://github.com/Harsha-code-per/Sahpaathi'
 
-/** Number words drifting around the speaker, one per language Sahpaathi speaks. */
+/** Number words circling the speaker in 3D, one per language Sahpaathi speaks. */
 const WORDS = [
-  { lang: 'ta', text: 'ஒன்று, இரண்டு', pos: 'top-[8%] left-0', delay: '0s' },
-  { lang: 'hi', text: 'तीन, चार', pos: 'right-0 bottom-[18%]', delay: '-1.5s' },
-  { lang: 'or', text: 'ପାଞ୍ଚ', pos: 'bottom-[4%] left-[14%]', delay: '-3s' },
-  { lang: 'sat', text: 'ᱥᱟᱱᱛᱟᱲᱤ', pos: 'top-[24%] right-[2%]', delay: '-4.5s' },
-  { lang: 'en', text: 'six, seven', pos: 'top-[52%] -left-[4%]', delay: '-2.2s' },
+  { lang: 'ta', text: 'ஒன்று, இரண்டு' },
+  { lang: 'hi', text: 'तीन, चार' },
+  { lang: 'or', text: 'ପାଞ୍ଚ' },
+  { lang: 'sat', text: 'ᱥᱟᱱᱛᱟᱲᱤ' },
+  { lang: 'en', text: 'six, seven' },
 ]
 
 const STEPS = [
@@ -23,10 +23,11 @@ const STEPS = [
   ['Nobody left behind', 'Absent children get the recap that evening, as a call to a parent’s basic phone. Keys 1, 2 and 3 answer back.'],
 ]
 
+/** The number counts up when scrolled into view (motion.ts reads data-count). The markup always holds the final value. */
 function Stat({ value, children }: { value: string; children: ReactNode }) {
   return (
     <div className="space-y-2">
-      <p className="font-heading text-5xl leading-none font-extrabold text-[#8a5a00]">{value}</p>
+      <p data-count={value} className="font-heading text-5xl leading-none font-extrabold text-[#8a5a00] tabular-nums">{value}</p>
       <p className="text-muted-foreground">{children}</p>
     </div>
   )
@@ -54,7 +55,15 @@ export default function Landing() {
   useEffect(() => setupMotion(root.current!), [])
   return (
     <div ref={root} className="min-h-dvh overflow-x-clip bg-background text-foreground">
-      <header className="mx-auto flex max-w-7xl items-center gap-4 px-5 py-5 md:px-8">
+      <div data-hero className="cine relative isolate overflow-hidden bg-[#0b1413] text-[#f2efe6]">
+        <div aria-hidden className="cine-light absolute inset-0 -z-10" />
+        <div aria-hidden className="cine-beam absolute inset-x-0 top-0 -z-10 h-[70%]" />
+        <div aria-hidden className="cine-grain pointer-events-none absolute inset-0 z-10" />
+        <div aria-hidden className="cine-vignette pointer-events-none absolute inset-0 z-10" />
+        <div aria-hidden data-bar className="pointer-events-none absolute inset-x-0 top-0 z-30 h-[16%] bg-black" />
+        <div aria-hidden data-bar className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-[16%] bg-black" />
+
+      <header className="relative z-20 mx-auto flex max-w-7xl items-center gap-4 px-5 py-5 md:px-8">
         <a href="/" className="flex items-center gap-3 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring">
           <span className="grid size-10 place-items-center rounded-xl bg-primary text-primary-foreground">
             <LogoMark className="size-6" />
@@ -62,33 +71,32 @@ export default function Landing() {
           <span className="font-heading text-xl font-bold">Sahpaathi</span>
         </a>
         <div className="flex-1" />
-        <a href="#how" className="text-muted-foreground hover:text-foreground max-sm:hidden">
+        <a href="#how" className="text-[#a9b8b3] hover:text-[#f2efe6] max-sm:hidden">
           How it works
         </a>
-        <a href="#try" className="inline-flex h-11 items-center rounded-xl bg-foreground px-4 font-semibold text-background hover:bg-foreground/85">
+        <a href="#try" className="inline-flex h-11 items-center rounded-xl bg-[#f2efe6] px-4 font-semibold text-[#0b1413] hover:bg-white">
           Try it
         </a>
       </header>
 
-      <main>
-        <section data-hero className="mx-auto grid max-w-7xl items-center gap-12 px-5 pt-10 pb-24 md:px-8 lg:grid-cols-[1.15fr_1fr] lg:pt-16">
+        <section className="relative z-20 mx-auto grid max-w-7xl items-center gap-12 px-5 pt-10 pb-28 md:px-8 lg:min-h-[calc(100dvh-5rem)] lg:grid-cols-[1.05fr_1fr] lg:pt-12">
           <div data-hero-copy className="space-y-7">
             <h1 className="font-heading text-display font-extrabold tracking-tight">
               <Words text="A second teacher, in a ₹500 speaker." cls="" />
             </h1>
-            <p className="landing-rise max-w-xl text-xl leading-relaxed text-muted-foreground" style={{ animationDelay: '160ms' }}>
+            <p className="landing-rise max-w-xl text-xl leading-relaxed text-[#a9b8b3]" style={{ animationDelay: '160ms' }}>
               While she teaches Grade 3, Sahpaathi teaches Grade 1: a lively audio lesson in the children’s home language that adapts with every tap, with no internet in the room.
             </p>
             <div className="landing-rise flex flex-wrap gap-3" style={{ animationDelay: '240ms' }}>
               <a href="/teacher" className="inline-flex h-14 items-center gap-2 rounded-2xl bg-primary px-6 text-lg font-bold text-primary-foreground hover:bg-primary/85">
                 <PlayIcon className="size-5" aria-hidden /> Open the teacher app
               </a>
-              <a href="#how" className="inline-flex h-14 items-center gap-2 rounded-2xl border border-input px-6 text-lg font-semibold hover:bg-accent">
+              <a href="#how" className="inline-flex h-14 items-center gap-2 rounded-2xl border border-white/25 px-6 text-lg font-semibold hover:bg-white/10">
                 See how it works
               </a>
             </div>
             <div className="landing-rise space-y-2" style={{ animationDelay: '320ms' }}>
-              <p className="text-sm font-semibold text-muted-foreground">Tap what the class said and watch the rings change pace.</p>
+              <p className="text-sm font-semibold text-[#a9b8b3]">Tap what the class said and watch the sound rings change pace.</p>
               <div role="group" aria-label="How well the class understood" className="flex flex-wrap gap-2">
                 {LEVELS.map((l) => (
                   <button
@@ -96,7 +104,7 @@ export default function Landing() {
                     type="button"
                     aria-pressed={level.id === l.id}
                     onClick={() => setLevel(l)}
-                    className="inline-flex h-11 items-center rounded-full border border-input bg-card px-4 font-semibold outline-none focus-visible:ring-2 focus-visible:ring-ring aria-pressed:border-foreground aria-pressed:bg-foreground aria-pressed:text-background"
+                    className="inline-flex h-11 items-center rounded-full border border-white/25 bg-white/5 px-4 font-semibold outline-none hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-ring aria-pressed:border-[#f2efe6] aria-pressed:bg-[#f2efe6] aria-pressed:text-[#0b1413]"
                   >
                     {l.label}
                   </button>
@@ -105,31 +113,37 @@ export default function Landing() {
             </div>
           </div>
 
-          <div data-orb className="relative mx-auto grid aspect-square w-full max-w-md place-items-center" aria-hidden>
+          <div data-orb className="spk-stage relative mx-auto aspect-square w-full max-w-lg" aria-hidden>
+            <span className="spk-backlight absolute inset-[8%] rounded-full" />
             {[0, 1, 2].map((d) => (
               <span
                 key={d}
-                className="landing-ring absolute inset-0 rounded-full border-2"
+                className="spk-wave absolute rounded-full border-2"
                 style={{ animationDuration: `${level.secs}s`, animationDelay: `${(d * level.secs) / 3}s`, borderColor: level.color }}
               />
             ))}
-            <span className="absolute inset-[22%] rounded-full bg-[radial-gradient(circle_at_50%_50%,rgba(244,178,62,0.22),transparent_70%)]" />
-            <span className="relative grid size-40 place-items-center rounded-full border-2 border-primary bg-[radial-gradient(circle_at_35%_30%,#3a524d,#0f1918)] shadow-[0_24px_60px_rgba(23,37,36,0.28)]">
-              <span className="size-16 rounded-full border-2 border-input bg-[#0f1918]" />
-            </span>
-            {WORDS.map((w) => (
-              <span
-                key={w.lang}
-                lang={w.lang}
-                className={`landing-drift absolute ${w.pos} rounded-full border border-border bg-card px-4 py-2 text-lg font-semibold shadow-[0_6px_20px_rgba(23,37,36,0.1)]`}
-                style={{ animationDelay: w.delay } as CSSProperties}
-              >
-                {w.text}
+            <div data-speaker className="spk">
+              <span className="spk-body">
+                <span className="spk-grille" />
+                <span className="spk-led" />
               </span>
-            ))}
+              <span className="spk-cap" />
+              <span className="spk-base" />
+            </div>
+            <div className="spk-orbit">
+              {WORDS.map((w, i) => (
+                <span key={w.lang} className="spk-slot" style={{ '--a': `${(360 / WORDS.length) * i}deg` } as CSSProperties}>
+                  <span lang={w.lang} className="spk-word">
+                    {w.text}
+                  </span>
+                </span>
+              ))}
+            </div>
           </div>
         </section>
+      </div>
 
+      <main>
         <Scene />
 
         <section className="bg-[#f2efe6] py-24 text-[#172524]">

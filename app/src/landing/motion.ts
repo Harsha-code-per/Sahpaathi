@@ -14,7 +14,37 @@ export function setupMotion(root: HTMLElement): () => void {
   gsap.ticker.add(tick)
   gsap.ticker.lagSmoothing(0)
 
+  let offMove = () => {}
   const ctx = gsap.context(() => {
+    // Opening shot: the letterbox bars slide away, the speaker rises into the light.
+    gsap.to('[data-bar]', { scaleY: 0, duration: 1.4, ease: 'expo.inOut', delay: 0.15, transformOrigin: (i: number) => (i === 0 ? 'top' : 'bottom') })
+    gsap.from('[data-speaker]', { translate: '0px 80px', opacity: 0, duration: 1.6, ease: 'expo.out', delay: 0.3 })
+    gsap.from('.spk-word', { opacity: 0, duration: 1, stagger: 0.15, delay: 1.1 })
+    // The spotlight and the speaker follow the pointer (not on touch screens). CSS variables, so the speaker's own transform stays CSS-driven.
+    if (window.matchMedia('(pointer: fine)').matches) {
+      const hero = root.querySelector<HTMLElement>('[data-hero]')!
+      const speaker = root.querySelector<HTMLElement>('[data-speaker]')!
+      const move = (e: PointerEvent) => {
+        const r = hero.getBoundingClientRect()
+        const x = (e.clientX - r.left) / r.width
+        const y = (e.clientY - r.top) / r.height
+        gsap.to(speaker, { '--ry': `${(x - 0.5) * 36}deg`, '--rx': `${(0.5 - y) * 14}deg`, duration: 0.8, ease: 'power3', overwrite: 'auto' })
+        gsap.to(hero, { '--mx': `${x * 100}%`, '--my': `${y * 100}%`, duration: 0.6, ease: 'power3', overwrite: 'auto' })
+      }
+      hero.addEventListener('pointermove', move)
+      offMove = () => hero.removeEventListener('pointermove', move)
+    }
+    // Scores count up from zero as each number scrolls into view.
+    gsap.utils.toArray<HTMLElement>('[data-count]').forEach((el) => {
+      const m = /^([\d,.]+)(.*)$/.exec(el.dataset.count ?? '')
+      const to = m ? parseFloat(m[1].replace(/,/g, '')) : 0
+      if (!m || !to) return
+      const dec = m[1].includes('.') ? m[1].split('.')[1].length : 0
+      const fmt = new Intl.NumberFormat('en-IN', { minimumFractionDigits: dec, maximumFractionDigits: dec, useGrouping: m[1].includes(',') })
+      const n = { v: 0 }
+      el.textContent = fmt.format(0) + m[2]
+      gsap.to(n, { v: to, duration: 1.8, ease: 'power2.out', onUpdate: () => void (el.textContent = fmt.format(n.v) + m[2]), scrollTrigger: { trigger: el, start: 'top 88%', once: true } })
+    })
     // Headline assembles word by word.
     gsap.from('[data-hero-word]', { opacity: 0, y: 48, filter: 'blur(14px)', duration: 0.9, ease: 'expo.out', stagger: 0.06 })
     // ...and lifts away as the page scrolls.
@@ -30,16 +60,8 @@ export function setupMotion(root: HTMLElement): () => void {
       { opacity: 0.15 },
       { opacity: 1, stagger: 0.1, ease: 'none', scrollTrigger: { trigger: '[data-statement]', start: 'top 80%', end: 'bottom 55%', scrub: 0.6 } },
     )
-    // Hero: the speaker orb tips back in 3D and swells as you leave the hero.
-    gsap.to('[data-orb]', {
-      transformPerspective: 900,
-      rotateX: 38,
-      rotateZ: 10,
-      scale: 1.25,
-      y: -30,
-      ease: 'none',
-      scrollTrigger: { trigger: '[data-hero]', start: 'top top', end: 'bottom top', scrub: 0.6 },
-    })
+    // Hero: the speaker swells toward you and fades into the dark as you leave the hero.
+    gsap.to('[data-orb]', { scale: 1.2, y: -50, opacity: 0.25, ease: 'none', scrollTrigger: { trigger: '[data-hero]', start: 'top top', end: 'bottom top', scrub: 0.6 } })
     // Scene: the phone tilts up out of the page, then turns a little; the level chips float in around it.
     gsap.set('[data-phone]', { transformPerspective: 1400 })
     const scene = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: '[data-scene]', start: 'top top', end: 'bottom bottom', scrub: 0.6 } })
@@ -48,6 +70,11 @@ export function setupMotion(root: HTMLElement): () => void {
       .fromTo('[data-scene-copy]', { opacity: 0, x: -50 }, { opacity: 1, x: 0, duration: 0.6 }, 0.1)
       .fromTo('[data-float]', { opacity: 0, y: 70 }, { opacity: 1, y: 0, duration: 0.6, stagger: 0.2 }, 0.5)
       .to('[data-phone]', { rotateY: -16, rotateX: 8, duration: 1 })
+    // The class score fills as you scroll through the scene: the ring and the number move together (87 % of 276.5 = 36 left uncovered).
+    const score = { v: 0 }
+    const dialNum = root.querySelector<HTMLElement>('[data-dialnum]')!
+    gsap.set('[data-dial]', { strokeDashoffset: 276.5 })
+    scene.to('[data-dial]', { strokeDashoffset: 36, duration: 1.2 }, 0.3).to(score, { v: 87, duration: 1.2, onUpdate: () => void (dialNum.textContent = String(Math.round(score.v))) }, 0.3)
     // How it works: on desktop the steps pin and slide sideways, each turning flat as it arrives.
     gsap.matchMedia().add('(min-width: 1024px)', () => {
       const track = root.querySelector<HTMLElement>('[data-track]')!
@@ -64,6 +91,7 @@ export function setupMotion(root: HTMLElement): () => void {
   }, root)
 
   return () => {
+    offMove()
     ctx.revert()
     gsap.ticker.remove(tick)
     lenis.destroy()
