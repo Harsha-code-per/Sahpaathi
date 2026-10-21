@@ -1,82 +1,33 @@
 import { RefreshCwIcon } from 'lucide-react'
-import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Bar, BarChart, Cell, CartesianGrid, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { CountUp } from '@/components/CountUp'
 import { Button } from '@/components/ui/button'
 import type { Summary } from '../studio/api'
-import { adminApi, ApiError, type Dashboard as Data, type PackSummary } from './api'
+import { adminApi, ApiError, type DataView, type Dashboard as Data, type PackSummary } from './api'
+import { SampleBanner } from './SampleBanner'
 import Pipeline from './Pipeline'
+import { C, tooltip } from './theme'
+import { Empty, Panel, Tile } from './ui'
 import { pct } from './view'
-
-// Chart colours are the theme tokens (index.css); SVG attributes need the values themselves.
-const C = { most: '#3fb8a0', some: '#f4b23e', few: '#e8704a', ink: '#10241f', muted: '#4b5d58', lagoon: '#0e6f61', grid: '#dce4d8' }
-const tooltip = { contentStyle: { borderRadius: 12, border: `1px solid ${C.grid}`, fontFamily: 'inherit' } }
-const card = 'rounded-2xl border border-border bg-card p-5 shadow-[0_1px_2px_rgba(23,37,36,0.04),0_14px_34px_-14px_rgba(23,37,36,0.14)]'
-
-const TINT = {
-  mint: ['bg-[var(--tint-mint)]!', 'text-[var(--lagoon)]'],
-  sun: ['bg-[var(--tint-sun)]!', 'text-[#8a5a00]'],
-  sky: ['bg-[var(--tint-sky)]!', 'text-[var(--indigo)]'],
-} as const
-
-function Tile(props: { label: string; value: string; note: ReactNode; lead?: boolean; tint?: keyof typeof TINT; children?: ReactNode }) {
-  const { lead } = props
-  const [fill, ink] = props.tint ? TINT[props.tint] : ['', '']
-  return (
-    <div className={`${card} flex flex-col gap-1 ${lead ? 'border-transparent bg-sidebar text-sidebar-foreground' : `${fill} border-black/5`}`}>
-      <p className={`text-sm font-semibold ${lead ? 'text-sidebar-muted' : 'text-muted-foreground'}`}>{props.label}</p>
-      <div className="flex items-end justify-between gap-3">
-        <p className={`font-heading text-5xl leading-none font-bold ${lead ? 'text-sidebar-primary' : ink}`}>
-          <CountUp value={props.value} />
-        </p>
-        {props.children}
-      </div>
-      <p className={`text-[0.8125rem] ${lead ? 'text-sidebar-muted' : 'text-muted-foreground'}`}>{props.note}</p>
-    </div>
-  )
-}
-
-function Panel({ title, note, children, className = '' }: { title: string; note?: string; children: ReactNode; className?: string }) {
-  return (
-    <section className={`${card} flex min-w-0 flex-col gap-3 ${className}`} aria-label={title}>
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="font-heading text-lg font-bold">{title}</h2>
-        {note && <p className="text-sm text-muted-foreground">{note}</p>}
-      </div>
-      {children}
-    </section>
-  )
-}
-
-const Empty = ({ children }: { children: ReactNode }) => (
-  <div className="grid min-h-40 place-items-center content-center gap-4 text-center text-muted-foreground">
-    <span aria-hidden className="relative grid size-14 place-items-center">
-      <span className="desk-ping absolute inset-0 rounded-full border-2 border-[#f4b23e]" />
-      <span className="desk-ping absolute inset-0 rounded-full border-2 border-[#f4b23e] [animation-delay:-1.4s]" />
-      <span className="size-4 rounded-full bg-[#f4b23e]" />
-    </span>
-    <p className="max-w-xs">{children}</p>
-  </div>
-)
 
 const short = (t: string) => (t.length > 26 ? `${t.slice(0, 25)}…` : t)
 const shortDate = (d: string) => new Date(d).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
 
-export default function Dashboard({ onSignedOut }: { onSignedOut: () => void }) {
+export default function Dashboard({ view, onView, onSignedOut }: { view: DataView; onView: (v: DataView) => void; onSignedOut: () => void }) {
   const [data, setData] = useState<Data | null>(null)
   const [episodes, setEpisodes] = useState<Summary[]>([])
   const [packs, setPacks] = useState<PackSummary[]>([])
   const [error, setError] = useState('')
 
   const load = useCallback(() => {
-    Promise.all([adminApi.dashboard(), adminApi.episodes(), adminApi.packs()]).then(
+    Promise.all([adminApi.dashboard(view), adminApi.episodes(), adminApi.packs()]).then(
       ([d, e, p]) => (setData(d), setEpisodes(e), setPacks(p), setError('')),
       (err) => {
         if (err instanceof ApiError && (err.status === 401 || err.status === 403)) return onSignedOut()
         setError(err instanceof ApiError ? err.message : 'Could not load the dashboard.')
       },
     )
-  }, [onSignedOut])
+  }, [view, onSignedOut])
 
   useEffect(load, [load])
 
@@ -107,6 +58,7 @@ export default function Dashboard({ onSignedOut }: { onSignedOut: () => void }) 
 
   return (
     <>
+      <SampleBanner view={view} onView={onView} sampleTaps={data.sample_taps} onChanged={load} />
       <div className="flex justify-end">
         <Button variant="outline" onClick={load}>
           <RefreshCwIcon aria-hidden /> Refresh

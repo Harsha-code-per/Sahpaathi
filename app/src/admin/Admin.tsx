@@ -1,16 +1,18 @@
-import { LayoutDashboardIcon, LogOutIcon, PackageIcon, PhoneCallIcon } from 'lucide-react'
+import { LayoutDashboardIcon, LogOutIcon, PackageIcon, PhoneCallIcon, SchoolIcon } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from 'cn'
 import { AppShell, type SidebarApi } from '@/components/AppShell'
 import { LoginCard } from '@/components/LoginCard'
 import { Button } from '@/components/ui/button'
-import { adminApi, ApiError, session } from './api'
+import { adminApi, ApiError, session, type DataView } from './api'
 import Calls from './Calls'
+import Classes from './Classes'
 import Dashboard from './Dashboard'
 import Packs from './Packs'
 
 const TABS = [
   { id: 'dashboard', label: 'Overview', icon: LayoutDashboardIcon },
+  { id: 'classes', label: 'Classes', icon: SchoolIcon },
   { id: 'packs', label: 'Lesson packs', icon: PackageIcon },
   { id: 'calls', label: 'Catch-up calls', icon: PhoneCallIcon },
 ] as const
@@ -19,6 +21,7 @@ type Tab = (typeof TABS)[number]['id']
 export default function Admin() {
   const [signedIn, setSignedIn] = useState(() => session.get() !== null)
   const [tab, setTab] = useState<Tab>('dashboard')
+  const [view, setView] = useState<DataView>('all') // real data, sample data, or both
 
   const logout = () => {
     session.clear()
@@ -75,7 +78,8 @@ export default function Admin() {
   return (
     <AppShell product="Admin" sidebar={sidebar} topbar={topbar}>
       <div className="space-y-5">
-        {tab === 'dashboard' && <Dashboard onSignedOut={logout} />}
+        {tab === 'dashboard' && <Dashboard view={view} onView={setView} onSignedOut={logout} />}
+        {tab === 'classes' && <Classes view={view} onView={setView} onSignedOut={logout} />}
         {tab === 'packs' && <Packs onSignedOut={logout} />}
         {tab === 'calls' && <Calls onSignedOut={logout} />}
       </div>
