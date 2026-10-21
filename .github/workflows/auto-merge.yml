@@ -1,0 +1,29 @@
+name: auto-merge
+
+# Every PR into main merges by itself once the required checks (backend, app) pass.
+# Opt out: open it as a draft, or add the "hold" label. Stacked PRs wait until GitHub
+# retargets them to main (it does when the PR below them merges).
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, edited, labeled, unlabeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    if: github.event.pull_request.base.ref == 'main'
+    runs-on: ubuntu-latest
+    env:
+      # A personal token, so the merge's push to main still triggers deploy-app;
+      # merges made with GITHUB_TOKEN never trigger other workflows.
+      GH_TOKEN: ${{ secrets.AUTOMERGE_TOKEN || secrets.GITHUB_TOKEN }}
+      PR: ${{ github.event.pull_request.html_url }}
+    steps:
+      - name: Hold
+        if: github.event.pull_request.draft || contains(github.event.pull_request.labels.*.name, 'hold')
+        run: gh pr merge --disable-auto "$PR" || true
+      - name: Merge when green
+        if: ${{ !github.event.pull_request.draft && !contains(github.event.pull_request.labels.*.name, 'hold') }}
+        run: gh pr merge --auto --rebase "$PR"
