@@ -4,6 +4,8 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app import tutor
+from app.db import Base
+from app.db import engine as db_engine
 from app.main import app
 from app.tutor import engine
 from app.tutor.models import (
@@ -201,9 +203,10 @@ class FakeBrain(ScriptedBrain):
 def brain():
     fake = FakeBrain(say("ready"))
     app.dependency_overrides[tutor.get_brain] = lambda: fake
-    tutor._used.clear()
+    Base.metadata.create_all(db_engine)  # the daily caps are counted in the database
     yield fake
     app.dependency_overrides.clear()
+    Base.metadata.drop_all(db_engine)
 
 
 def post(path, body):
@@ -261,3 +264,26 @@ def test_speak_returns_a_wav(brain):
     res = post("speak", {"text": "Hello", "language": "hi"})
     assert res.status_code == 200 and res.headers["content-type"] == "audio/wav"
     assert res.content[:4] == b"RIFF"
+
+
+def test_one_caller_cannot_use_up_everyones_day(brain, monkeypatch):
+    monkeypatch.setattr(tutor.settings, "tutor_ip_daily_turns", 1)
+    me, you = {"X-Forwarded-For": "203.0.113.5"}, {"X-Forwarded-For": "198.51.100.7"}
+    client = TestClient(app)
+    turn = {"text": "hi"}
+    assert client.post("/api/v1/tutor/turn", json=turn, headers=me).status_code == 200
+    assert client.post("/api/v1/tutor/turn", json=turn, headers=me).status_code == 429
+    assert client.post("/api/v1/tutor/turn", json=turn, headers=you).status_code == 200
+
+
+def test_plans_from_files_have_their_own_small_cap(brain, monkeypatch):
+    monkeypatch.setattr(tutor.settings, "tutor_ip_daily_file_plans", 1)
+    doc = {"name": "ch1.pdf", "media_type": "application/pdf", "data": "JVBERi0="}
+    assert post("plan", {"document": doc}).status_code == 200
+    assert post("plan", {"document": doc}).status_code == 429
+    assert post("plan", {"topic": "fractions"}).status_code == 200  # a typed topic still works
+
+
+def test_an_oversized_body_is_refused_before_it_is_read(brain):
+    huge = "x" * 1_100_000
+    assert post("turn", {"text": huge}).status_code == 413

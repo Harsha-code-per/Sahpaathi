@@ -15,4 +15,5 @@ COPY content/ /srv/content/
 RUN useradd --create-home app
 USER app
 EXPOSE 8000
-CMD ["sh", "-c", "alembic upgrade head && python -m app.seed; exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# && throughout: a failed migration must stop the deploy, not start the server on the old schema.
+CMD ["sh", "-c", "alembic upgrade head && python -m app.seed && exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

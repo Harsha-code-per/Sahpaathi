@@ -62,9 +62,9 @@ def export(db: Session, record_id: int, out_dir: Path = LIBRARY) -> Path:
 
 
 def load(db: Session, library: Path = LIBRARY) -> int:
-    """Adds library episodes the database lacks, as approved. Returns how many were added."""
-    approved = db.scalars(select(EpisodeRecord).where(EpisodeRecord.status == "approved"))
-    have = {r.episode["id"] for r in approved}
+    """Adds library episodes the database has never had, as approved. Returns how many."""
+    # Any status counts: a library lesson a reviewer rejected must not come back approved on boot.
+    have = {ep["id"] for ep in db.scalars(select(EpisodeRecord.episode)) if ep}
     added = 0
     for path in sorted(library.glob("*.json")):
         data = json.loads(path.read_text(encoding="utf-8"))

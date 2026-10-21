@@ -1,9 +1,10 @@
-from datetime import datetime
+from datetime import date, datetime
 
 from sqlalchemy import (
     JSON,
     Boolean,
     CheckConstraint,
+    Date,
     DateTime,
     ForeignKey,
     Integer,
@@ -182,3 +183,15 @@ class CatchupCall(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
+
+
+class Usage(Base):
+    """What the open and paid endpoints used today (UTC), per kind and caller. Daily caps live here,
+    not in memory, so a restart or a deploy (several a day with auto-merge) does not reset them."""
+
+    __tablename__ = "usage"
+
+    day: Mapped[date] = mapped_column(Date, primary_key=True)
+    kind: Mapped[str] = mapped_column(String(20), primary_key=True)
+    key: Mapped[str] = mapped_column(String(80), primary_key=True)  # "all", or a caller's IP
+    count: Mapped[int] = mapped_column(Integer, default=0)

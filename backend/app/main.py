@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from starlette.middleware.gzip import GZipMiddleware
 from starlette.types import ASGIApp, Receive, Scope, Send
 
@@ -42,8 +43,30 @@ class JsonGZip:
         await (self.app if skip else self.gzip)(scope, receive, send)
 
 
+class BodyLimit:
+    """Refuses an oversized body before it is read: the open endpoints (/sync, /tutor) would
+    otherwise hold any upload in memory on a 512 MB instance. A plan may carry a PDF or photo.
+    ponytail: trusts Content-Length; a chunked upload without one is not counted."""
+
+    PLAN_PATH, PLAN_MAX, DEFAULT_MAX = "/api/v1/tutor/plan", 8_000_000, 1_000_000
+
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] == "http":
+            length = dict(scope["headers"]).get(b"content-length", b"0")
+            limit = self.PLAN_MAX if scope["path"] == self.PLAN_PATH else self.DEFAULT_MAX
+            if not length.isdigit() or int(length) > limit:
+                too_big = JSONResponse({"detail": "That is too large to send."}, status_code=413)
+                await too_big(scope, receive, send)
+                return
+        await self.app(scope, receive, send)
+
+
 app = FastAPI(title="Sahpaathi API", version="0.1.0", lifespan=lifespan)
 app.add_middleware(JsonGZip)
+app.add_middleware(BodyLimit)  # added before CORS, so a 413 still carries the CORS headers
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
