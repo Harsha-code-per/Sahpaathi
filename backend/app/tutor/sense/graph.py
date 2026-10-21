@@ -105,12 +105,16 @@ def orchestrate(state: SenseState) -> dict:
             miss *= 1 - w * r.scores.get(sig, 0.0)
         scores[sig] = round(1 - miss, 3)
     weights = load_weights()
+    at = dict.fromkeys(SIGNALS, CHECK_IN_AT)  # how high each score must be to suggest a check-in
     if weights:  # a model trained on real labelled sessions replaces the hand-set rules it covers
         for sig, model in weights.get("models", {}).items():
             if sig in scores:
                 scores[sig] = round(_learned(model, features), 3)
-    top: State = max(SIGNALS, key=lambda s: scores[s])
-    notable = scores[top] >= CHECK_IN_AT
+                # the threshold was chosen on held-out data for a target precision; keep it sane
+                at[sig] = min(0.9, max(0.4, float(weights.get("threshold", CHECK_IN_AT))))
+    firing = [s for s in SIGNALS if scores[s] >= at[s]]
+    top: State = max(firing or SIGNALS, key=lambda s: scores[s])
+    notable = bool(firing)
     state_name: State = top if notable else "focused"
     reasons = (
         [n for r in reports if r.scores.get(top, 0) > 0.3 for n in r.notes][:4] if notable else []

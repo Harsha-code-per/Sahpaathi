@@ -30,9 +30,13 @@ const COOLDOWN_MS = 90_000 // never check in more than once in a minute and a ha
 const MAX_CHECK_INS = 5 // per session
 const STREAK = 2 // the same signal in this many reports in a row, so a moment never triggers anything
 
+/** What this device keeps, in memory only, and deletes: labelled numbers the learner chose to save. */
+export const RETENTION_MS = 30 * 60 * 1000
+
 interface Row {
   features: Record<string, number>
   label: 'got_it' | 'confused'
+  at: number
 }
 
 /**
@@ -49,21 +53,42 @@ export function useSense(opts: { getContext: () => SenseContext; onCheckIn: (i: 
   const [saved, setSaved] = useState(0)
   const live = useRef<{ stop: () => void } | null>(null)
   const rows = useRef<Row[]>([])
+  // A random id for this sitting, so a trained model can be tested on people it has not seen. It
+  // identifies nobody and is not stored anywhere.
+  const session = useRef(crypto.randomUUID())
   const latest = useRef<Insight | null>(null)
   const optsRef = useRef(opts)
   useEffect(() => {
     optsRef.current = opts
   })
 
+  /** Deletes everything this device kept: the saved moments and the latest reading. */
+  const deleteNow = useCallback(() => {
+    rows.current = []
+    latest.current = null
+    setSaved(0)
+  }, [])
+
   const stop = useCallback(() => {
+    deleteNow() // stopping deletes it all, as the consent card promised
     live.current?.stop()
     live.current = null
     setStream(null)
     setStatus('off')
     setInsight(null)
-    latest.current = null
-  }, [])
+  }, [deleteNow])
   useEffect(() => stop, [stop])
+  // Nothing is kept longer than RETENTION_MS, even if the learner forgets to press Stop.
+  useEffect(() => {
+    const sweep = setInterval(() => {
+      const keep = rows.current.filter((r) => Date.now() - r.at < RETENTION_MS)
+      if (keep.length !== rows.current.length) {
+        rows.current = keep
+        setSaved(keep.length)
+      }
+    }, 30_000)
+    return () => clearInterval(sweep)
+  }, [])
 
   const start = useCallback(async () => {
     setStatus('starting')
@@ -190,14 +215,14 @@ export function useSense(opts: { getContext: () => SenseContext; onCheckIn: (i: 
   /** The learner says how they really feel; this window plus its label is kept (in memory only) to train a better model later. */
   const label = useCallback((l: Row['label']) => {
     if (!latest.current) return
-    rows.current.push({ features: latest.current.features, label: l })
+    rows.current.push({ features: latest.current.features, label: l, at: Date.now() })
     setSaved(rows.current.length)
   }, [])
 
   const exportCsv = useCallback(() => {
     if (!rows.current.length) return
     const cols = Object.keys(rows.current[0].features)
-    const csv = [[...cols, 'label'].join(','), ...rows.current.map((r) => [...cols.map((c) => r.features[c]), r.label].join(','))].join('\n')
+    const csv = [['session', ...cols, 'label'].join(','), ...rows.current.map((r) => [session.current, ...cols.map((c) => r.features[c]), r.label].join(','))].join('\n')
     const a = document.createElement('a')
     a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }))
     a.download = 'my-sense-session.csv'
@@ -205,5 +230,5 @@ export function useSense(opts: { getContext: () => SenseContext; onCheckIn: (i: 
     URL.revokeObjectURL(a.href)
   }, [])
 
-  return { status, error, insight, stream, saved, start, stop, label, exportCsv }
+  return { status, error, insight, stream, saved, start, stop, label, exportCsv, deleteNow }
 }

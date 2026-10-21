@@ -34,6 +34,7 @@ def make(n: int, seed: int = 0) -> pd.DataFrame:
     cols["silence_s"] = rng.random(n) * 10
     frame = pd.DataFrame(cols)[FEATURES].round(4)
     frame["label"] = np.where(confused, "confused", "got_it")
+    frame.insert(0, "session", [f"synthetic-{i % 12}" for i in range(n)])  # 12 invented sittings
     return frame
 
 

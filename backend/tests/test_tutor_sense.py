@@ -91,6 +91,18 @@ def test_trained_weights_replace_the_hand_set_rules(tmp_path, monkeypatch):
     assert low.scores["confused"] < 0.5 < high.scores["confused"]  # logistic: sigmoid(-4 + 20 * x)
 
 
+def test_the_trained_threshold_decides_when_to_ask(tmp_path, monkeypatch):
+    model = {
+        "confused": {"bias": -2, "coef": {"brow_down": 10}}
+    }  # sigmoid(-2 + 10 * x): x=0.3 gives 0.73
+    for threshold, asks in ((0.6, True), (0.85, False)):
+        path = tmp_path / f"w{threshold}.json"
+        path.write_text(json.dumps({"threshold": threshold, "models": model}))
+        monkeypatch.setattr(graph, "load_weights", lambda p=path: graph.json.loads(p.read_text()))
+        out = sense.analyse(window(face=Face(brow_down=0.3)))
+        assert out.check_in is asks, threshold
+
+
 def test_a_missing_weights_file_means_the_rules_are_used(tmp_path):
     assert graph.load_weights(tmp_path / "nope.json") is None
 
@@ -110,6 +122,34 @@ def test_the_http_endpoint_returns_an_insight_and_stores_nothing():
         and res.json()["state"] == "confused"
         and res.json()["check_in"] is True
     )
+
+
+def test_the_server_logs_nothing_about_what_it_receives(caplog):
+    import logging
+
+    caplog.set_level(logging.DEBUG)
+    body = window(
+        face=Face(brow_down=0.31337), audio=Audio(level=0.4242, noise=0.2718)
+    ).model_dump()
+    assert TestClient(app).post("/api/v1/tutor/sense", json=body).status_code == 200
+    log = caplog.text
+    assert (
+        "31337" not in log and "4242" not in log and "2718" not in log
+    )  # the numbers are never logged
+
+
+def test_the_sense_endpoint_never_touches_the_database():
+    from app import db
+
+    def boom():
+        raise AssertionError("the sense endpoint asked for a database session")
+
+    app.dependency_overrides[db.get_db] = boom  # any route that depends on a session would now fail
+    try:
+        body = window(face=Face(brow_down=0.3)).model_dump()
+        assert TestClient(app).post("/api/v1/tutor/sense", json=body).status_code == 200
+    finally:
+        app.dependency_overrides.pop(db.get_db, None)
 
 
 # --- how a signal reaches the lesson ------------------------------------------------------------
