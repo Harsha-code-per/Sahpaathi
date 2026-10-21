@@ -1,6 +1,7 @@
-import { ArrowRightIcon, BookOpenCheckIcon, LayoutDashboardIcon, PlayIcon } from 'lucide-react'
+import { ArrowRightIcon, BookOpenCheckIcon, LayoutDashboardIcon, MessagesSquareIcon, PlayIcon, SpeakerIcon, WifiIcon, WifiOffIcon } from 'lucide-react'
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { LogoMark } from '@/components/Logo'
+import { MODES, type ModeId } from '@/lib/modes'
 import './landing.css'
 import { setupMotion } from './motion'
 import Scene from './Scene'
@@ -70,6 +71,9 @@ export default function Landing() {
           <span className="font-heading text-xl font-bold">Sahpaathi</span>
         </a>
         <div className="flex-1" />
+        <a href="#modes" className="text-[#a9b8b3] hover:text-[#f2efe6] max-sm:hidden">
+          Two modes
+        </a>
         <a href="#how" className="text-[#a9b8b3] hover:text-[#f2efe6] max-sm:hidden">
           How it works
         </a>
@@ -90,8 +94,8 @@ export default function Landing() {
               <a href="/teacher" className="inline-flex h-14 items-center gap-2 rounded-2xl bg-primary px-6 text-lg font-bold text-primary-foreground hover:bg-primary/85">
                 <PlayIcon className="size-5" aria-hidden /> Open the teacher app
               </a>
-              <a href="#how" className="inline-flex h-14 items-center gap-2 rounded-2xl border border-white/25 px-6 text-lg font-semibold hover:bg-white/10">
-                See how it works
+              <a href="/tutor" className="inline-flex h-14 items-center gap-2 rounded-2xl border border-white/25 px-6 text-lg font-semibold hover:bg-white/10">
+                <MessagesSquareIcon className="size-5" aria-hidden /> Talk to the AI teacher
               </a>
             </div>
             <div className="landing-rise space-y-2" style={{ animationDelay: '320ms' }}>
@@ -143,6 +147,48 @@ export default function Landing() {
       </div>
 
       <main>
+        <section id="modes" className="mx-auto max-w-7xl scroll-mt-8 space-y-10 px-5 py-24 md:px-8">
+          <div className="landing-reveal max-w-3xl space-y-4">
+            <h2 className="font-heading text-4xl leading-tight font-extrabold md:text-5xl">Two modes. One curriculum.</h2>
+            <p className="text-lg text-muted-foreground">
+              The classroom has no signal, so the classroom mode never needs one. A child with a phone and a connection gets a teacher of their own. Each works on its own.
+            </p>
+          </div>
+          <div className="grid gap-6 lg:grid-cols-2">
+            {(Object.keys(MODES) as ModeId[]).map((id) => {
+              const m = MODES[id]
+              const Icon = id === 'offline' ? SpeakerIcon : MessagesSquareIcon
+              const Net = id === 'offline' ? WifiOffIcon : WifiIcon
+              return (
+                <article key={id} className="landing-reveal flex flex-col gap-5 rounded-3xl border border-border bg-card p-7 shadow-[0_10px_30px_rgba(23,37,36,0.06)]">
+                  <div className="flex items-center gap-3">
+                    <span className="grid size-12 place-items-center rounded-2xl bg-primary text-primary-foreground">
+                      <Icon className="size-6" aria-hidden />
+                    </span>
+                    <h3 className="font-heading text-2xl font-bold">{m.label}</h3>
+                    <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-sm font-semibold">
+                      <Net className="size-4" aria-hidden /> {m.internet ? 'Needs internet' : 'No internet needed'}
+                    </span>
+                  </div>
+                  <p className="text-lg text-muted-foreground">{m.tagline}</p>
+                  <ul className="flex-1 space-y-2.5">
+                    {m.features.map((f) => (
+                      <li key={f} className="flex gap-2.5 leading-relaxed">
+                        <span aria-hidden className="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <a href={m.path} className="inline-flex h-14 items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-lg font-bold text-primary-foreground outline-none hover:bg-primary/85 focus-visible:ring-2 focus-visible:ring-ring">
+                    {m.cta} <ArrowRightIcon className="size-5" aria-hidden />
+                  </a>
+                </article>
+              )
+            })}
+          </div>
+          <p className="landing-reveal text-muted-foreground">Next: a hybrid, where the AI teacher helps a child at home with what the class just learned, using the same taps.</p>
+        </section>
+
         <Scene />
 
         <section className="bg-[#f2efe6] py-24 text-[#172524]">
@@ -200,11 +246,12 @@ export default function Landing() {
             <h2 className="font-heading text-4xl font-extrabold md:text-6xl">Try it in your browser.</h2>
             <p className="text-lg text-muted-foreground">Demo accounts for the teacher, reviewer and admin are in the README.</p>
           </div>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {(
               [
                 ['/teacher', PlayIcon, 'Teacher app', 'Play a lesson, tap the checkpoints, take attendance. Works offline.'],
                 ['/studio', BookOpenCheckIcon, 'Studio', 'Read a Claude-written lesson line by line with its review, then approve it.'],
+                ['/tutor', MessagesSquareIcon, 'AI teacher', 'Talk to a teacher of your own: study a topic, ask doubts, take a break with a puzzle. Needs internet.'],
                 ['/admin', LayoutDashboardIcon, 'Admin', 'Lesson pipeline, how classrooms are doing, and the catch-up call simulator.'],
               ] as const
             ).map(([href, Icon, title, text]) => (

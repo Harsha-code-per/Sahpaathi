@@ -5,6 +5,7 @@ import Teacher from './teacher/Teacher'
 const Studio = lazy(() => import('./studio/Studio'))
 const Admin = lazy(() => import('./admin/Admin'))
 const Landing = lazy(() => import('./landing/Landing'))
+const Tutor = lazy(() => import('./tutor/Tutor'))
 
 // ponytail: pathname switch; add a router when a section needs nested routes.
 const sections: Record<string, React.ComponentType> = {
@@ -12,6 +13,7 @@ const sections: Record<string, React.ComponentType> = {
   '/teacher': Teacher,
   '/studio': Studio,
   '/admin': Admin,
+  '/tutor': Tutor,
 }
 
 export default function App() {

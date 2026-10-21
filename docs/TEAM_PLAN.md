@@ -16,7 +16,7 @@ Evaluation (2–9 Nov) uses the repo and deployment as they are at the deadline.
 |---|---|---|
 | **M1 Harshavardhan K** (lead) | @Harsha-code-per | `backend/app/factory/` (Claude scriptwriter, 4-tier guardrails), **backend core** (DB models + migrations, auth/roles, Studio API, Docker/Render deploy, CI), `app/src/studio/`, `app/src/lib/types.ts`, `content/`, `docs/` |
 | **M2 Sanjjith B** | @Sanjjith27 | `app/` shell + PWA config, `app/src/teacher/` player, offline storage, pack import/share, attendance, sync client, `app/package.json` |
-| **M3 Loktrishal K** | @loktrishal-05 | `backend/app/voice/` (TTS, Santali splicer, loudnorm + opus, pack builder, Ed25519), `app/src/sensing/` (choral mic), `content/voices/` |
+| **M3 Loktrishal K** | @loktrishal-05 | `backend/app/voice/` (TTS, Santali splicer, loudnorm + opus, pack builder, Ed25519), `app/src/sensing/` (choral mic), `content/voices/`; and the online AI teacher: `backend/app/tutor/`, `app/src/tutor/`, `app/src/sense/`, `ml/` |
 | **M4 Cholan Kinnera** | @Cholan-kinnera | `POST /api/v1/sync` (`backend/app/sync.py`), IVR catch-up calls (`backend/app/ivr/`), CRP dashboard API + `app/src/admin/`, release tags. Builds on the backend core (auth, DB, deploy) that M1 set up on 18 Oct |
 
 Ask **M1** for new DB columns or migrations (only one person writes migrations, so there's never "multiple heads").
@@ -49,4 +49,4 @@ Work on a separate branch and deployment; the submitted one stays frozen. Refine
 | Celery + Redis | FastAPI BackgroundTasks + a status column | Generation queues back up |
 | Bluetooth/AUX manager | Android routes audio itself | Never |
 | Mesh pods, voice+stroke capsules, step-lock, confusion pulse | Roadmap slide | After finale |
-| Online Mode (camera/mic tutor, LangGraph) | Roadmap; optional finale prototype | Top 10 |
+| Online Mode (camera/mic tutor, LangGraph) | **Prototype built early by M3 (21 Oct) in open PRs #75 to #78; the team decides if it ships now or after the submission.** See [STATUS.md](STATUS.md#2-online-mode-built-early-as-a-prototype-decision-needed) | Top 10 for the finale version |

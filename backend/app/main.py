@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.gzip import GZipMiddleware
 from starlette.types import ASGIApp, Receive, Scope, Send
 
-from app import auth, dashboard, episodes, packs, sync
+from app import auth, dashboard, episodes, packs, sync, tutor
 from app.config import settings
 from app.db import SessionLocal
 from app.ivr import exotel
@@ -57,6 +57,7 @@ app.include_router(auth.router)
 app.include_router(episodes.router)
 app.include_router(packs.router)
 app.include_router(sync.router)
+app.include_router(tutor.router)
 app.include_router(dashboard.router)
 app.include_router(ivr.router)
 app.include_router(exotel.router)
