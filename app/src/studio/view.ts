@@ -13,6 +13,10 @@ export const STATUS: Record<Status, { label: string; tone: string }> = {
   rejected: { label: 'Rejected', tone: 'bg-bad text-bad-foreground' },
 }
 
+/** A status badge that never crashes: a status this build doesn't know yet (API deployed first) shows as plain text. */
+export const badge = (map: Record<string, { label: string; tone: string }>, key: string) =>
+  map[key] ?? { label: key.replace(/_/g, ' '), tone: 'bg-secondary text-secondary-foreground' }
+
 export const CRITERIA: { key: Criterion; label: string }[] = [
   { key: 'pedagogy', label: 'Teaching' },
   { key: 'age_fit', label: 'Age fit' },

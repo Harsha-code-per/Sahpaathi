@@ -1,10 +1,10 @@
 import { LayoutDashboardIcon, LogOutIcon, PackageIcon, PhoneCallIcon } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { cn } from 'cn'
 import { AppShell, type SidebarApi } from '@/components/AppShell'
 import { LoginCard } from '@/components/LoginCard'
 import { Button } from '@/components/ui/button'
-import { adminApi, ApiError, session } from './api'
+import { adminApi, ApiError, session, SIGNED_OUT } from './api'
 import Calls from './Calls'
 import Dashboard from './Dashboard'
 import Packs from './Packs'
@@ -17,7 +17,13 @@ const TABS = [
 type Tab = (typeof TABS)[number]['id']
 
 export default function Admin() {
-  const [signedIn, setSignedIn] = useState(() => session.get() !== null)
+  // The Studio shares this tab's token; a reviewer's token is not enough here, so ask for an admin sign-in.
+  const [signedIn, setSignedIn] = useState(() => session.role() === 'admin')
+  useEffect(() => {
+    const out = () => setSignedIn(false)
+    window.addEventListener(SIGNED_OUT, out)
+    return () => window.removeEventListener(SIGNED_OUT, out)
+  }, [])
   const [tab, setTab] = useState<Tab>('dashboard')
 
   const logout = () => {

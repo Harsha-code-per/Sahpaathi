@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
+import { Waking } from '@/components/Waking'
 import { adminApi, ApiError, downloadPack, type PackSummary, type Summary } from './api'
+import { badge } from '../studio/view'
 import { anyBuilding, formatSize, PACK_STATUS, packRows } from './view'
 
 const POLL_MS = 5000
@@ -74,7 +76,10 @@ export default function Packs({ onSignedOut }: { onSignedOut: () => void }) {
       </p>
       {error && <p role="alert" className="text-bad-foreground">{error}</p>}
       {!loaded ? (
-        <p className="text-muted-foreground">Loading…</p>
+        <div className="space-y-2">
+          <p className="text-muted-foreground">Loading…</p>
+          <Waking />
+        </div>
       ) : rows.length === 0 ? (
         <p className="text-muted-foreground">No approved episodes yet. Approve one in the Studio first.</p>
       ) : (
@@ -91,8 +96,8 @@ export default function Packs({ onSignedOut }: { onSignedOut: () => void }) {
               </div>
               <div className="flex items-center gap-2">
                 {latest && (
-                  <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${PACK_STATUS[latest.status].tone}`}>
-                    {PACK_STATUS[latest.status].label}
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${badge(PACK_STATUS, latest.status).tone}`}>
+                    {badge(PACK_STATUS, latest.status).label}
                   </span>
                 )}
                 {ready && (

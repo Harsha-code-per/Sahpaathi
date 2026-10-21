@@ -64,7 +64,13 @@ const MAX_FILE = 5 * 1024 * 1024
 
 /** The tutor is open to anyone (no login); the server caps what it can spend per day. */
 async function post(path: string, body: unknown): Promise<Response> {
-  const res = await fetch(`${BASE}/tutor/${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+  let res: Response
+  try {
+    // 90 s: a sleeping free-tier server takes up to a minute to wake, and a plan takes about 15 s more.
+    res = await fetch(`${BASE}/tutor/${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(90_000) })
+  } catch {
+    throw new Error('Cannot reach the teacher right now. Check the internet connection and try again.')
+  }
   if (res.ok) return res
   const detail = await res.json().then((j: { detail?: unknown }) => j.detail).catch(() => undefined)
   throw new Error(typeof detail === 'string' ? detail : 'The teacher could not answer. Try again.')

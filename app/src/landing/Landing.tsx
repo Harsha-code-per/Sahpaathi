@@ -1,13 +1,14 @@
 import { ArrowRightIcon, BookOpenCheckIcon, LayoutDashboardIcon, MessagesSquareIcon, PlayIcon, SpeakerIcon, WifiIcon, WifiOffIcon } from 'lucide-react'
-import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
+import { Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
 import { LogoMark } from '@/components/Logo'
+import { lazyPage } from '@/lib/utils'
 import { MODES, type ModeId } from '@/lib/modes'
 import './landing.css'
 import { setupMotion } from './motion'
 import Scene from './Scene'
 
 // three.js is about 130 KB gz, so the speaker loads after the page has painted, in its own chunk.
-const Speaker3D = lazy(() => import('./Speaker3D'))
+const Speaker3D = lazyPage(() => import('./Speaker3D'))
 
 const REPO = 'https://github.com/Harsha-code-per/Sahpaathi'
 

@@ -141,7 +141,10 @@ export default function Tutor() {
     },
     [],
   )
-  useEffect(() => end.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }), [turns, live, phase, plan])
+  // Braces matter: scrollIntoView returns a Promise in current Chrome, and React would call it as the cleanup.
+  useEffect(() => {
+    end.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+  }, [turns, live, phase, plan])
 
   function halt() {
     generation.current++

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { BASE } from '../studio/api'
 import { clamp, faceDelta, makeBaseline, NoiseTracker, poseDelta, type Baseline, type RawFace, type RawPose } from './features'
+import { uuid } from '@/lib/utils'
 import { loadVision, type Vision } from './vision'
 
 export type Signal = 'confused' | 'distracted' | 'noisy' | 'tired' | 'uncomfortable'
@@ -55,7 +56,7 @@ export function useSense(opts: { getContext: () => SenseContext; onCheckIn: (i: 
   const rows = useRef<Row[]>([])
   // A random id for this sitting, so a trained model can be tested on people it has not seen. It
   // identifies nobody and is not stored anywhere.
-  const session = useRef(crypto.randomUUID())
+  const [session] = useState(uuid) // once per mount, not on every render
   const latest = useRef<Insight | null>(null)
   const optsRef = useRef(opts)
   useEffect(() => {
@@ -222,7 +223,7 @@ export function useSense(opts: { getContext: () => SenseContext; onCheckIn: (i: 
   const exportCsv = useCallback(() => {
     if (!rows.current.length) return
     const cols = Object.keys(rows.current[0].features)
-    const csv = [['session', ...cols, 'label'].join(','), ...rows.current.map((r) => [session.current, ...cols.map((c) => r.features[c]), r.label].join(','))].join('\n')
+    const csv = [['session', ...cols, 'label'].join(','), ...rows.current.map((r) => [session, ...cols.map((c) => r.features[c]), r.label].join(','))].join('\n')
     const a = document.createElement('a')
     a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }))
     a.download = 'my-sense-session.csv'

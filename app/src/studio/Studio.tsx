@@ -1,13 +1,14 @@
 import { CheckCircle2Icon, ClipboardListIcon, LogOutIcon, PlusIcon, SearchIcon } from 'lucide-react'
 import { useCallback, useEffect, useState, type SubmitEvent } from 'react'
+import { Waking } from '@/components/Waking'
 import { cn } from 'cn'
 import { AppShell, type SidebarApi } from '@/components/AppShell'
 import { LoginCard } from '@/components/LoginCard'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { api, ApiError, session, type Catalog, type Status, type Summary } from './api'
+import { api, ApiError, session, SIGNED_OUT, type Catalog, type Status, type Summary } from './api'
 import EpisodeView from './EpisodeView'
-import { LANG_NAMES, STATUS } from './view'
+import { badge, LANG_NAMES, STATUS } from './view'
 import type { Lang } from '../lib/types'
 
 const POLL_MS = 5000
@@ -75,7 +76,15 @@ const FILTERS: { key: Filter; label: string; match: (s: Status) => boolean }[] =
   { key: 'all', label: 'All', match: () => true },
 ]
 
-function EpisodeList(props: { items: Summary[]; selected: number | null; onSelect: (id: number) => void; onDark?: boolean }) {
+function EpisodeList(props: { items: Summary[] | null; selected: number | null; onSelect: (id: number) => void; onDark?: boolean }) {
+  const muted = props.onDark ? 'text-sidebar-muted' : 'text-muted-foreground'
+  if (!props.items)
+    return (
+      <div className={cn('space-y-2 px-1 text-sm', muted)}>
+        <p>Loading lessons…</p>
+        <Waking className={muted} />
+      </div>
+    )
   if (!props.items.length) return <p className={cn('px-1 text-sm', props.onDark ? 'text-sidebar-muted' : 'text-muted-foreground')}>No lessons here.</p>
   return (
     <ul className="space-y-1">
@@ -94,7 +103,7 @@ function EpisodeList(props: { items: Summary[]; selected: number | null; onSelec
             >
               <span className="line-clamp-2 font-semibold">{e.title ?? `${e.lesson_id}, ${e.district_id}`}</span>
               <span className={cn('mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.8125rem]', props.onDark ? 'text-sidebar-muted' : 'text-muted-foreground')}>
-                <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS[e.status].tone}`}>{STATUS[e.status].label}</span>
+                <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${badge(STATUS, e.status).tone}`}>{badge(STATUS, e.status).label}</span>
                 {e.district_id} · {new Date(e.created_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
               </span>
             </button>
@@ -108,7 +117,7 @@ function EpisodeList(props: { items: Summary[]; selected: number | null; onSelec
 export default function Studio() {
   const [signedIn, setSignedIn] = useState(() => session.get() !== null)
   const [catalog, setCatalog] = useState<Catalog | null>(null)
-  const [items, setItems] = useState<Summary[]>([])
+  const [items, setItems] = useState<Summary[] | null>(null) // null until the first answer, so it never says "No lessons" while loading
   // The open episode lives in the URL (?episode=12), so a reload or a shared link lands on it.
   const [selected, setSelectedState] = useState<number | null>(() => Number(new URLSearchParams(location.search).get('episode')) || null)
   const setSelected = useCallback((id: number | null) => {
@@ -123,6 +132,11 @@ export default function Studio() {
   const logout = useCallback(() => {
     session.clear()
     setSignedIn(false)
+  }, [])
+  useEffect(() => {
+    const out = () => setSignedIn(false)
+    window.addEventListener(SIGNED_OUT, out)
+    return () => window.removeEventListener(SIGNED_OUT, out)
   }, [])
 
   const handle = useCallback(
@@ -143,12 +157,13 @@ export default function Studio() {
 
   // Open on the tab that has something in it: with nothing to review, show the approved lessons.
   const [picked, setPicked] = useState(false)
-  if (!picked && items.length) {
+  const list = items ?? []
+  if (!picked && list.length) {
     setPicked(true)
-    if (!items.some((e) => FILTERS[0].match(e.status))) setFilter('approved')
+    if (!list.some((e) => FILTERS[0].match(e.status))) setFilter('approved')
   }
 
-  const writing = items.some((e) => e.status === 'generating')
+  const writing = list.some((e) => e.status === 'generating')
   useEffect(() => {
     if (!writing) return
     const id = window.setInterval(refresh, POLL_MS)
@@ -173,12 +188,12 @@ export default function Studio() {
       />
     )
 
-  const current = items.find((e) => e.id === selected)
+  const current = list.find((e) => e.id === selected)
   const q = query.trim().toLowerCase()
-  const shown = items.filter(
+  const shown = items && items.filter(
     (e) => FILTERS.find((f) => f.key === filter)!.match(e.status) && (!q || [e.title, e.lesson_id, e.district_id].some((t) => t?.toLowerCase().includes(q))),
   )
-  const count = (f: Filter) => items.filter((e) => FILTERS.find((x) => x.key === f)!.match(e.status)).length
+  const count = (f: Filter) => list.filter((e) => FILTERS.find((x) => x.key === f)!.match(e.status)).length
 
   const sidebar = ({ collapsed, expand, close }: SidebarApi) =>
     collapsed ? (
@@ -265,7 +280,7 @@ export default function Studio() {
               <Button onClick={() => setWritingOpen(true)}>
                 <PlusIcon aria-hidden /> Write a new lesson
               </Button>
-              {shown[0] && (
+              {shown?.[0] && (
                 <Button variant="outline" onClick={() => setSelected(shown[0].id)}>
                   Open {shown[0].title ?? 'the first lesson'}
                 </Button>
@@ -296,7 +311,7 @@ export default function Studio() {
             <DialogDescription>Claude writes it, then a second model reviews it. This takes about five minutes.</DialogDescription>
           </DialogHeader>
           {catalog ? (
-            <NewEpisode catalog={catalog} onStarted={(s) => (setItems((l) => [s, ...l]), setSelected(s.id), setFilter('review'), setWritingOpen(false))} />
+            <NewEpisode catalog={catalog} onStarted={(s) => (setItems((l) => [s, ...(l ?? [])]), setSelected(s.id), setFilter('review'), setWritingOpen(false))} />
           ) : (
             <p className="text-muted-foreground">Loading lessons…</p>
           )}

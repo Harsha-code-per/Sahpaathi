@@ -1,5 +1,6 @@
 import { RefreshCwIcon } from 'lucide-react'
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import { Waking } from '@/components/Waking'
 import { Bar, BarChart, Cell, CartesianGrid, Line, LineChart, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { CountUp } from '@/components/CountUp'
 import { Button } from '@/components/ui/button'
@@ -82,11 +83,20 @@ export default function Dashboard({ onSignedOut }: { onSignedOut: () => void }) 
 
   if (error)
     return (
-      <p role="alert" className="rounded-2xl bg-bad p-5 text-bad-foreground">
-        {error}
-      </p>
+      <div role="alert" className="flex flex-wrap items-center gap-3 rounded-2xl bg-bad p-5 text-bad-foreground">
+        <p className="flex-1">{error}</p>
+        <Button variant="outline" onClick={() => (setError(''), load())}>
+          Try again
+        </Button>
+      </div>
     )
-  if (!data) return <p className="text-muted-foreground">Loading…</p>
+  if (!data)
+    return (
+      <div className="space-y-2">
+        <p className="text-muted-foreground">Loading…</p>
+        <Waking />
+      </div>
+    )
 
   const { overall, catchup_calls: calls } = data
   const animate = !matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -95,9 +105,9 @@ export default function Dashboard({ onSignedOut }: { onSignedOut: () => void }) 
     { name: 'Some got it', value: overall.some, fill: C.some },
     { name: 'Few got it', value: overall.few, fill: C.few },
   ]
-  const days = data.last_days.map((d) => ({ ...d, label: shortDate(d.date) }))
+  const days = (data.last_days ?? []).map((d) => ({ ...d, label: shortDate(d.date) }))
   const titles = new Map(packs.filter((p) => p.episode_slug).map((p) => [p.episode_slug!, p.title ?? p.episode_slug!]))
-  const lessons = data.episodes.map((e) => ({ name: titles.get(e.episode_id) ?? e.episode_id, Most: e.most, Some: e.some, Few: e.few }))
+  const lessons = (data.episodes ?? []).map((e) => ({ name: titles.get(e.episode_id) ?? e.episode_id, Most: e.most, Some: e.some, Few: e.few }))
   const funnel = [
     { label: 'Queued', n: calls.total, colour: C.muted },
     { label: 'Finished', n: calls.completed + calls.no_response, colour: C.some },
