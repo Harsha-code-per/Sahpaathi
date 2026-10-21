@@ -13,13 +13,16 @@ Draft for the deck's Future Roadmap pages (10% of the Build score). Keep it conc
 - **DIKSHA:** publish approved episodes and chalk-sketch cards as open content.
 - **State IVR / community radio:** the same packs play on existing state IVR lines and community radio slots.
 
-## Online Mode (for connected students, later)
-A 1-on-1 live AI tutor for older or connected learners, sharing the same curriculum brain.
-- On-device (edge) signals of confusion or fatigue, e.g. hesitation, voice confidence, gaze. **Raw video and audio never leave the device.** Explicit parental consent under the DPDP Act 2023.
-- Multi-agent orchestration that pauses for an empathy check-in and re-explains more simply.
-- Study tools: video explainers, handwritten-style notes, adaptive timetable.
+## Online Mode (for connected students)
+A 1-on-1 live AI tutor for older or connected learners, sharing the same curriculum. **A prototype exists** ([MODES.md](MODES.md), [STATUS.md](STATUS.md#2-online-mode-built-early-as-a-prototype-decision-needed)).
+- **Built:** a spoken teacher that chats, then plans any topic, PDF or textbook photo into parts, teaches each, quizzes it, and teaches it again until it lands; answers doubts and switches language or "like I'm 5" on request; and takes breaks with riddles, quick maths and a memory game.
+- **Built, untested on real faces:** opt-in, on-device sensing of confusion, tiredness, distraction and noise by four LangGraph agents and an orchestrator, which only makes the teacher *ask* if the learner is okay. **Raw video and audio never leave the device; nothing is recorded; saved moments are deleted on Stop or after 30 minutes** ([SENSE.md](SENSE.md)).
+- **Next:** a real parental-consent flow (verifiable, under the DPDP Act 2023) and legal review before any child uses the camera; learner accounts with saved progress; the four lesson guardrails on the tutor's answers; real-data training of the perception model from consented pilots; an on-device sound classifier for the *kind* of noise; study tools such as video explainers and handwritten-style notes.
 
-This is deliberately **not** in the Build-stage submission. The classroom offline mode honours the "no child devices" constraint, and Online Mode extends Sahpaathi beyond it.
+The Build-stage submission is the offline classroom. Online Mode extends Sahpaathi beyond the "no child devices" constraint, so it is labelled a prototype wherever it is shown.
+
+## Hybrid (planned)
+The two modes helping each other: a child at home continues the class's lesson with the AI teacher; the class's *Few got it* taps tell the AI what to revisit; the AI's results reach the CRP dashboard, with consent; and a smartphone family can catch an absent child up by AI instead of by phone call. Plan: [MODES.md](MODES.md#hybrid-planned-not-started).
 
 ## Offline upgrades
 - Voice + pen-stroke micro-capsules (<100 KB) between teachers over 2G.

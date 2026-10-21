@@ -34,3 +34,12 @@ Due **Sun 1 Nov 2026, 23:59 IST** on Hack2Skill. Target: **Sat 31 Oct, 18:00 IST
 - [ ] User inputs and testing (1–2 pages) from [TESTING_LOG.md](TESTING_LOG.md)
 - [ ] Future roadmap (1–2 pages) from [ROADMAP.md](ROADMAP.md)
 - [ ] Re-check every statistic against its source (UDISE+ 2024-25, ASER 2024, DoT, EDC IRI)
+
+## 5. Online AI teacher (only if the team decides it ships with this submission)
+- [ ] Decision recorded in [STATUS.md](STATUS.md#2-online-mode-built-early-as-a-prototype-decision-needed) (M1)
+- [ ] PRs #77, #75, #76 merged and the live `/tutor` tried end to end on a phone: chat, "teach me ...", a wrong answer, a break, "explain in Hindi" (M3)
+- [ ] `ANTHROPIC_API_KEY` is set on Render (and `TTS_API_KEY` for the real voice); the daily caps are acceptable (M1)
+- [ ] The deck and video call it a **prototype**; say that the camera sensing is rule-based, opt-in, on-device, and **not tested with real faces** (M3)
+- [ ] The camera feature is demoed with **adults only**; no child's face on video until the DPDP legal review and a parental-consent flow exist (all)
+- [ ] The AI teacher's Hindi, Tamil and Odia checked by a native speaker, or labelled unreviewed (M1)
+
