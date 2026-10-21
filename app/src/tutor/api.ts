@@ -94,12 +94,20 @@ export async function turn(body: TurnIn): Promise<TurnOut> {
   return (await (await post('turn', body)).json()) as TurnOut
 }
 
-/** Server voice (Sarvam) as a playable URL, or null when the server has none: the caller then speaks it itself. */
+let voiceDownUntil = 0 // after the server voice fails, stop asking it for a while
+
+/**
+ * Server voice (Sarvam) as a playable URL, or null when the server has none or is slow or failing: the
+ * caller then speaks it with the browser's own voice. A failing server voice is not retried for 10 minutes,
+ * so every answer is not delayed by a request that is going to fail.
+ */
 export async function speakUrl(text: string, language: Lang): Promise<string | null> {
+  if (Date.now() < voiceDownUntil) return null
   try {
-    const res = await post('speak', { text: text.slice(0, 600), language })
+    const res = await Promise.race([post('speak', { text: text.slice(0, 600), language }), new Promise<never>((_, no) => setTimeout(() => no(new Error('voice timeout')), 8000))])
     return URL.createObjectURL(await res.blob())
   } catch {
+    voiceDownUntil = Date.now() + 10 * 60_000
     return null
   }
 }
