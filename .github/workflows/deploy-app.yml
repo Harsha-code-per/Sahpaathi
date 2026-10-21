@@ -31,7 +31,7 @@ jobs:
       - name: Skip until the Vercel secrets are set
         if: env.VERCEL_TOKEN == '' || env.VERCEL_ORG_ID == '' || env.VERCEL_PROJECT_ID == ''
         run: echo "::notice::VERCEL_TOKEN, VERCEL_ORG_ID or VERCEL_PROJECT_ID is not set; nothing deployed."
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         if: env.VERCEL_TOKEN != '' && env.VERCEL_ORG_ID != '' && env.VERCEL_PROJECT_ID != ''
       - uses: actions/setup-node@v7
         if: env.VERCEL_TOKEN != '' && env.VERCEL_ORG_ID != '' && env.VERCEL_PROJECT_ID != ''
