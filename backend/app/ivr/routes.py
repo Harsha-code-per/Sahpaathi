@@ -8,7 +8,7 @@ from datetime import datetime
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, computed_field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -16,19 +16,19 @@ from app import db as database
 from app.auth import require
 from app.ivr import flow
 from app.models import CatchupCall, EpisodeRecord, PackRecord, User
+from app.sync import SAMPLE_PREFIX, Ref
 
 router = APIRouter(prefix="/api/v1/ivr", tags=["ivr"])
 Admin = Annotated[User, Depends(require("admin"))]
 DB = Annotated[Session, Depends(database.get_db)]
 
-REF = r"^[A-Za-z0-9][A-Za-z0-9-]{0,39}$"  # a classroom code or a roll number, never a name
 SLUG = r"^[a-z0-9][a-z0-9-]*$"
 Digit = Literal["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "*", "#"]
 
 
 class CallIn(BaseModel):
-    classroom_id: str = Field(pattern=REF)
-    student_ref: str = Field(pattern=REF)
+    classroom_id: Ref
+    student_ref: Ref
     episode_slug: str = Field(max_length=100, pattern=SLUG)
 
 
@@ -41,6 +41,12 @@ class CallOut(BaseModel):
     outcome: str | None
     plays: int
     created_at: datetime
+
+    @computed_field
+    @property
+    def sample(self) -> bool:
+        """A call to a SAMPLE classroom (app/sample_data.py): shown with a label, never dialled."""
+        return self.classroom_id.startswith(SAMPLE_PREFIX)
 
 
 class AudioRef(BaseModel):

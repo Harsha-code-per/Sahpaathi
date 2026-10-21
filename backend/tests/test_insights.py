@@ -239,3 +239,24 @@ def test_sample_data_never_pretends_to_be_a_testimonial(api):
 
         comments = {c for (c,) in db.execute(select(LessonFeedback.comment))}
     assert comments == {""}  # invented ratings only, never invented words from a teacher
+
+
+def test_feedback_errors_name_the_field_not_the_event_kind(api):
+    out = sync(api, [feedback(5, rating=9)])
+    assert out["rejected"][0]["reason"].startswith("rating:")
+
+
+def test_real_data_cannot_use_the_sample_prefix(api):
+    """Removing the sample deletes by the prefix, so real rows must never carry it."""
+    out = sync(api, [tap(1, "demo-a", "most"), feedback(6, classroom_id="Demo-x")])
+    assert out["accepted"] == 0 and len(out["rejected"]) == 2
+    assert all("reserved for sample data" in r["reason"] for r in out["rejected"])
+
+
+def test_sample_calls_are_labelled():
+    from app.ivr.routes import CallOut
+
+    base = dict(id=1, student_ref="7", episode_slug="ep-one", status="queued", outcome=None)
+    when = datetime.now(UTC)
+    assert CallOut(classroom_id="demo-chn-g1-a", plays=0, created_at=when, **base).sample
+    assert not CallOut(classroom_id="CHN-04", plays=0, created_at=when, **base).sample
