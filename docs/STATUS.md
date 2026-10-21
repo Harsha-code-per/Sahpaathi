@@ -23,21 +23,8 @@ Live: app https://sahpaathi.vercel.app (all four routes load), API https://sahpa
 
 **Deliberately cut, on the roadmap:** RAG over the curriculum, a job queue, mesh pods and micro-capsules. (Online Mode was cut too, then prototyped early: section 2.)
 
-## 2. Online Mode: built early as a prototype, decision needed
-Planned on 18 Oct as a 1-on-1 AI tutor for connected learners, to be prototyped only in the Top 10 stage on a separate branch. **A working prototype was built on 21 Oct** and is in open pull requests, not yet in `main`. Plan and feature-by-feature status: [MODES.md](MODES.md); the camera part: [SENSE.md](SENSE.md).
-
-| Piece | PR | Status |
-|---|---|---|
-| The AI teacher at `/tutor`: chat, study mode (topic, PDF or photo analysed into parts), teach, quiz, hint, reteach, breaks and games, four languages, voice in and out | #75 | ✅ Built and tested (about 40 backend tests on the engine, breaks and API, and real-Claude runs in a real browser). Voice not tried with a real microphone |
-| Two modes made visible: landing section, mode switch, offline warning, docs | #76 | ✅ Built |
-| The `langgraph` dependency (the repo asks for dependencies in a tiny separate PR) | #77 | ✅ CI green, Docker image builds |
-| Opt-in camera and microphone sensing: four LangGraph agents plus an orchestrator, on-device, a gentle "are you okay?" check-in, auto-deletion, consent gate, training tools | #78 | 🟡 Built and tested with synthetic numbers and a fake camera. **Not tested with real faces**; rule-based; needs legal review (DPDP Act 2023) before any child uses it |
-| Deploy from GitHub Actions, to avoid the Vercel block | #74 | 🟡 Written, not run: needs three Vercel secrets from the Vercel owner |
-
-**Decision needed (M1): does Online Mode ship in the 31 Oct submission?**
-- *For:* it is a differentiator, and it works.
-- *Against:* the plan said the submitted build stays the offline classroom; the AI teacher's answers do not go through the four guardrails; there are no learner accounts or verifiable parental consent; the camera feature needs legal review; and it adds Claude and Sarvam spend (capped at 600 turns a day each).
-- *Suggestion:* merge #77, #75 and #76 so the two-modes story is visible, label it a **prototype** in the deck and video, and keep #78 (camera) either off the demo or adults-only. If the team prefers to stay frozen, leave the stack open and merge it after the submission (the Top 10 branch).
+## 2. Online Mode
+A 1-on-1 AI teacher for connected older learners at `/tutor`: it plans, teaches, quizzes and reteaches, with voice and file attach, plus a switch between the two modes on the landing page. **Camera/mic sensing** (LangGraph perception agents, on-device, detect-never-record) is merged but **off by default** (`SENSE_ENABLED` / `VITE_SENSE_ENABLED`): it needs legal review and parental consent under the DPDP Act 2023 before children use it. Turn both on only for an adults-only demo.
 
 ## 3. Submission checklist (due 1 Nov; target 31 Oct, 18:00 IST)
 
@@ -86,7 +73,7 @@ Planned on 18 Oct as a 1-on-1 AI tutor for connected learners, to be prototyped 
 - 30 Oct: final deck (testing pages, guardrail and cost slides) and video recording.
 - 31 Oct: README password, secrets scan, repo public, evaluator access, tag `v1.0-build`, submit by 18:00.
 
-**If Top 10 (10 Nov):** the Online Mode prototype on its own branch, a 10–12 slide finale deck, a rehearsed live demo with a recorded fallback, more classroom pilots.
+**If Top 10 (10 Nov):** the consent flow for Online Mode sensing, a 10–12 slide finale deck, a rehearsed live demo with a recorded fallback, more classroom pilots.
 
 ## 6. The one thing that matters most
 **Teacher evidence in the testing log this week**, each finding tied to a change we shipped. The product is complete enough to win; the 35% criterion is decided by proof that real teachers used it and that we improved it from what they said.
