@@ -14,6 +14,10 @@ export function setupMotion(root: HTMLElement): () => void {
   gsap.ticker.add(tick)
   gsap.ticker.lagSmoothing(0)
 
+  // Hero animations run forever; pause them once the hero is off screen so the pinned scenes below get the GPU.
+  const hero = root.querySelector<HTMLElement>('[data-hero]')
+  const watch = new IntersectionObserver(([e]) => hero?.classList.toggle('cine-off', !e.isIntersecting))
+  if (hero) watch.observe(hero)
   let offMove = () => {}
   const ctx = gsap.context(() => {
     // Opening shot: the letterbox bars slide away, the speaker rises into the light.
@@ -92,6 +96,7 @@ export function setupMotion(root: HTMLElement): () => void {
 
   return () => {
     offMove()
+    watch.disconnect()
     ctx.revert()
     gsap.ticker.remove(tick)
     lenis.destroy()
