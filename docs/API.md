@@ -7,6 +7,8 @@ Auth: `POST /auth/login` returns a JWT (12 h); send `Authorization: Bearer <toke
 | Method | Path | Role | Purpose |
 |---|---|---|---|
 | GET | `/health` (no prefix) | public | Liveness; the Render health check and keep-warm cron use it |
+| POST | `/tutor/chat` | public | AI tutor (Online Mode prototype). `{messages: [{role, content}], language: en/hi/ta/or, style: normal/simple, topic}` → `{reply}`. Claude Haiku, a few short sentences ending in a question. Capped per UTC day (`TUTOR_DAILY_TURNS`, default 600): **429** when reached |
+| POST | `/tutor/speak` | public | `{text, language}` → `audio/wav` (Sarvam voice). **503** when `TTS_API_KEY` is not set: the app then uses the browser's voice. Capped (`TUTOR_DAILY_VOICE`) |
 | POST | `/auth/login` | public | `{email, password}` → `{token, role, name}`; 401 `"Wrong email or password."` |
 | GET | `/catalog` | reviewer, admin | `{lessons: [{id, grade, subject, chapter, nipun_lo}], districts: [{id, name, state, home_lang, school_lang}]}` from `content/` |
 | POST | `/episodes` | reviewer, admin | `{lesson_id, district_id}` → **202** summary with `status: "generating"`. Generation (Sonnet → tier-1 rules → Haiku review, one repair) runs in the background for a few minutes; poll the list or detail |

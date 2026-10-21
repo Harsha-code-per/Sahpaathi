@@ -1,0 +1,49 @@
+/* The voice button breathes while listening, spins while the teacher thinks, bounces while it speaks. */
+
+.tutor-voice::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 2px solid #3fb8a0;
+  opacity: 0;
+  pointer-events: none;
+}
+.tutor-voice[data-phase='listening']::before {
+  animation: tutor-ring 1.6s ease-out infinite;
+}
+.tutor-voice[data-phase='speaking'] {
+  background: #f4b23e;
+}
+.tutor-bars {
+  animation: tutor-bounce 0.9s ease-in-out infinite;
+}
+.tutor-dots {
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 9999px;
+  border: 3px solid rgba(11, 20, 19, 0.3);
+  border-top-color: #0b1413;
+  animation: tutor-spin 0.8s linear infinite;
+}
+
+@keyframes tutor-ring {
+  from {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  to {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+@keyframes tutor-bounce {
+  50% {
+    transform: scaleY(1.35);
+  }
+}
+@keyframes tutor-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
