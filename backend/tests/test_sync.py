@@ -277,7 +277,7 @@ def test_malformed_individual_events_and_pii_safety(api):
     assert "tap:" in reasons[make_tap(1)["event_id"]]
     assert "extra" in reasons[make_tap(2)["event_id"]]
     assert reasons[make_tap(3)["event_id"]] == "at: needs a timezone"
-    assert reasons["test-unknown-id"] == "kind: must be tap or attendance"
+    assert reasons["test-unknown-id"] == "kind: must be tap, attendance or feedback"
 
     # Confirm PII was NOT leaked into reasons
     assert "+919876543210" not in str(data["rejected"])

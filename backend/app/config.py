@@ -13,6 +13,9 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ["http://localhost:5173"]
     anthropic_api_key: str = ""
     demo_password: str = ""  # password of the seeded demo accounts (app/seed.py)
+    # Loads clearly labelled SAMPLE classroom data (app/sample_data.py) on start, so the dashboard
+    # is not empty for an evaluation. Admins can also load or remove it from the dashboard.
+    demo_data: bool = False
     # Lessons the Studio may write per UTC day (~$1 of Claude credits each); protects the budget.
     generate_daily_limit: int = 10
     # Online teacher camera/mic perception (docs/SENSE.md): off until legal review and parental

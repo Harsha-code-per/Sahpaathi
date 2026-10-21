@@ -6,7 +6,7 @@
 
 from collections import Counter
 from datetime import UTC, datetime, timedelta
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
@@ -16,12 +16,24 @@ from sqlalchemy.orm import Session
 from app import db as database
 from app.auth import require
 from app.models import CatchupCall, EpisodeRecord, PackRecord, SyncEvent, User
+from app.sample_data import PREFIX
 
 router = APIRouter(prefix="/api/v1", tags=["dashboard"])
 Admin = Annotated[User, Depends(require("admin"))]
 DB = Annotated[Session, Depends(database.get_db)]
 
 DAYS = 14
+Data = Literal["all", "real", "sample"]  # sample rows are invented and labelled: app/sample_data.py
+
+
+def _taps(data: Data):
+    mark = SyncEvent.event_id.like(f"{PREFIX}%")
+    return {"sample": mark, "real": ~mark}.get(data)
+
+
+def _calls(data: Data):
+    mark = CatchupCall.classroom_id.like(f"{PREFIX}%")
+    return {"sample": mark, "real": ~mark}.get(data)
 
 
 class Understanding(BaseModel):
@@ -63,19 +75,23 @@ class Dashboard(BaseModel):
     episodes_by_status: dict[str, int]
     packs_ready: int
     catchup_calls: CatchupStats
+    data: Data = "all"
+    sample_taps: int = 0  # how many of all the taps are invented sample data
+    sample_calls: int = 0
 
 
-def _catchup(db: Session) -> CatchupStats:
-    by_status = dict(
-        db.execute(select(CatchupCall.status, func.count()).group_by(CatchupCall.status)).all()
+def _catchup(db: Session, data: Data = "all") -> CatchupStats:
+    cond = _calls(data)
+    status_q = select(CatchupCall.status, func.count()).group_by(CatchupCall.status)
+    outcome_q = (
+        select(CatchupCall.outcome, func.count())
+        .where(CatchupCall.outcome.is_not(None))
+        .group_by(CatchupCall.outcome)
     )
-    outcomes = dict(
-        db.execute(
-            select(CatchupCall.outcome, func.count())
-            .where(CatchupCall.outcome.is_not(None))
-            .group_by(CatchupCall.outcome)
-        ).all()
-    )
+    if cond is not None:
+        status_q, outcome_q = status_q.where(cond), outcome_q.where(cond)
+    by_status = dict(db.execute(status_q).all())
+    outcomes = dict(db.execute(outcome_q).all())
     done = by_status.get("completed", 0) + by_status.get("no_response", 0)
     return CatchupStats(
         total=sum(by_status.values()),
@@ -107,12 +123,14 @@ def _understanding(c: Counter) -> Understanding:
 
 
 @router.get("/dashboard")
-def dashboard(_: Admin, db: DB) -> Dashboard:
-    rows = db.execute(
+def dashboard(_: Admin, db: DB, data: Data = "all") -> Dashboard:
+    cond = _taps(data)
+    q = (
         select(SyncEvent.episode_id, SyncEvent.tap, SyncEvent.auto, func.count())
         .group_by(SyncEvent.episode_id, SyncEvent.tap, SyncEvent.auto)
         .order_by(SyncEvent.episode_id)
     )
+    rows = db.execute(q.where(cond) if cond is not None else q)
     overall: Counter = Counter()
     per_episode: dict[str, Counter] = {}
     autos: Counter = Counter()
@@ -128,7 +146,8 @@ def dashboard(_: Admin, db: DB) -> Dashboard:
     start = today - timedelta(days=DAYS - 1)
     per_day: Counter = Counter()
     cutoff = datetime(start.year, start.month, start.day, tzinfo=UTC)
-    for (at,) in db.execute(select(SyncEvent.at).where(SyncEvent.at >= cutoff)):
+    day_q = select(SyncEvent.at).where(SyncEvent.at >= cutoff)
+    for (at,) in db.execute(day_q.where(cond) if cond is not None else day_q):
         # SQLite hands the time back without its zone; astimezone() would then read it as the
         # server's local time and move early-morning UTC taps to the day before.
         per_day[(at if at.tzinfo else at.replace(tzinfo=UTC)).astimezone(UTC).date()] += 1
@@ -150,5 +169,8 @@ def dashboard(_: Admin, db: DB) -> Dashboard:
             ).all()
         ),
         packs_ready=db.scalar(select(func.count()).where(PackRecord.status == "ready")) or 0,
-        catchup_calls=_catchup(db),
+        catchup_calls=_catchup(db, data),
+        data=data,
+        sample_taps=db.scalar(select(func.count()).where(_taps("sample"))) or 0,
+        sample_calls=db.scalar(select(func.count()).where(_calls("sample"))) or 0,
     )
