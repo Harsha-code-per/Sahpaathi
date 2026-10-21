@@ -6,6 +6,10 @@ import { FRESH, makePlan, readAttachment, speakUrl, turn, type Attachment, type 
 import { countFillers } from '../sense/features'
 import { SensePanel } from '../sense/SensePanel'
 import { useSense, type Insight } from '../sense/useSense'
+
+// Camera/mic perception stays hidden unless the build sets VITE_SENSE_ENABLED=true (docs/SENSE.md):
+// it needs legal review and parental consent before children use it. Without the panel it never starts.
+const SENSE_ENABLED = import.meta.env.VITE_SENSE_ENABLED === 'true'
 import MemoryGame from './MemoryGame'
 import { canListen, listen, speak, type Listener, type Speaker } from './speech'
 import './tutor.css'
@@ -359,7 +363,7 @@ export default function Tutor() {
           </button>
         </div>
 
-        <SensePanel sense={sense} />
+        {SENSE_ENABLED && <SensePanel sense={sense} />}
 
         {plan && (
           <section aria-label="Lesson plan" className="space-y-2 rounded-3xl border border-white/15 bg-white/5 p-4">

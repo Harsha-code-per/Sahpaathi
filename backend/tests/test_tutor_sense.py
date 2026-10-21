@@ -114,7 +114,19 @@ def test_payload_limits_are_enforced():
         Face(brow_down=2)
 
 
-def test_the_http_endpoint_returns_an_insight_and_stores_nothing():
+@pytest.fixture
+def sense_on(monkeypatch):
+    from app.config import settings
+
+    monkeypatch.setattr(settings, "sense_enabled", True)
+
+
+def test_the_endpoint_is_off_unless_enabled():
+    body = window(face=Face(brow_down=0.35)).model_dump()
+    assert TestClient(app).post("/api/v1/tutor/sense", json=body).status_code == 404
+
+
+def test_the_http_endpoint_returns_an_insight_and_stores_nothing(sense_on):
     body = window(face=Face(brow_down=0.35, eye_squint=0.3)).model_dump()
     res = TestClient(app).post("/api/v1/tutor/sense", json=body)
     assert (
@@ -124,7 +136,7 @@ def test_the_http_endpoint_returns_an_insight_and_stores_nothing():
     )
 
 
-def test_the_server_logs_nothing_about_what_it_receives(caplog):
+def test_the_server_logs_nothing_about_what_it_receives(caplog, sense_on):
     import logging
 
     caplog.set_level(logging.DEBUG)
@@ -138,7 +150,7 @@ def test_the_server_logs_nothing_about_what_it_receives(caplog):
     )  # the numbers are never logged
 
 
-def test_the_sense_endpoint_never_touches_the_database():
+def test_the_sense_endpoint_never_touches_the_database(sense_on):
     from app import db
 
     def boom():

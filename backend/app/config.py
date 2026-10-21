@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     demo_password: str = ""  # password of the seeded demo accounts (app/seed.py)
     # Lessons the Studio may write per UTC day (~$1 of Claude credits each); protects the budget.
     generate_daily_limit: int = 10
+    # Online teacher camera/mic perception (docs/SENSE.md): off until legal review and parental
+    # consent, as the DPDP Act 2023 restricts behavioural monitoring of children.
+    sense_enabled: bool = False
     # AI tutor (app/tutor.py) is open to anyone, so cap what it can spend per UTC day: Claude turns
     # (~₹0.1 each on Haiku) and Sarvam spoken replies.
     tutor_daily_turns: int = 600

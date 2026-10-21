@@ -97,7 +97,10 @@ def turn(body: TurnIn, brain: Brain) -> TurnOut:
 @router.post("/sense")
 def read_signals(body: sense.SenseIn) -> sense.Insight:
     """The perception agents (LangGraph): numbers from the learner's own camera and microphone
-    processing in, a hint out. No image or audio ever arrives here, and nothing is stored or logged."""
+    processing in, a hint out. No image or audio ever arrives here, and nothing is stored or logged.
+    Off (404) unless SENSE_ENABLED is set: see docs/SENSE.md before turning it on."""
+    if not settings.sense_enabled:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found.")
     return sense.analyse(body)
 
 
