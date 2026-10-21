@@ -35,6 +35,13 @@ function useDemoPassword(enabled: boolean) {
 export type DemoAccount = { role: string; email: string }
 
 /** Sign-in for the desk tools. `login` throws an ApiError whose message is shown as is. `demo` lists test accounts that one tap fills in. */
+/** Two classroom scenes, each a seamless slow loop (re-edited with dissolves, no hard cuts). */
+const SCENES = ['signin-a', 'signin-b']
+// Reduced motion or a data-saver connection: the still posters instead of video.
+const still =
+  typeof window !== 'undefined' &&
+  (matchMedia('(prefers-reduced-motion: reduce)').matches || Boolean((navigator as { connection?: { saveData?: boolean } }).connection?.saveData))
+
 export function LoginCard(props: { product: string; blurb: string; demo?: DemoAccount[]; login: (email: string, password: string) => Promise<void> }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -58,10 +65,14 @@ export function LoginCard(props: { product: string; blurb: string; demo?: DemoAc
   return (
     <main className="relative isolate grid min-h-dvh place-items-center overflow-hidden bg-background p-4">
       <div aria-hidden className="login-bg absolute inset-0 -z-10">
-        {[1, 3].map((n) => (
-          <img key={n} src={`/media/landing-${n}.jpg`} alt="" decoding="async" />
-        ))}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(248,246,239,0.92),rgba(248,246,239,0.55)_55%,rgba(248,246,239,0.25))]" />
+        {SCENES.map((s) =>
+          still ? (
+            <img key={s} src={`/media/${s}.jpg`} alt="" decoding="async" />
+          ) : (
+            <video key={s} src={`/media/${s}.mp4`} poster={`/media/${s}.jpg`} muted loop playsInline autoPlay preload="auto" />
+          ),
+        )}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(248,246,239,0.8),rgba(248,246,239,0.45)_55%,rgba(248,246,239,0.15))]" />
       </div>
       <form onSubmit={submit} className="w-full max-w-sm space-y-5 rounded-3xl border border-border bg-card/95 p-7 shadow-[0_20px_50px_rgba(23,37,36,0.1)]">
         <div className="space-y-3">

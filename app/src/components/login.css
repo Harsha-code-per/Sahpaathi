@@ -1,9 +1,10 @@
-/* Sign-in backdrop: two classroom scenes drift slowly and crossfade; a light veil keeps the card readable.
-   Stills, not video: the supplied clips are montages with a hard cut every couple of seconds and jump back
-   at the loop point, which read as shaking. Only transform and opacity animate, so it stays on the GPU. */
+/* Sign-in backdrop: two classroom scenes, each a seamless slow video loop (re-edited from the supplied
+   montages: cuts replaced by dissolves, the watermark cropped off), crossfading every 12 s. A light veil
+   keeps the card readable. Under reduced motion or Save-Data the stills crossfade instead, without zoom. */
 .login-bg {
-  background: #f2efe6 url('/media/landing-1.jpg') center / cover;
+  background: #f2efe6 url('/media/signin-a.jpg') center / cover;
 }
+.login-bg video,
 .login-bg img {
   position: absolute;
   inset: 0;
@@ -11,33 +12,26 @@
   height: 100%;
   object-fit: cover;
   opacity: 0;
-  will-change: transform, opacity;
-  backface-visibility: hidden;
-  animation: login-drift 24s linear infinite;
+  will-change: opacity, transform;
+  animation: login-scene 24s linear infinite;
 }
-.login-bg img:nth-child(2) {
+.login-bg :nth-child(2) {
   animation-delay: -12s;
 }
-/* Each scene is visible for 60% of the cycle (14.4 s), fades in over the first 10% and out over the last 10%
-   of that, exactly as the other scene fades in, so the two always add up to one full picture. */
-@keyframes login-drift {
+/* Each scene shows for 60% of the cycle, fading in and out over 10% while the other does the reverse. */
+@keyframes login-scene {
   0% {
     opacity: 0;
-    transform: scale(1) translate3d(0, 0, 0);
+    transform: scale(1.04);
   }
-  10% {
-    opacity: 1;
-  }
+  10%,
   50% {
     opacity: 1;
   }
-  60% {
-    opacity: 0;
-    transform: scale(1.07) translate3d(-1.2%, -0.8%, 0);
-  }
+  60%,
   100% {
     opacity: 0;
-    transform: scale(1.07) translate3d(-1.2%, -0.8%, 0);
+    transform: scale(1);
   }
 }
 @media (prefers-reduced-motion: reduce) {
