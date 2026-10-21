@@ -1,22 +1,5 @@
 /* Landing page motion. The global prefers-reduced-motion rule (index.css) stills all of it. */
 
-@keyframes ring {
-  from {
-    transform: scale(0.55);
-    opacity: 0.7;
-  }
-  to {
-    transform: scale(1.35);
-    opacity: 0;
-  }
-}
-
-@keyframes drift {
-  50% {
-    transform: translateY(-0.75rem);
-  }
-}
-
 @keyframes rise {
   from {
     opacity: 0;
@@ -24,14 +7,159 @@
   }
 }
 
-.landing-ring {
-  animation: ring 3.6s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
-}
-.landing-drift {
-  animation: drift 6s ease-in-out infinite;
-}
 .landing-rise {
   animation: rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/* Cinematic hero: spotlight that follows the pointer, a light cone, film grain and a vignette. */
+.cine {
+  --mx: 68%;
+  --my: 46%;
+}
+.cine-light {
+  background:
+    radial-gradient(38rem 30rem at var(--mx) var(--my), rgba(244, 178, 62, 0.2), transparent 70%),
+    radial-gradient(60rem 40rem at 50% 115%, rgba(63, 184, 160, 0.18), transparent 70%);
+}
+.cine-beam {
+  background: conic-gradient(from 180deg at 70% -10%, transparent 150deg, rgba(244, 178, 62, 0.16) 175deg, transparent 200deg);
+  filter: blur(18px);
+  mix-blend-mode: screen;
+}
+.cine-grain {
+  opacity: 0.09;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+.cine-vignette {
+  background: radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(0, 0, 0, 0.55));
+}
+
+/* The speaker: a lit cylinder with a speaker-cloth grille, a marigold status ring and sound rings spreading across the floor. */
+.spk-stage {
+  perspective: 1100px;
+}
+.spk {
+  position: absolute;
+  left: 27%;
+  top: 12%;
+  width: 46%;
+  height: 62%;
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transform-style: preserve-3d;
+}
+.spk-body {
+  position: absolute;
+  inset: 7% 0 0;
+  border-radius: 46% / 8%;
+  background: linear-gradient(90deg, #040807, #243a36 24%, #4a6560 46%, #2b4440 62%, #101b19 84%, #040807);
+  box-shadow: inset 0 -1.5rem 2rem rgba(0, 0, 0, 0.55), 0 2.5rem 4rem rgba(0, 0, 0, 0.6);
+}
+.spk-grille {
+  position: absolute;
+  inset: 14% 8% 10%;
+  border-radius: 38% / 6%;
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.75) 1.3px, transparent 1.8px);
+  background-size: 8px 8px;
+  mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+}
+.spk-led {
+  position: absolute;
+  left: 50%;
+  bottom: 5%;
+  width: 14%;
+  height: 0.28rem;
+  translate: -50% 0;
+  border-radius: 9999px;
+  background: #f4b23e;
+  box-shadow: 0 0 0.9rem 0.2rem rgba(244, 178, 62, 0.8);
+  animation: led 2.4s ease-in-out infinite;
+}
+.spk-cap {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 14%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 40%, #587670, #1a2a28 70%);
+  box-shadow: 0 0 0 0.18rem #f4b23e, 0 0 1.6rem 0.2rem rgba(244, 178, 62, 0.55);
+}
+.spk-base {
+  position: absolute;
+  inset: auto -6% -3% -6%;
+  height: 8%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(244, 178, 62, 0.5), transparent 70%);
+  filter: blur(6px);
+}
+.spk-backlight {
+  background: radial-gradient(circle, rgba(244, 178, 62, 0.28), transparent 65%);
+  animation: breathe 5s ease-in-out infinite;
+}
+.spk-wave {
+  left: 8%;
+  top: 72%;
+  width: 90%;
+  height: 26%;
+  transform: rotateX(72deg) scale(0.4);
+  animation: floorwave 3.6s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+}
+
+/* Words circle the speaker in a tilted ring. Each slot turns with the ring and each word turns back, so the text always faces you. */
+.spk-orbit {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(-14deg);
+  animation: orbit 36s linear infinite;
+}
+.spk-slot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-style: preserve-3d;
+  transform: rotateY(var(--a)) translateZ(min(15rem, 38vw)) rotateY(calc(var(--a) * -1));
+}
+.spk-word {
+  display: block;
+  translate: -50% -50%;
+  white-space: nowrap;
+  padding: 0.4rem 1rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(15, 25, 24, 0.7);
+  backdrop-filter: blur(6px);
+  font-size: 1.125rem;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  animation: unorbit 36s linear infinite;
+}
+
+@keyframes floorwave {
+  to {
+    transform: rotateX(72deg) scale(1.35);
+    opacity: 0;
+  }
+}
+@keyframes orbit {
+  to {
+    transform: rotateX(-14deg) rotateY(360deg);
+  }
+}
+@keyframes unorbit {
+  to {
+    transform: rotateY(-360deg);
+  }
+}
+@keyframes led {
+  50% {
+    opacity: 0.45;
+  }
+}
+@keyframes breathe {
+  50% {
+    transform: scale(1.08);
+    opacity: 0.8;
+  }
 }
 
 /* Sections fade up as they scroll in, where the browser supports scroll-driven animation. */
@@ -46,6 +174,9 @@
 
 /* Scene, reduced motion: no pin, no tilt. The phone and chips sit flat beside the copy. */
 @media (prefers-reduced-motion: reduce) {
+  [data-bar] {
+    display: none;
+  }
   .scene {
     height: auto;
   }

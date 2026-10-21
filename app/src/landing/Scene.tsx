@@ -51,6 +51,18 @@ export default function Scene() {
             <p className="max-w-lg text-lg leading-relaxed text-muted-foreground">
               After each part she taps how the class did. The next part switches on the phone, with no signal needed.
             </p>
+            <div aria-hidden className="flex items-center gap-4 pt-2">
+              <svg viewBox="0 0 100 100" className="size-24 -rotate-90">
+                <circle cx="50" cy="50" r="44" fill="none" strokeWidth="9" className="stroke-border" />
+                <circle data-dial cx="50" cy="50" r="44" fill="none" strokeWidth="9" strokeLinecap="round" stroke="#3fb8a0" strokeDasharray="276.5" strokeDashoffset="36" />
+              </svg>
+              <div>
+                <p className="font-heading text-4xl leading-none font-extrabold tabular-nums">
+                  <span data-dialnum>87</span>%
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">of a sample class got it (illustration)</p>
+              </div>
+            </div>
           </div>
           <div className="relative mx-auto grid h-[34rem] w-full max-w-sm place-items-center [perspective:1400px]">
             <div
