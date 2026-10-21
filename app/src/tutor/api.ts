@@ -7,6 +7,48 @@ export interface Turn {
   content: string
 }
 
+/** Mirror of backend app/tutor/models.py. */
+export interface Question {
+  ask: string
+  answer: string
+  hint: string
+}
+export interface Part {
+  title: string
+  points: string[]
+  example: string
+  minutes: number
+  quiz: Question[]
+}
+export interface Plan {
+  title: string
+  language: Lang
+  parts: Part[]
+}
+export interface Progress {
+  mode: 'chat' | 'teach' | 'quiz' | 'done'
+  part: number
+  q: number
+  misses: number
+  correct: number
+  revealed: string[]
+}
+export interface TurnOut {
+  reply: string
+  progress: Progress
+  language: Lang
+  style: Style
+  start_study: string | null
+}
+export interface Attachment {
+  name: string
+  media_type: 'application/pdf' | 'image/png' | 'image/jpeg' | 'image/webp' | 'text/plain'
+  data: string
+}
+
+export const FRESH: Progress = { mode: 'chat', part: 0, q: 0, misses: 0, correct: 0, revealed: [] }
+const MAX_FILE = 5 * 1024 * 1024
+
 /** The tutor is open to anyone (no login); the server caps what it can spend per day. */
 async function post(path: string, body: unknown): Promise<Response> {
   const res = await fetch(`${BASE}/tutor/${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
@@ -15,9 +57,25 @@ async function post(path: string, body: unknown): Promise<Response> {
   throw new Error(typeof detail === 'string' ? detail : 'The teacher could not answer. Try again.')
 }
 
-export async function chat(messages: Turn[], language: Lang, style: Style, topic: string): Promise<string> {
-  const res = await post('chat', { messages, language, style, topic })
-  return ((await res.json()) as { reply: string }).reply
+/** Analyses a topic or an attached file into a plan of parts. Takes about 15 seconds. */
+export async function makePlan(topic: string, document: Attachment | null, language: Lang, style: Style): Promise<Plan> {
+  const res = await post('plan', { topic, document, language, style })
+  return (await res.json()) as Plan
+}
+
+export interface TurnIn {
+  messages: Turn[]
+  text: string
+  begin: boolean
+  plan: Plan | null
+  progress: Progress
+  language: Lang
+  style: Style
+}
+
+/** One step of the conversation: the server applies the teaching rules and returns the reply and the new position. */
+export async function turn(body: TurnIn): Promise<TurnOut> {
+  return (await (await post('turn', body)).json()) as TurnOut
 }
 
 /** Server voice (Sarvam) as a playable URL, or null when the server has none: the caller then speaks it itself. */
@@ -28,4 +86,18 @@ export async function speakUrl(text: string, language: Lang): Promise<string | n
   } catch {
     return null
   }
+}
+
+/** Reads a chosen file into what /plan accepts: a PDF, a photo of a page, or plain text. */
+export function readAttachment(file: File): Promise<Attachment> {
+  const type = file.type || (file.name.endsWith('.txt') ? 'text/plain' : '')
+  const ok = ['application/pdf', 'image/png', 'image/jpeg', 'image/webp', 'text/plain']
+  if (!ok.includes(type)) return Promise.reject(new Error('Please attach a PDF, a photo (PNG, JPG) or a text file.'))
+  if (file.size > MAX_FILE) return Promise.reject(new Error('That file is over 5 MB. Try a smaller one, or a photo of one page.'))
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onerror = () => reject(new Error('Could not read that file.'))
+    reader.onload = () => resolve({ name: file.name, media_type: type as Attachment['media_type'], data: String(reader.result).split(',')[1] ?? '' })
+    reader.readAsDataURL(file)
+  })
 }

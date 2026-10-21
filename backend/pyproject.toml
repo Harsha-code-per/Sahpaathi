@@ -7,6 +7,7 @@ select = ["E", "F", "I", "UP", "B"]
 
 [tool.ruff.lint.per-file-ignores]
 "alembic/versions/*" = ["E501"]  # generated: long SQL in constraint strings
+"app/tutor/*" = ["E501"]  # teaching prompts and prose docstrings read better unwrapped
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
