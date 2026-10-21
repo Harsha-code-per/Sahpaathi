@@ -15,15 +15,24 @@ const VIEWS: [DataView, string][] = [
  */
 export function SampleBanner(props: { view: DataView; onView: (v: DataView) => void; sampleTaps: number; onChanged: () => void }) {
   const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
   const act = async (fn: () => Promise<unknown>) => {
     setBusy(true)
+    setError('')
     try {
       await fn()
       props.onChanged()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'That did not work. Try again.')
     } finally {
       setBusy(false)
     }
   }
+  const failed = error && (
+    <p role="alert" className="basis-full rounded-xl bg-bad px-3 py-2 text-sm text-bad-foreground">
+      {error}
+    </p>
+  )
 
   if (props.sampleTaps === 0)
     return (
@@ -33,6 +42,7 @@ export function SampleBanner(props: { view: DataView; onView: (v: DataView) => v
         <Button variant="outline" disabled={busy} onClick={() => act(insightsApi.loadSample)}>
           Load sample classrooms
         </Button>
+        {failed}
       </div>
     )
 
@@ -49,15 +59,16 @@ export function SampleBanner(props: { view: DataView; onView: (v: DataView) => v
             type="button"
             aria-pressed={props.view === v}
             onClick={() => props.onView(v)}
-            className="h-9 rounded-full border border-[#6b4a0a]/30 px-3 text-sm font-semibold outline-none hover:bg-white/50 focus-visible:ring-2 focus-visible:ring-ring aria-pressed:border-[#6b4a0a] aria-pressed:bg-[#6b4a0a] aria-pressed:text-white"
+            className="h-11 rounded-full border border-[#6b4a0a]/30 px-3 text-sm font-semibold outline-none hover:bg-white/50 focus-visible:ring-2 focus-visible:ring-ring aria-pressed:border-[#6b4a0a] aria-pressed:bg-[#6b4a0a] aria-pressed:text-white"
           >
             {label}
           </button>
         ))}
-        <button type="button" disabled={busy} onClick={() => act(insightsApi.removeSample)} className="h-9 rounded-full px-3 text-sm font-semibold underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring">
+        <button type="button" disabled={busy} onClick={() => confirm('Remove all sample classrooms? Real data is not touched.') && act(insightsApi.removeSample)} className="h-11 rounded-full px-3 text-sm font-semibold underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring">
           Remove sample data
         </button>
       </div>
+      {failed}
     </div>
   )
 }

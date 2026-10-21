@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest'
 import type { Summary } from '../studio/api'
 import type { PackSummary } from './api'
-import { anyBuilding, callableEpisodes, CLASS_STATUS, dayBars, endMessage, formatSize, KEYPAD, lessonTitles, mixBar, packFilename, packRows, partName, pct, pipeline } from './view'
+import { anyBuilding, callableEpisodes, CLASS_STATUS, dayBars, endMessage, formatSize, KEYPAD, lessonTitles, mixBar, packFilename, packRows, partName, pct, pipeline, weekSummary } from './view'
 
 const ep = (id: number, status: Summary['status']): Summary => ({
   id, lesson_id: 'l', district_id: 'd', status, title: `Episode ${id}`, passed: true, scores: null, error: null,
@@ -107,4 +107,14 @@ test('lessonTitles maps an episode id (lesson-district) to the Studio title', ()
   const e = { ...ep(1, 'approved'), lesson_id: 'g1-numbers-to-20', district_id: 'chennai-migrant', title: 'Counting to 20' }
   expect(lessonTitles([e, { ...ep(2, 'approved'), title: null }]).get('g1-numbers-to-20-chennai-migrant')).toBe('Counting to 20')
   expect(lessonTitles([{ ...ep(2, 'approved'), title: null }]).size).toBe(0)
+})
+
+test('weekSummary describes the first and last weeks with taps, and says when there are none', () => {
+  const weeks = [
+    { label: '1 Sep', Most: null, Few: null },
+    { label: '8 Sep', Most: 40, Few: 30 },
+    { label: '15 Sep', Most: 55, Few: 20 },
+  ]
+  expect(weekSummary(weeks)).toContain('went from 40% (8 Sep) to 55% (15 Sep)')
+  expect(weekSummary([{ label: '1 Sep', Most: null, Few: null }])).toMatch(/no taps/)
 })
