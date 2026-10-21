@@ -1,10 +1,10 @@
-import { ArrowLeftIcon, PencilIcon } from 'lucide-react'
+import { ArrowLeftIcon, PencilIcon, SparklesIcon } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { cn } from 'cn'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import type { Episode, Line } from '../lib/types'
-import { api, ApiError, type Detail, type Edit, type Issue, type Status } from './api'
+import { api, ApiError, type Detail, type Edit, type Issue, type PartTaps, type Status } from './api'
 import { CRITERIA, LANG_NAMES, STATUS, glossById, issuesByLine, minutes, schoolShare, svgDataUrl } from './view'
 
 const POLL_MS = 5000
@@ -176,7 +176,70 @@ function flagCount(lines: Line[], issues: Map<string, Issue[]>) {
   return lines.reduce((n, l) => n + (issues.get(l.id)?.length ?? 0), 0)
 }
 
-function Script({ ep, ctx }: { ep: Episode; ctx: LineCtx }) {
+/**
+ * How classes did on this part, and a way to have Claude rewrite just this part from that evidence.
+ * The rewrite becomes a new version that goes through the guardrails and review like any lesson.
+ */
+function InClass({ part, onRewrite }: { part?: PartTaps; onRewrite?: (note: string) => Promise<void> }) {
+  const [note, setNote] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  if (!onRewrite) return null
+  const pct = (n: number) => (part?.taps ? Math.round((100 * n) / part.taps) : 0)
+
+  async function go() {
+    setBusy(true)
+    setError('')
+    try {
+      await onRewrite!(note)
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Could not start the rewrite.')
+      setBusy(false)
+    }
+  }
+
+  return (
+    <section className="space-y-3 rounded-xl border border-border bg-background p-4" aria-label="How classes did on this part">
+      {part?.taps ? (
+        <div className="space-y-2">
+          <p className="font-semibold">
+            In class: {part.taps} taps · <span className={pct(part.few) >= 40 ? 'text-bad-foreground' : ''}>{pct(part.few)}% few got it</span>
+            {part.auto > 0 && <span className="font-normal text-muted-foreground"> · {part.auto} with no tap</span>}
+          </p>
+          <div className="flex h-2 overflow-hidden rounded-full" role="img" aria-label={`Most ${pct(part.most)}%, some ${pct(part.some)}%, few ${pct(part.few)}%`}>
+            <span className="bg-most" style={{ width: `${pct(part.most)}%` }} />
+            <span className="bg-some" style={{ width: `${pct(part.some)}%` }} />
+            <span className="bg-few" style={{ width: `${pct(part.few)}%` }} />
+          </div>
+        </div>
+      ) : (
+        <p className="text-sm text-muted-foreground">No classroom taps for this part yet. You can still ask for a rewrite with a note.</p>
+      )}
+      <div className="flex flex-wrap items-end gap-2">
+        <label className="min-w-60 flex-1">
+          <span className="sr-only">What should change in this part?</span>
+          <input
+            className="h-11 w-full rounded-xl border border-input bg-card px-3 outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40"
+            placeholder="What should change? e.g. smaller numbers, more pebble work"
+            value={note}
+            maxLength={1000}
+            onChange={(e) => setNote(e.target.value)}
+          />
+        </label>
+        <Button variant="outline" disabled={busy || (!part?.taps && !note.trim())} onClick={go}>
+          <SparklesIcon aria-hidden /> {busy ? 'Starting…' : 'Rewrite this part'}
+        </Button>
+      </div>
+      {error && (
+        <p role="alert" className="text-sm text-bad-foreground">
+          {error}
+        </p>
+      )}
+    </section>
+  )
+}
+
+function Script({ ep, ctx, parts: taps, onRewrite }: { ep: Episode; ctx: LineCtx; parts: PartTaps[]; onRewrite?: (segmentId: string, note: string) => Promise<void> }) {
   const parts = [
     ...ep.segments.map((s, i) => ({ id: s.id, label: `Part ${i + 1}`, lines: [...s.teach, ...s.easier, ...s.core, ...s.stretch] })),
     { id: 'analogy', label: 'Analogy', lines: ep.analogy },
@@ -205,6 +268,7 @@ function Script({ ep, ctx }: { ep: Episode; ctx: LineCtx }) {
             <h3 className="font-heading text-xl font-bold">{s.title}</h3>
             <Handover ep={ep} index={i} />
           </div>
+          <InClass part={taps.find((t) => t.segment_id === s.id)} onRewrite={onRewrite && ((note) => onRewrite(s.id, note))} />
           <Lines lines={s.teach} ctx={ctx} />
           <p className="rounded-xl bg-sidebar px-4 py-3 text-sidebar-foreground">
             <span className="font-semibold text-sidebar-primary">Teacher checks:</span> <span lang={ep.school_lang}>{s.checkpoint}</span>
@@ -293,14 +357,22 @@ export default function EpisodeView(props: {
   onBack: () => void
   onChanged: () => void
   onError: (e: unknown) => void
+  /** Opens another version, e.g. the rewrite just started. */
+  onOpen: (id: number) => void
 }) {
-  const { id, status, onChanged, onError } = props
+  const { id, status, onChanged, onError, onOpen } = props
   const [detail, setDetail] = useState<Detail | null>(null)
+  const [taps, setTaps] = useState<PartTaps[]>([])
 
   const load = useCallback(() => api.episode(id).then(setDetail, onError), [id, onError])
   useEffect(() => {
     load()
   }, [load, status]) // reload when the list sees the status change (e.g. writing → needs review)
+
+  const reviewable = detail?.status === 'in_review' || detail?.status === 'approved'
+  useEffect(() => {
+    if (reviewable) api.classroom(id).then(setTaps, onError)
+  }, [id, reviewable, onError])
 
   useEffect(() => {
     if (detail?.status !== 'generating') return
@@ -398,7 +470,12 @@ export default function EpisodeView(props: {
             </figure>
           </section>
 
-          <Script ep={ep} ctx={ctx} />
+          <Script
+            ep={ep}
+            ctx={ctx}
+            parts={taps}
+            onRewrite={reviewable ? async (segmentId, note) => onOpen((await api.rewrite(id, segmentId, note)).id) : undefined}
+          />
           <Decision detail={detail} onDecided={(d) => (setDetail(d), onChanged())} onError={onError} />
         </>
       )}

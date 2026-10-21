@@ -274,7 +274,15 @@ export default function Studio() {
           </div>
         </>
       ) : (
-        <EpisodeView key={selected} id={selected} status={current?.status} onBack={() => setSelected(null)} onChanged={refresh} onError={handle} />
+        <EpisodeView
+          key={selected}
+          id={selected}
+          status={current?.status}
+          onBack={() => setSelected(null)}
+          onChanged={refresh}
+          onError={handle}
+          onOpen={(next) => (void refresh(), setSelected(next))}
+        />
       )}
 
       <Dialog open={writingOpen} onOpenChange={setWritingOpen}>
