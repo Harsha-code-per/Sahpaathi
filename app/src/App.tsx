@@ -8,6 +8,7 @@ const Studio = lazyPage(() => import('./studio/Studio'))
 const Admin = lazyPage(() => import('./admin/Admin'))
 const Landing = lazyPage(() => import('./landing/Landing'))
 const Tutor = lazyPage(() => import('./tutor/Tutor'))
+const Evidence = lazyPage(() => import('./evidence/Evidence'))
 
 // ponytail: pathname switch; add a router when a section needs nested routes.
 const sections: Record<string, React.ComponentType> = {
@@ -16,6 +17,7 @@ const sections: Record<string, React.ComponentType> = {
   '/studio': Studio,
   '/admin': Admin,
   '/tutor': Tutor,
+  '/evidence': Evidence,
 }
 
 /** While a section's code downloads (slow on 2G), show that something is happening instead of a blank page. */

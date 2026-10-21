@@ -78,6 +78,9 @@ export default function Landing() {
         <a href="#modes" className="text-[#a9b8b3] hover:text-[#f2efe6] max-sm:hidden">
           Two modes
         </a>
+        <a href="/evidence" className="text-[#a9b8b3] hover:text-[#f2efe6] max-sm:hidden">
+          Evidence
+        </a>
         <a href="#how" className="text-[#a9b8b3] hover:text-[#f2efe6] max-sm:hidden">
           How it works
         </a>
@@ -257,6 +260,9 @@ export default function Landing() {
       <footer className="mx-auto flex max-w-7xl flex-wrap items-center gap-4 border-t border-border px-5 py-8 text-sm text-muted-foreground md:px-8">
         <span>Team A1pha · AI for Foundational Learning Hackathon 2026</span>
         <div className="flex-1" />
+        <a href="/evidence" className="underline-offset-4 hover:text-foreground hover:underline">
+          Evidence, cost and your data
+        </a>
         <a href={REPO} className="underline-offset-4 hover:text-foreground hover:underline">
           Source on GitHub
         </a>
