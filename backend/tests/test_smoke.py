@@ -15,6 +15,19 @@ def test_health():
     assert TestClient(app).get("/health").json() == {"status": "ok"}
 
 
+def test_health_answers_head_for_uptime_monitors():
+    assert TestClient(app).head("/health").status_code == 200
+
+
+def test_big_json_is_gzipped_but_range_requests_are_not():
+    client = TestClient(app)
+    gzip = {"Accept-Encoding": "gzip"}
+    assert client.get("/openapi.json", headers=gzip).headers["content-encoding"] == "gzip"
+    ranged = client.get("/openapi.json", headers={**gzip, "Range": "bytes=0-99"})
+    assert "content-encoding" not in ranged.headers
+    assert "content-encoding" not in client.get("/health", headers=gzip).headers  # under 1 KB
+
+
 def test_sample_episode_matches_contract():
     Episode.model_validate_json(SAMPLE.read_text())
 
