@@ -6,8 +6,8 @@ No sign-up clips: the product has no sign-up page (accounts are seeded).
 ## Files to make
 | Use | Clips | Save as |
 |---|---|---|
-| Landing hero | 3 x 8 s, one story in three acts | `app/public/media/signin-a.mp4 (re-edited)`, `landing-2.mp4`, `landing-3.mp4` |
-| Sign-in background | 2 x 8 s, seamless loops | `app/public/media/signin-1.mp4`, `signin-2.mp4` |
+| Landing hero | 3 x 8 s, one story in three acts | the landing hero is now a WebGL speaker; no video |
+| Sign-in background | 3 x 10 s supplied montages, re-edited into seamless 6 s loops (hard cuts to dissolves, watermark cropped, no audio) | `app/public/media/signin-1.mp4`, `signin-2.mp4`, `signin-3.mp4` |
 
 Specs for every clip: 16:9, 1920x1080 or higher, 24 or 30 fps, 8 seconds, no audio, slow steady camera with smooth easing.
 

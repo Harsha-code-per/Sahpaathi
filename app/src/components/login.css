@@ -1,8 +1,9 @@
-/* Sign-in backdrop: two classroom scenes, each a seamless slow video loop (re-edited from the supplied
-   montages: cuts replaced by dissolves, the watermark cropped off), crossfading every 12 s. A light veil
-   keeps the card readable. Under reduced motion or Save-Data the stills crossfade instead, without zoom. */
+/* Sign-in backdrop: three classroom scenes, each a seamless slow video loop (the supplied montages re-edited:
+   hard cuts replaced by dissolves, closed so the last frame is the first, watermark cropped off), crossfading
+   in turn every 12 s. A light veil keeps the card readable. No zoom, so nothing drifts or shakes. Under reduced
+   motion or Save-Data the first still is shown instead. */
 .login-bg {
-  background: #f2efe6 url('/media/signin-a.jpg') center / cover;
+  background: #f2efe6 url('/media/signin-1.jpg') center / cover;
 }
 .login-bg video,
 .login-bg img {
@@ -12,26 +13,26 @@
   height: 100%;
   object-fit: cover;
   opacity: 0;
-  will-change: opacity, transform;
-  animation: login-scene 24s linear infinite;
+  animation: login-scene 36s linear infinite;
 }
 .login-bg :nth-child(2) {
+  animation-delay: -24s;
+}
+.login-bg :nth-child(3) {
   animation-delay: -12s;
 }
-/* Each scene shows for 60% of the cycle, fading in and out over 10% while the other does the reverse. */
+/* Each scene is fully shown for a third of the cycle, fading in and out over 8% while the next does the reverse. */
 @keyframes login-scene {
   0% {
     opacity: 0;
-    transform: scale(1.04);
   }
-  10%,
-  50% {
+  8%,
+  33% {
     opacity: 1;
   }
-  60%,
+  41%,
   100% {
     opacity: 0;
-    transform: scale(1);
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -41,7 +42,7 @@
   .login-bg img:first-child {
     opacity: 1;
   }
-  .login-bg img:nth-child(2) {
+  .login-bg img:nth-child(n + 2) {
     display: none;
   }
 }
