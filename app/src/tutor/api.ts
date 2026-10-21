@@ -84,6 +84,9 @@ export interface TurnIn {
   progress: Progress
   language: Lang
   style: Style
+  /** The perception agents suggest a gentle check-in (no student words). */
+  signal?: 'confused' | 'distracted' | 'noisy' | 'tired' | 'uncomfortable' | null
+  reasons?: string[]
 }
 
 /** One step of the conversation: the server applies the teaching rules and returns the reply and the new position. */

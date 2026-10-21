@@ -20,7 +20,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from pydantic import ValidationError
 
 from app.config import settings
-from app.tutor import engine
+from app.tutor import engine, sense
 from app.tutor.brain import ClaudeBrain, EmptyReply
 from app.tutor.models import Plan, PlanIn, SpeakIn, TurnIn, TurnOut
 from app.voice.sarvam import SarvamTTS
@@ -92,6 +92,16 @@ def turn(body: TurnIn, brain: Brain) -> TurnOut:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(e)) from e
     except (anthropic.APIError, ValidationError, EmptyReply) as e:
         raise _busy(e) from e
+
+
+@router.post("/sense")
+def read_signals(body: sense.SenseIn) -> sense.Insight:
+    """The perception agents (LangGraph): numbers from the learner's own camera and microphone
+    processing in, a hint out. No image or audio ever arrives here, and nothing is stored or logged.
+    Off (404) unless SENSE_ENABLED is set: see docs/SENSE.md before turning it on."""
+    if not settings.sense_enabled:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found.")
+    return sense.analyse(body)
 
 
 @router.post("/speak")

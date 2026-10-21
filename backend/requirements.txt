@@ -9,3 +9,4 @@ python-multipart==0.0.32
 pyjwt==2.15.1          # login tokens
 anthropic==1.15.0      # factory (M1)
 cryptography==50.0.2   # pack signing, Ed25519 (M3)
+langgraph==1.2.16      # tutor perception agents (M3): parallel agents + an orchestrator
