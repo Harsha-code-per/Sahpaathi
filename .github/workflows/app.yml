@@ -23,6 +23,7 @@ jobs:
           cache: npm
           cache-dependency-path: app/package-lock.json
       - run: npm ci
-      - run: npm run lint
-      - run: npm test
+      - run: npm run lint # oxlint with accessibility rules; warnings fail
+      - run: npm run format:check
+      - run: npm run test:coverage # unit tests with a coverage floor (vite.config.ts)
       - run: npm run build

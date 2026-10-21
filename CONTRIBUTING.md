@@ -2,6 +2,8 @@
 
 Four people, 14 days, one `main`. These rules exist so nobody spends 31 October resolving merge conflicts.
 
+**The quality bar for every change is in [AGENTS.md](AGENTS.md)** (the six judging criteria as rules). This file is the process.
+
 ## 1. Golden rules
 1. **Edit only files you own** ([.github/CODEOWNERS](.github/CODEOWNERS), [ownership map](docs/TEAM_PLAN.md#ownership)). Touching someone else's file? Tag them in the PR.
 2. **Never commit to `main` directly.** Branch, PR, merge.
@@ -36,8 +38,10 @@ git fetch origin
 git rebase origin/main          # rare conflicts if you stay in your files
 git push --force-with-lease     # safe force-push of your own branch
 
-# open PR → CI green → owner/teammate approves → "Rebase and merge"
+# open PR → CI green → it merges itself (rebase) and deploys
 ```
+
+**Auto-merge:** every PR into `main` merges itself as soon as the required checks pass (backend, app, e2e, security) and then deploys. Open it as a **draft**, or add the **`hold`** label, while it should wait (a migration, a risky change, waiting for a teammate). Remove `hold` to let it go.
 
 **Never "Squash and merge".** It collapses your commits into one authored by whoever clicks the button and erases per-member history.
 Rebase gone wrong? `git rebase --abort` and ask. Never force-push `main`.
@@ -46,19 +50,20 @@ Rebase gone wrong? `git rebase --abort` and ask. Never force-push `main`.
 
 `<type>(<scope>): <imperative summary, ≤ 72 chars>`
 
-Types: `feat` `fix` `refactor` `test` `docs` `style` `chore` `ci`.
-Scopes: `factory` `guardrails` `studio` `content` `player` `pwa` `sync` `voice` `pack` `sensing` `api` `db` `auth` `ivr` `admin` `deploy`.
+Types: `feat` `fix` `perf` `refactor` `test` `docs` `style` `chore` `ci`.
+Scopes: `factory` `guardrails` `studio` `content` `player` `teacher` `pwa` `sync` `voice` `pack` `sensing` `sense` `tutor` `landing` `insights` `api` `db` `auth` `ivr` `admin` `backend` `app` `deps` `deploy` `ci` `docs`.
 
 ## 5. Pull requests
 - Fill in the PR template. Keep it under ~300 changed lines.
 - UI PRs include a screenshot (phone width).
 - Review within a couple of hours when tagged. "LGTM + ran it" beats a perfect review on Day 13.
-- CI (lint + tests + build) must be green.
+- CI must be green: lint, format, tests with a coverage floor, build, the browser smoke test (every page, no white screen, no serious accessibility issue) and the security scan (secrets, vulnerable dependencies).
+- There is no human gate before merge, so review your own diff against the [AGENTS.md](AGENTS.md) checklist.
 
 ## 6. Code style
 **Python (backend):** 3.12, type hints, `ruff check . && ruff format .`. Every guardrail, pack and IVR function that can be wrong has a pytest.
 
-**TypeScript (app):** strict TS, `npm run lint` (oxlint). Components `PascalCase.tsx`. Episode types come only from `src/lib/types.ts`. Colours come from the Tailwind theme tokens in `src/index.css` (`ink`, `sun`, `leaf`, `clay`). Big tap targets (≥ 56 px): teachers tap mid-lesson.
+**TypeScript (app):** strict TS, `npm run lint` (oxlint, with accessibility rules, warnings fail CI), `npm run format` (Prettier). Components `PascalCase.tsx`. Episode types come only from `src/lib/types.ts`. Colours come from the Tailwind theme tokens in `src/index.css`. Big tap targets (≥ 56 px on the teacher player, ≥ 44 px elsewhere): teachers tap mid-lesson.
 
 ## 7. Dependencies
 Need a new one? Ask the file owner (M1 for `backend/requirements.txt`, M2 for `app/package.json`). They add it in a tiny separate PR, so lockfile conflicts never happen in feature branches.
