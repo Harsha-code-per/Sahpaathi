@@ -364,6 +364,35 @@ class ClaudeBrain:
             Question, TALK_MODEL, system, [{"role": "user", "content": "A riddle, please."}], 400
         )
 
+    def parent_summary(
+        self, title: str, parts: list[str], revise: list[str], language: Lang
+    ) -> str:
+        """A few short sentences a child can say aloud to a parent who may not read."""
+        topics = "; ".join(parts) or title
+        again = "; ".join(revise)
+        system = (
+            f"{PERSONA}{NL}You are now writing a short note, not teaching. A child will say it aloud to a "
+            "parent or grandparent who may not read and did not go to school for long. Write 4 to 6 very "
+            'short, warm sentences, in the first person as the child ("Today I learned..."): what the '
+            "lesson was about, the one idea to remember, and one thing they can practise together at "
+            "home using free things like pebbles, seeds or fingers. No jargon, no scores, no marks, "
+            f"no advice to buy anything. {_language(language)}"
+        )
+        ask = f"Lesson: {title}. Parts: {topics}."
+        if again:
+            ask += f" Things still to practise: {again}."
+        res = self.client.messages.create(
+            model=TALK_MODEL,
+            max_tokens=600,
+            thinking=NO_THINKING[TALK_MODEL],
+            system=system,
+            messages=[{"role": "user", "content": ask}],
+        )
+        text = "".join(b.text for b in res.content if b.type == "text").strip()
+        if not text:
+            raise EmptyReply("Claude returned no text")
+        return text
+
     def say(
         self, directive: Directive, history: list[Message], language: Lang, style: Style
     ) -> str:

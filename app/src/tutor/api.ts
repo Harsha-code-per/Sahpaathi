@@ -100,6 +100,12 @@ export async function turn(body: TurnIn): Promise<TurnOut> {
   return (await (await post('turn', body)).json()) as TurnOut
 }
 
+/** A short note, in the learner's language, that a child can say aloud to a parent. Stores nothing. */
+export async function parentSummary(r: { title: string; parts: string[]; revise: string[]; language: Lang }): Promise<string> {
+  const res = await post('summary', r)
+  return ((await res.json()) as { text: string }).text
+}
+
 let voiceDownUntil = 0 // after the server voice fails, stop asking it for a while
 
 /**

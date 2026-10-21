@@ -22,7 +22,7 @@ from pydantic import ValidationError
 from app.config import settings
 from app.tutor import engine, sense
 from app.tutor.brain import ClaudeBrain, EmptyReply
-from app.tutor.models import Plan, PlanIn, SpeakIn, TurnIn, TurnOut
+from app.tutor.models import Plan, PlanIn, SpeakIn, SummaryIn, SummaryOut, TurnIn, TurnOut
 from app.voice.sarvam import SarvamTTS
 from app.voice.settings import VoiceSettings
 from app.voice.tts import TTSError
@@ -91,6 +91,18 @@ def turn(body: TurnIn, brain: Brain) -> TurnOut:
     except engine.LessonError as e:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(e)) from e
     except (anthropic.APIError, ValidationError, EmptyReply) as e:
+        raise _busy(e) from e
+
+
+@router.post("/summary")
+def parent_summary(body: SummaryIn, brain: Brain) -> SummaryOut:
+    """A short note in the learner's language to say aloud to a parent. Nothing about the learner is stored."""
+    _spend("chat", settings.tutor_daily_turns)
+    try:
+        return SummaryOut(
+            text=brain.parent_summary(body.title, body.parts, body.revise, body.language)
+        )
+    except (anthropic.APIError, EmptyReply) as e:
         raise _busy(e) from e
 
 

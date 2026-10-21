@@ -10,6 +10,8 @@ import { useSense, type Insight } from '../sense/useSense'
 // Camera/mic perception stays hidden unless the build sets VITE_SENSE_ENABLED=true (docs/SENSE.md):
 // it needs legal review and parental consent before children use it. Without the panel it never starts.
 const SENSE_ENABLED = import.meta.env.VITE_SENSE_ENABLED === 'true'
+import { LearningPanel } from './LearningPanel'
+import { useLearning } from './useLearning'
 import MemoryGame from './MemoryGame'
 import { canListen, listen, speak, type Listener, type Speaker } from './speech'
 import './tutor.css'
@@ -79,6 +81,7 @@ export default function Tutor() {
   const [plan, setPlan] = useState<Plan | null>(null)
   const [progress, setProgress] = useState<Progress>(FRESH)
   const [turns, setTurns] = useState<Shown[]>([])
+  const learning = useLearning()
   const [phase, setPhase] = useState<Phase>('idle')
   const [note, setNote] = useState('')
   const [live, setLive] = useState('')
@@ -252,6 +255,7 @@ export default function Tutor() {
       if (mine !== generation.current) return
       progressRef.current = out.progress
       setProgress(out.progress)
+      if (planRef.current) learning.update(out.progress)
       if (out.language !== lang) setLang(out.language)
       if (out.style !== style) setStyle(out.style)
       settings.current = { ...settings.current, lang: out.language, style: out.style }
@@ -292,6 +296,7 @@ export default function Tutor() {
       }
       planRef.current = made
       setPlan(made)
+      learning.begin(made, settings.current.lang)
       setAttached(null)
       setStudy(false)
       settings.current = { ...settings.current, attached: null, study: false }
@@ -304,6 +309,13 @@ export default function Tutor() {
       planning.current = false
       fail(e, mine)
     }
+  }
+
+  /** Reads a note aloud with the server voice, or the browser's own; the lesson is not touched. */
+  async function readAloud(text: string, language: Lang) {
+    speaker.current?.stop()
+    const url = await speakUrl(text, language)
+    speaker.current = speak(text, language, url, () => (speaker.current = null), () => setNote('There is no voice for this language on this device.'))
   }
 
   function press() {
@@ -377,6 +389,7 @@ export default function Tutor() {
         </div>
 
         {SENSE_ENABLED && <SensePanel sense={sense} />}
+        <LearningPanel learning={learning} onPractise={(text) => void startStudy(text, null)} onSpeak={readAloud} />
 
         {plan && (
           <section aria-label="Lesson plan" className="space-y-2 rounded-3xl border border-white/15 bg-white/5 p-4">

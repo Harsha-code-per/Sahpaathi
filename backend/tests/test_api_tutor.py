@@ -54,6 +54,10 @@ class ScriptedBrain:
         self.said.append(directive)
         return f"SAY:{directive.action}"
 
+    def parent_summary(self, title, parts, revise, language):
+        self.summarised = (title, parts, revise, language)
+        return "Today I learned counting. Let us count pebbles together."
+
     def riddle(self, plan, part, language, style):
         return Question(ask="What has hands but cannot clap?", answer="a clock", hint="Time.")
 
@@ -249,6 +253,33 @@ def test_daily_cap_stops_the_spending_and_a_plan_costs_five_turns(brain, monkeyp
     assert post("plan", {"topic": "x"}).status_code == 200  # 5 of 6 used
     assert post("turn", {"text": "hi"}).status_code == 200
     assert post("turn", {"text": "hi"}).status_code == 429
+
+
+def test_a_parent_summary_comes_back_and_counts_against_the_daily_cap(brain, monkeypatch):
+    body = {
+        "title": "Place value",
+        "parts": ["Tens", "Ones"],
+        "revise": ["Which digit is in the tens place?"],
+        "language": "ta",
+    }
+    res = post("summary", body)
+    assert res.status_code == 200 and res.json() == {
+        "text": "Today I learned counting. Let us count pebbles together."
+    }
+    assert brain.summarised == (
+        "Place value",
+        ["Tens", "Ones"],
+        ["Which digit is in the tens place?"],
+        "ta",
+    )
+    monkeypatch.setattr(tutor.settings, "tutor_daily_turns", 1)
+    assert post("summary", body).status_code == 429  # the first one used the day's only turn
+
+
+def test_a_parent_summary_needs_a_title_and_has_limits(brain):
+    assert post("summary", {"parts": []}).status_code == 422
+    assert post("summary", {"title": "x" * 161}).status_code == 422
+    assert post("summary", {"title": "ok", "parts": ["p"] * 7}).status_code == 422
 
 
 def test_speak_without_a_server_voice_says_so(brain):
