@@ -2,6 +2,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.gzip import GZipMiddleware
+from starlette.types import ASGIApp, Receive, Scope, Send
 
 from app import auth, dashboard, episodes, packs, sync
 from app.config import settings
@@ -18,7 +20,30 @@ async def lifespan(_: FastAPI):
     yield
 
 
+class JsonGZip:
+    """Gzips API responses for clients that accept it (JSON shrinks ~5x on a slow link).
+
+    Pack downloads and IVR audio are already compressed, and a gzipped body would break resumed
+    (Range) downloads, so they pass through.
+    """
+
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+        self.gzip = GZipMiddleware(app, minimum_size=1000)
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        path = scope.get("path", "")
+        skip = (
+            scope["type"] != "http"
+            or "/packs" in path
+            or path.startswith("/api/v1/ivr")
+            or any(k == b"range" for k, _ in scope["headers"])
+        )
+        await (self.app if skip else self.gzip)(scope, receive, send)
+
+
 app = FastAPI(title="Sahpaathi API", version="0.1.0", lifespan=lifespan)
+app.add_middleware(JsonGZip)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
@@ -37,6 +62,7 @@ app.include_router(ivr.router)
 app.include_router(exotel.router)
 
 
-@app.get("/health")
+# HEAD too: uptime monitors probe with HEAD by default and would read a 405 as "down".
+@app.api_route("/health", methods=["GET", "HEAD"])
 def health() -> dict[str, str]:
     return {"status": "ok"}
