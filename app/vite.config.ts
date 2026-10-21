@@ -48,6 +48,7 @@ export default defineConfig({
   // Coverage floors for the logic the unit tests cover (CI: npm run test:coverage). Raise them, never lower.
   test: {
     exclude: ['e2e/**', 'node_modules/**'],
+    testTimeout: 20_000, // coverage instrumentation slows the 10 MB pack tests on CI
     coverage: { provider: 'v8', thresholds: { statements: 85, lines: 85, branches: 75, functions: 75 } },
   },
 })

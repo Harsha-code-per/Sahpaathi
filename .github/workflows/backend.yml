@@ -36,6 +36,8 @@ jobs:
           cache: pip
           cache-dependency-path: backend/requirements*.txt
       - run: pip install -r requirements-dev.txt
+      - name: ffmpeg, so the voice and pack tests run instead of skipping
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
       - name: Lint
         run: ruff check . && ruff format --check .
       - name: Migrations apply, roll back and re-apply; models match them
