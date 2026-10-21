@@ -176,7 +176,7 @@ export default function Library({ onOpen, pending }: { onOpen: (lesson: OpenLess
 
   return (
     <main className="theme-board min-h-dvh bg-background text-foreground">
-      <div className="mx-auto flex max-w-xl flex-col gap-5 px-5 py-6">
+      <div className="mx-auto flex max-w-xl flex-col gap-5 px-5 pt-6 pb-28">
         <header className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <span className="grid size-11 place-items-center rounded-xl bg-primary text-primary-foreground">
