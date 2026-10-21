@@ -40,8 +40,8 @@ jobs:
         run: ruff check . && ruff format --check .
       - name: Migrations apply, roll back and re-apply; models match them
         run: alembic upgrade head && alembic downgrade base && alembic upgrade head && alembic check
-      - name: Tests (real Postgres)
-        run: pytest -q
+      - name: Tests (real Postgres), with a coverage floor
+        run: pytest -q --cov=app --cov-report=term:skip-covered --cov-fail-under=85
 
   docker:
     runs-on: ubuntu-latest

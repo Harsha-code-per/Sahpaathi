@@ -6,12 +6,16 @@ from sqlalchemy.pool import StaticPool
 
 from app.config import settings
 
-# SQLite is only for tests: one shared in-memory connection so every session sees the same data.
+# SQLite is for tests and local runs. In memory: one shared connection, so every session sees the
+# same data. A SQLite file (browser smoke test, local dev) gets a connection per thread, as Postgres
+# does: sharing one across the server's threads gave wrong rows and crashed on concurrent requests.
 _sqlite = settings.database_url.startswith("sqlite")
+_memory = _sqlite and ":memory:" in settings.database_url
 engine = create_engine(
     settings.database_url,
     pool_pre_ping=not _sqlite,
-    **({"connect_args": {"check_same_thread": False}, "poolclass": StaticPool} if _sqlite else {}),
+    **({"connect_args": {"check_same_thread": False}} if _sqlite else {}),
+    **({"poolclass": StaticPool} if _memory else {}),
 )
 SessionLocal = sessionmaker(engine, expire_on_commit=False)
 
