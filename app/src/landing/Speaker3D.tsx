@@ -43,7 +43,10 @@ function profile(): THREE.Vector2[] {
 }
 
 const lathe = (pts: THREE.Vector2[], from: number, to: number) =>
-  new THREE.LatheGeometry(pts.filter((p) => p.y >= from && p.y <= to), 128)
+  new THREE.LatheGeometry(
+    pts.filter((p) => p.y >= from && p.y <= to),
+    128,
+  )
 
 /**
  * The hero: a real-time WebGL speaker in a dark studio. Fabric body, metal top with a marigold light ring,
@@ -151,7 +154,14 @@ export default function Speaker3D({ pulse, words }: { pulse: Pulse; words: Word[
       keep(new THREE.PlaneGeometry(1.9, 1.9)),
       keep(
         new THREE.MeshBasicMaterial({
-          map: keep(radial([[0, 'rgba(244,178,62,0)'], [0.55, 'rgba(244,178,62,0)'], [0.68, 'rgba(244,178,62,0.55)'], [0.82, 'rgba(244,178,62,0)']])),
+          map: keep(
+            radial([
+              [0, 'rgba(244,178,62,0)'],
+              [0.55, 'rgba(244,178,62,0)'],
+              [0.68, 'rgba(244,178,62,0.55)'],
+              [0.82, 'rgba(244,178,62,0)'],
+            ]),
+          ),
           transparent: true,
           blending: THREE.AdditiveBlending,
           depthWrite: false,
@@ -170,12 +180,45 @@ export default function Speaker3D({ pulse, words }: { pulse: Pulse; words: Word[
       scene.add(m)
       return m
     }
-    flat(3.4, keep(new THREE.MeshBasicMaterial({ map: keep(radial([[0, 'rgba(0,0,0,0.85)'], [0.45, 'rgba(0,0,0,0.5)'], [1, 'rgba(0,0,0,0)']])), transparent: true, depthWrite: false })), 0.002)
-    const poolMat = keep(new THREE.MeshBasicMaterial({ map: keep(radial([[0, 'rgba(255,255,255,0.5)'], [1, 'rgba(255,255,255,0)']])), color: MARIGOLD, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false }))
+    flat(
+      3.4,
+      keep(
+        new THREE.MeshBasicMaterial({
+          map: keep(
+            radial([
+              [0, 'rgba(0,0,0,0.85)'],
+              [0.45, 'rgba(0,0,0,0.5)'],
+              [1, 'rgba(0,0,0,0)'],
+            ]),
+          ),
+          transparent: true,
+          depthWrite: false,
+        }),
+      ),
+      0.002,
+    )
+    const poolMat = keep(
+      new THREE.MeshBasicMaterial({
+        map: keep(
+          radial([
+            [0, 'rgba(255,255,255,0.5)'],
+            [1, 'rgba(255,255,255,0)'],
+          ]),
+        ),
+        color: MARIGOLD,
+        transparent: true,
+        opacity: 0.35,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      }),
+    )
     flat(6, poolMat, 0.001)
     const ringGeo = keep(new THREE.RingGeometry(0.97, 1, 160))
     const waves = [0, 1, 2].map(() => {
-      const m = new THREE.Mesh(ringGeo, keep(new THREE.MeshBasicMaterial({ color: pulseRef.current.color, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })))
+      const m = new THREE.Mesh(
+        ringGeo,
+        keep(new THREE.MeshBasicMaterial({ color: pulseRef.current.color, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })),
+      )
       m.rotation.x = -Math.PI / 2
       m.position.y = 0.004
       scene.add(m)

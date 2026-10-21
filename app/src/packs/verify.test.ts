@@ -6,8 +6,7 @@ import { MAX_PACK_BYTES, PackError, signedBytes, verifyPack } from './verify'
 const sample = samplePack.episode
 const lineId = sample.segments[0].teach[0].id
 const toB64 = (bytes: Uint8Array) => btoa(String.fromCharCode(...bytes))
-const hex = async (b: Uint8Array<ArrayBuffer>) =>
-  Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', b)), (x) => x.toString(16).padStart(2, '0')).join('')
+const hex = async (b: Uint8Array<ArrayBuffer>) => Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', b)), (x) => x.toString(16).padStart(2, '0')).join('')
 
 let signer: CryptoKey
 let publicKey: string
@@ -54,9 +53,7 @@ const rejects = async (zip: Uint8Array, message: RegExp, key: string | null = pu
 
 describe('signedBytes', () => {
   it('matches Python json.dumps(sort_keys=True, separators=(",", ":"))', () => {
-    expect(new TextDecoder().decode(signedBytes({ 'sketch.svg': 'bb', 'audio/a.opus': 'aa' }))).toBe(
-      '{"audio/a.opus":"aa","sketch.svg":"bb"}',
-    )
+    expect(new TextDecoder().decode(signedBytes({ 'sketch.svg': 'bb', 'audio/a.opus': 'aa' }))).toBe('{"audio/a.opus":"aa","sketch.svg":"bb"}')
   })
 })
 
@@ -148,7 +145,6 @@ describe('verifyPack', () => {
     const zip = await makePack({ files: { 'episode.json': JSON.stringify(sample), 'audio/nope.opus': new Uint8Array([1]) } })
     await rejects(zip, /audio for "nope", which is not a line/)
   })
-
 
   it('refuses packs that unzip to more than the size cap', async () => {
     const big = new Uint8Array(MAX_PACK_BYTES + 1)

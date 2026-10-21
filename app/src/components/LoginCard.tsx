@@ -39,8 +39,7 @@ export type DemoAccount = { role: string; email: string }
 const SCENES = ['signin-a', 'signin-b']
 // Reduced motion or a data-saver connection: the still posters instead of video.
 const still =
-  typeof window !== 'undefined' &&
-  (matchMedia('(prefers-reduced-motion: reduce)').matches || Boolean((navigator as { connection?: { saveData?: boolean } }).connection?.saveData))
+  typeof window !== 'undefined' && (matchMedia('(prefers-reduced-motion: reduce)').matches || Boolean((navigator as { connection?: { saveData?: boolean } }).connection?.saveData))
 
 export function LoginCard(props: { product: string; blurb: string; demo?: DemoAccount[]; login: (email: string, password: string) => Promise<void> }) {
   const [email, setEmail] = useState('')
@@ -89,7 +88,14 @@ export function LoginCard(props: { product: string; blurb: string; demo?: DemoAc
         <label className="block space-y-1.5">
           <span className="text-sm font-semibold">Password</span>
           <span className="relative block">
-            <input className={`${field} pr-12`} type={show ? 'text' : 'password'} autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+            <input
+              className={`${field} pr-12`}
+              type={show ? 'text' : 'password'}
+              autoComplete="current-password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
             <button
               type="button"
               aria-label={show ? 'Hide password' : 'Show password'}

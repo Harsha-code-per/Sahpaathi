@@ -1,13 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": [
-    "react",
-    "typescript",
-    "oxc",
-    "jsx-a11y",
-    "import",
-    "promise"
-  ],
+  "plugins": ["react", "typescript", "oxc", "jsx-a11y", "import", "promise"],
   "rules": {
     "react/rules-of-hooks": "error",
     "react/only-export-components": [
@@ -26,10 +19,7 @@
     "no-console": [
       "error",
       {
-        "allow": [
-          "warn",
-          "error"
-        ]
+        "allow": ["warn", "error"]
       }
     ],
     "promise/catch-or-return": "off",
@@ -37,9 +27,7 @@
   },
   "overrides": [
     {
-      "files": [
-        "src/components/ui/**"
-      ],
+      "files": ["src/components/ui/**"],
       "rules": {
         "react/only-export-components": "off"
       }

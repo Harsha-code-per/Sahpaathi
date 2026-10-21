@@ -72,7 +72,10 @@ async function post(path: string, body: unknown): Promise<Response> {
     throw new Error('Cannot reach the teacher right now. Check the internet connection and try again.')
   }
   if (res.ok) return res
-  const detail = await res.json().then((j: { detail?: unknown }) => j.detail).catch(() => undefined)
+  const detail = await res
+    .json()
+    .then((j: { detail?: unknown }) => j.detail)
+    .catch(() => undefined)
   throw new Error(typeof detail === 'string' ? detail : 'The teacher could not answer. Try again.')
 }
 

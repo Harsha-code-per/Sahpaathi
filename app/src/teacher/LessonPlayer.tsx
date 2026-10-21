@@ -26,10 +26,13 @@ function playLine(line: Line, url: string | undefined, onDone: () => void, onPau
   const wait = (sec: number) => {
     if (finished) return
     finished = true
-    timer = window.setTimeout(() => {
-      onPause(false)
-      onDone()
-    }, (sec + line.pause_after_sec) * 1000)
+    timer = window.setTimeout(
+      () => {
+        onPause(false)
+        onDone()
+      },
+      (sec + line.pause_after_sec) * 1000,
+    )
   }
   if (!url) {
     wait(estimateSec(line))
@@ -56,7 +59,6 @@ const TAPS: { tap: Tap; colour: string }[] = [
   { tap: 'some', colour: 'bg-some text-[#172524]' },
   { tap: 'few', colour: 'bg-few text-[#1a0f0b]' },
 ]
-
 
 /** Three big tap buttons; mounted fresh per segment so the 10 s countdown restarts. Answers at most once. */
 function Checkpoint({
@@ -188,9 +190,7 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
   const onTap = (segmentId: string, t: Tap, auto: boolean) => {
     setPhase((p) => tap(episode, p, t))
     // The lesson never waits on storage: a failed write is logged, not shown mid-class.
-    recordTap({ episode_id: episode.id, segment_id: segmentId, tap: t, auto }).then(onTapRecorded, (e) =>
-      console.error('Could not queue tap', e),
-    )
+    recordTap({ episode_id: episode.id, segment_id: segmentId, tap: t, auto }).then(onTapRecorded, (e) => console.error('Could not queue tap', e))
   }
 
   const segment = phase.kind === 'line' || phase.kind === 'checkpoint' ? episode.segments[phase.seg] : null
@@ -210,9 +210,7 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
           <h1 className="font-heading text-2xl leading-tight font-bold" lang={episode.school_lang}>
             {episode.title}
           </h1>
-          <p className="text-muted-foreground">
-            {t.lessonMeta(episode.grade, episode.district, episode.duration_min)}
-          </p>
+          <p className="text-muted-foreground">{t.lessonMeta(episode.grade, episode.district, episode.duration_min)}</p>
           {segment && (
             <div className="space-y-2">
               <div className="flex gap-1.5" aria-hidden>
@@ -232,12 +230,7 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
             episode={episode}
             onStart={() => setPhase(start(episode))}
             beforeStart={
-              <Button
-                variant="outline"
-                size="lg"
-                disabled={choral.state === 'starting' || choral.state === 'on'}
-                onClick={choral.enable}
-              >
+              <Button variant="outline" size="lg" disabled={choral.state === 'starting' || choral.state === 'on'} onClick={choral.enable}>
                 <MicIcon aria-hidden />
                 {t.mic[choral.state]}
               </Button>
@@ -248,9 +241,7 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
         {(phase.kind === 'line' || phase.kind === 'analogy') && line && (
           <section className="flex flex-1 flex-col gap-4">
             <div className="space-y-3 rounded-3xl border border-border bg-card p-5">
-              <span className="inline-block rounded-full bg-accent px-3 py-1 text-sm font-semibold">
-                {phase.kind === 'analogy' ? t.analogyPart : t.parts[phase.part]}
-              </span>
+              <span className="inline-block rounded-full bg-accent px-3 py-1 text-sm font-semibold">{phase.kind === 'analogy' ? t.analogyPart : t.parts[phase.part]}</span>
               <p lang={line.lang} className="text-[2rem] leading-snug font-semibold">
                 {line.text}
               </p>
@@ -264,12 +255,7 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
         )}
 
         {phase.kind === 'checkpoint' && segment && (
-          <Checkpoint
-            key={phase.seg}
-            question={segment.checkpoint}
-            suggested={suggested}
-            onTap={(t, auto) => onTap(segment.id, t, auto)}
-          />
+          <Checkpoint key={phase.seg} question={segment.checkpoint} suggested={suggested} onTap={(t, auto) => onTap(segment.id, t, auto)} />
         )}
 
         {(phase.kind === 'line' || phase.kind === 'checkpoint') && episode.analogy.length > 0 && (

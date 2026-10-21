@@ -16,11 +16,7 @@ export default function Teacher() {
 
   return (
     <LangProvider>
-      {lesson ? (
-        <LessonPlayer key={lesson.episode.id} {...lesson} pending={pending} onTapRecorded={sync} onExit={exit} />
-      ) : (
-        <Library onOpen={setLesson} pending={pending} />
-      )}
+      {lesson ? <LessonPlayer key={lesson.episode.id} {...lesson} pending={pending} onTapRecorded={sync} onExit={exit} /> : <Library onOpen={setLesson} pending={pending} />}
     </LangProvider>
   )
 }

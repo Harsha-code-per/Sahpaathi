@@ -152,9 +152,7 @@ export default function Library({ onOpen, pending }: { onOpen: (lesson: OpenLess
 
   async function open(p: StoredPack) {
     const files = await loadPackFiles(p.id)
-    const audio = Object.fromEntries(
-      Object.entries(files?.audio ?? {}).map(([id, bytes]) => [id, URL.createObjectURL(new Blob([bytes], { type: 'audio/ogg; codecs=opus' }))]),
-    )
+    const audio = Object.fromEntries(Object.entries(files?.audio ?? {}).map(([id, bytes]) => [id, URL.createObjectURL(new Blob([bytes], { type: 'audio/ogg; codecs=opus' }))]))
     onOpen({ episode: p.episode, audio })
   }
 

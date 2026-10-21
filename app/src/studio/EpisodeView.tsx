@@ -97,7 +97,13 @@ function LineRow({ line, ctx }: { line: Line; ctx: LineCtx }) {
   const edit = ctx.edits[line.id]
   const gloss = ctx.gloss.get(line.id)
   return (
-    <li id={`line-${line.id}`} className={cn('relative scroll-mt-24 border-t border-border py-4 pl-6 first:border-t-0 before:absolute before:top-[1.4rem] before:left-1 before:size-2.5 before:rounded-full', home ? 'before:bg-primary' : 'before:bg-most')}>
+    <li
+      id={`line-${line.id}`}
+      className={cn(
+        'relative scroll-mt-24 border-t border-border py-4 pl-6 first:border-t-0 before:absolute before:top-[1.4rem] before:left-1 before:size-2.5 before:rounded-full',
+        home ? 'before:bg-primary' : 'before:bg-most',
+      )}
+    >
       <div className="grid gap-x-8 gap-y-2 md:grid-cols-2">
         <div className="min-w-0 space-y-1.5">
           {editing && ctx.onEdit ? (
@@ -415,8 +421,8 @@ export default function EpisodeView(props: {
         <div className="min-w-0 space-y-2">
           {ep && (
             <p className="text-[0.8125rem] font-semibold tracking-wider text-muted-foreground uppercase">
-              Grade {ep.grade} · {ep.district} ·{' '}
-              {ep.home_lang === ep.school_lang ? LANG_NAMES[ep.school_lang] : `${LANG_NAMES[ep.home_lang]} → ${LANG_NAMES[ep.school_lang]}`} · {Math.round(minutes(main))} min
+              Grade {ep.grade} · {ep.district} · {ep.home_lang === ep.school_lang ? LANG_NAMES[ep.school_lang] : `${LANG_NAMES[ep.home_lang]} → ${LANG_NAMES[ep.school_lang]}`} ·{' '}
+              {Math.round(minutes(main))} min
             </p>
           )}
           <h1 className="font-heading text-3xl leading-tight font-bold" lang={ep?.school_lang}>
@@ -440,7 +446,11 @@ export default function EpisodeView(props: {
                 const s = detail.review!.rubric.scores[c.key]
                 if (!s) return null // an older review may lack a criterion
                 return (
-                  <div key={c.key} title={s.reason} className={cn('min-w-0 rounded-xl border px-3 py-2.5 sm:min-w-28 sm:px-3.5', scoreFill(s.score), s.score <= 2 ? 'border-few' : 'border-black/5')}>
+                  <div
+                    key={c.key}
+                    title={s.reason}
+                    className={cn('min-w-0 rounded-xl border px-3 py-2.5 sm:min-w-28 sm:px-3.5', scoreFill(s.score), s.score <= 2 ? 'border-few' : 'border-black/5')}
+                  >
                     <dt className="text-[0.8125rem] text-muted-foreground">{c.label}</dt>
                     <dd className={cn('text-lg font-bold', scoreTone(s.score))}>{s.score} / 5</dd>
                   </div>
@@ -478,12 +488,7 @@ export default function EpisodeView(props: {
             </figure>
           </section>
 
-          <Script
-            ep={ep}
-            ctx={ctx}
-            parts={taps}
-            onRewrite={reviewable ? async (segmentId, note) => onOpen((await api.rewrite(id, segmentId, note)).id) : undefined}
-          />
+          <Script ep={ep} ctx={ctx} parts={taps} onRewrite={reviewable ? async (segmentId, note) => onOpen((await api.rewrite(id, segmentId, note)).id) : undefined} />
           <Decision detail={detail} onDecided={(d) => (setDetail(d), onChanged())} onError={onError} />
         </>
       )}

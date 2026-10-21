@@ -49,7 +49,10 @@ async function send(path: string, init: RequestInit, fetchFn: typeof fetch) {
     throw new ApiError(NO_SIGNAL, 0)
   }
   if (!res.ok && res.status !== 206) {
-    const detail = await res.json().then((b) => b.detail, () => null)
+    const detail = await res.json().then(
+      (b) => b.detail,
+      () => null,
+    )
     throw new ApiError(typeof detail === 'string' ? detail : `The server answered ${res.status}.`, res.status)
   }
   return res

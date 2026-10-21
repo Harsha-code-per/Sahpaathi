@@ -190,9 +190,8 @@ export default function Studio() {
 
   const current = list.find((e) => e.id === selected)
   const q = query.trim().toLowerCase()
-  const shown = items && items.filter(
-    (e) => FILTERS.find((f) => f.key === filter)!.match(e.status) && (!q || [e.title, e.lesson_id, e.district_id].some((t) => t?.toLowerCase().includes(q))),
-  )
+  const shown =
+    items && items.filter((e) => FILTERS.find((f) => f.key === filter)!.match(e.status) && (!q || [e.title, e.lesson_id, e.district_id].some((t) => t?.toLowerCase().includes(q))))
   const count = (f: Filter) => list.filter((e) => FILTERS.find((x) => x.key === f)!.match(e.status)).length
 
   const sidebar = ({ collapsed, expand, close }: SidebarApi) =>
@@ -275,7 +274,9 @@ export default function Studio() {
               <span className="size-10 rounded-full bg-[#f4b23e]/70" />
             </span>
             <h1 className="max-w-xl font-heading text-3xl leading-tight font-bold">Pick a lesson to read it line by line.</h1>
-            <p className="mt-3 max-w-xl text-muted-foreground">Each line sits beside its English back-translation and the AI review. Correct what is wrong, then approve or reject.</p>
+            <p className="mt-3 max-w-xl text-muted-foreground">
+              Each line sits beside its English back-translation and the AI review. Correct what is wrong, then approve or reject.
+            </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Button onClick={() => setWritingOpen(true)}>
                 <PlusIcon aria-hidden /> Write a new lesson

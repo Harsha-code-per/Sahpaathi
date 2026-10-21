@@ -30,9 +30,7 @@ export function hintFromLevels(ambient: number[], answer: number[]): Hint {
   const floor = median(ambient)
   const active = answer.map((db) => db - floor).filter((excess) => excess > ACTIVE_MARGIN_DB)
   const participation = active.length / answer.length
-  const loudness = active.length
-    ? Math.min(1, active.reduce((a, b) => a + b, 0) / active.length / FULL_LOUDNESS_DB)
-    : 0
+  const loudness = active.length ? Math.min(1, active.reduce((a, b) => a + b, 0) / active.length / FULL_LOUDNESS_DB) : 0
   const score = participation * loudness
   return { tap: score >= MOST_AT ? 'most' : score >= SOME_AT ? 'some' : 'few', score }
 }

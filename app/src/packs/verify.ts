@@ -28,7 +28,11 @@ export interface VerifiedPack {
  * Python: json.dumps(sha256, sort_keys=True, separators=(",", ":")).encode()
  */
 export function signedBytes(sha256: Record<string, string>) {
-  const sorted = Object.fromEntries(Object.keys(sha256).sort().map((k) => [k, sha256[k]]))
+  const sorted = Object.fromEntries(
+    Object.keys(sha256)
+      .sort()
+      .map((k) => [k, sha256[k]]),
+  )
   return new TextEncoder().encode(JSON.stringify(sorted))
 }
 
@@ -131,9 +135,7 @@ export async function verifyPack(zip: Uint8Array, publicKeyB64: string | undefin
 
   // 4. Audio comes only from signed paths audio/<line_id>.opus. manifest.audio is ignored: it sits outside the
   //    signature, so trusting it would let anyone remap a line to a different (signed) clip.
-  const lineIds = new Set(
-    [...episode.segments.flatMap((s) => [...s.teach, ...s.easier, ...s.core, ...s.stretch]), ...episode.analogy, ...episode.ivr_recap].map((l) => l.id),
-  )
+  const lineIds = new Set([...episode.segments.flatMap((s) => [...s.teach, ...s.easier, ...s.core, ...s.stretch]), ...episode.analogy, ...episode.ivr_recap].map((l) => l.id))
   const audio: VerifiedPack['audio'] = {}
   for (const p of paths) {
     const id = /^audio\/(.+)\.opus$/.exec(p)?.[1]

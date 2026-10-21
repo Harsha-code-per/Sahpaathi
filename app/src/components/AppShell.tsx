@@ -77,7 +77,9 @@ export function AppShell(props: { product: string; sidebar: (api: SidebarApi) =>
           </button>
           {props.topbar}
         </header>
-        <main className="desk-main flex-1 space-y-4 bg-[radial-gradient(60rem_26rem_at_92%_-8%,rgba(244,178,62,0.13),transparent)] px-4 py-6 md:px-8 lg:px-10">{props.children}</main>
+        <main className="desk-main flex-1 space-y-4 bg-[radial-gradient(60rem_26rem_at_92%_-8%,rgba(244,178,62,0.13),transparent)] px-4 py-6 md:px-8 lg:px-10">
+          {props.children}
+        </main>
       </div>
 
       <Sheet open={menu} onOpenChange={setMenu}>

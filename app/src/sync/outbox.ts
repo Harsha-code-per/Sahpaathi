@@ -10,10 +10,7 @@ export async function recordTap(e: Pick<TapEvent, 'episode_id' | 'segment_id' | 
 }
 
 /** Queues one catch-up-call event for the lesson just played. */
-export async function recordAttendance(
-  e: Pick<AttendanceEvent, 'classroom_id' | 'episode_id' | 'absent'>,
-  now = new Date(),
-) {
+export async function recordAttendance(e: Pick<AttendanceEvent, 'classroom_id' | 'episode_id' | 'absent'>, now = new Date()) {
   // A bad code must not sit in the outbox failing /sync on every retry, so check before anything is saved.
   const bad = [e.classroom_id, ...e.absent].find((c) => !isCode(c))
   if (bad) throw new Error(`"${bad}" is not a classroom or roll code: letters, digits and hyphen, starting with a letter or digit, up to 40 characters.`)
