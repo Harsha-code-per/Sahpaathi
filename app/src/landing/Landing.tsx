@@ -12,7 +12,6 @@ const WORDS = [
   { lang: 'ta', text: 'ஒன்று, இரண்டு', pos: 'top-[8%] left-0', delay: '0s' },
   { lang: 'hi', text: 'तीन, चार', pos: 'right-0 bottom-[18%]', delay: '-1.5s' },
   { lang: 'or', text: 'ପାଞ୍ଚ', pos: 'bottom-[4%] left-[14%]', delay: '-3s' },
-  { lang: 'sat', text: 'ᱥᱟᱱᱛᱟᱲᱤ', pos: 'top-[24%] right-[2%]', delay: '-4.5s' },
   { lang: 'en', text: 'six, seven', pos: 'top-[52%] -left-[4%]', delay: '-2.2s' },
 ]
 

@@ -8,7 +8,7 @@ Due **Sun 1 Nov 2026, 23:59 IST** on Hack2Skill. Target: **Sat 31 Oct, 18:00 IST
 - [ ] Test credentials for every role, in README: **teacher**, **reviewer** (native speaker / DIET), **admin** (CRP) (M4)
 - [ ] 3–5 sample inputs that show it at its best, in README (M1), e.g.:
   - Grade 1 · counting to 20 · Chennai · Hindi → Tamil (migrant children)
-  - Grade 2 · place value (tens and ones) · Mayurbhanj · Santali → Odia
+  - Grade 2 · place value (tens and ones) · Madurai · Tamil (Santali → Odia once the phrase bank is recorded)
   - Grade 3 · subtraction with borrowing · Madurai · Tamil
   - "Need a simpler analogy" mid-episode, then airplane mode
   - Mark a child absent → catch-up call in the IVR simulator
