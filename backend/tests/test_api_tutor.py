@@ -54,6 +54,9 @@ class ScriptedBrain:
         self.said.append(directive)
         return f"SAY:{directive.action}"
 
+    def riddle(self, plan, part, language, style):
+        return Question(ask="What has hands but cannot clap?", answer="a clock", hint="Time.")
+
 
 def say(intent="ready", verdict=None, **kw) -> Judgement:
     return Judgement(intent=intent, verdict=verdict, **kw)

@@ -28,6 +28,7 @@ from app.tutor.models import (
 
 log = logging.getLogger(__name__)
 
+NL = chr(10)
 PLAN_MODEL = "claude-sonnet-5-5"  # once per lesson: worth the better analysis
 TALK_MODEL = "claude-haiku-5-5"  # every spoken turn: must answer in about a second
 # Both models answer straight away, but each names "no hidden thinking" differently.
@@ -54,11 +55,14 @@ STYLE = {
 
 
 def _language(language: str) -> str:
+    script = {
+        "hi": " Write it in Devanagari script, never in English letters.",
+        "ta": " Write it in Tamil script, never in English letters.",
+        "or": " Write it in Odia script, never in English letters.",
+    }.get(language, "")
     return (
-        f"Speak ONLY in {LANGUAGES[language]} (numerals and a few well-known English words are fine). "
-        "Always write it in the language's own script (Devanagari for Hindi, Tamil script for Tamil, "
-        "Odia script for Odia), never in English letters. Switch only if the learner asks, and then "
-        "keep to the new language."
+        f"Speak ONLY in {LANGUAGES[language]} (numerals and a few well-known English words are "
+        f"fine).{script} Switch only if the learner asks, and then keep to the new language."
     )
 
 
@@ -148,6 +152,71 @@ def _instruction(d: Directive) -> str:
                 f"Congratulate them. Say what they covered ({titles}). They answered {d.correct} "
                 f"question(s) correctly. Things to revise: {gaps}. Offer to practise again or learn "
                 "something else."
+            )
+        case "offer_break":
+            tired = f" They told you: '{d.text}'. Be kind, no pressure." if d.text else ""
+            return (
+                "The learner has worked hard. Say so warmly in one sentence, then offer a short break "
+                "and name the choices: a riddle, quick maths, a number pattern puzzle, a memory game "
+                "on the screen, or a little stretch. They can also say 'back to the lesson'. Ask what "
+                f"they would like.{tired}"
+            )
+        case "game_intro":
+            if d.kind == "memory":
+                return (
+                    "Tell them the memory game is open on the screen: flip two cards at a time and "
+                    "find the matching pairs. Say to tap 'Back to lesson' when they are done. Keep it "
+                    "to two sentences."
+                )
+            return (
+                "Lead a gentle 20-second stretch in simple steps: stand up, reach arms up high, roll "
+                "the shoulders, take three slow breaths. Keep it short and friendly. End by asking "
+                "them to say 'done' when they are ready to go back."
+            )
+        case "game_ask":
+            assert q
+            lead = {
+                "riddle": "Say you have a riddle for them.",
+                "maths": "Say it is quick maths time.",
+                "pattern": "Say it is a number pattern puzzle.",
+            }.get(d.kind, "")
+            return (
+                f"{lead} Then ask exactly this, word for word if the language is unchanged, and "
+                f"nothing after it: {q.ask}"
+            )
+        case "game_hint":
+            assert q
+            return (
+                f"Not quite. Say so kindly in one short sentence, give this hint: {q.hint} and ask "
+                f"the same question again: {q.ask}"
+            )
+        case "game_feedback":
+            assert q and d.then
+            first = (
+                "Praise the right answer in a few cheerful words."
+                if d.correct
+                else f"Kindly tell them the answer was {q.answer}, with no fuss."
+            )
+            return f"{first} Then continue: {_instruction(d.then)}"
+        case "game_result":
+            assert d.then
+            score = (
+                f"They got {d.correct} of {d.total} right." if d.total else "They had a good break."
+            )
+            return (
+                f"End the break cheerfully. {score} Then bring them back to the lesson: "
+                f"{_instruction(d.then)}"
+            )
+        case "resume_quiz":
+            assert q
+            return (
+                "Welcome them back warmly in one short sentence and say you will carry on from "
+                f"where you stopped. Then ask exactly this question: {q.ask}"
+            )
+        case "resume_part":
+            return (
+                "Welcome them back warmly in one short sentence. Then teach the next part now, "
+                f"freshly.\n{_spec(d.part, n, total)}\n{INVITE}"
             )
         case _:  # redirect
             back = (
@@ -240,27 +309,51 @@ class ClaudeBrain:
         language: Lang,
     ) -> Judgement:
         ctx = f"Lesson part being taught: {part.title}. Mode: {mode}."
+        if mode == "break":
+            ctx += (
+                " The teacher just offered a short break with these choices: riddle, maths (quick sums), "
+                "pattern (a number pattern puzzle), memory (a memory card game on the screen), stretch. "
+                "Set intent 'break' and activity to the one they picked; if they want to go back to the "
+                "lesson, intent 'ready'."
+            )
+        elif mode == "game":
+            ctx += " The learner is playing a break game. 'ready' means they want to stop and go back to the lesson."
         if question is not None:
-            ctx += f"\nOpen question: {question.ask}\nReference answer: {question.answer}"
+            ctx += f"{NL}Open question: {question.ask}{NL}Reference answer: {question.answer}"
         system = (
-            "You read what a learner just said to their teacher and classify it. Output JSON only.\n"
-            f"{ctx}\n"
+            "You read what a learner just said to their teacher and classify it. Output JSON only."
+            f"{NL}{ctx}{NL}"
             "intent: 'again' = they do not understand, ask to hear it again, say wait / slow down / "
             "explain differently / simpler / in another language; 'doubt' = they ask a question about "
             "the content; 'ready' = they are ready or agree to continue; 'answer' = they attempt an "
             "answer to the open question (also 'I do not know', which is a wrong answer); 'skip' = "
-            "they want to skip; 'stop' = they want to end the lesson; 'other' = unrelated chat.\n"
+            "they want to skip; 'stop' = they want to end the lesson; 'break' = they say they are "
+            "tired, bored or want a break, or ask for a game, riddle or puzzle; 'other' = unrelated "
+            f"chat.{NL}"
             "verdict (only when intent is 'answer'): 'correct' if it means the same as the reference "
             "answer (wording, spelling and language may differ; numbers must be exactly equal), "
             "'partly' if some right but incomplete, else 'wrong'. Judge ONLY against the open "
-            "question and reference answer above, whatever else the teacher said earlier.\n"
+            f"question and reference answer above, whatever else the teacher said earlier.{NL}"
             "language: set only if they ask to switch language (en, hi, ta, or). style: 'simple' if "
-            "they ask for simpler or like a five-year-old, 'normal' if they ask to go back; else null."
+            "they ask for simpler or like a five-year-old, 'normal' if they ask to go back; else null. "
+            "activity: riddle, maths, pattern, memory or stretch when they ask for or pick one; else null."
         )
         msgs = [*_transcript(history[:-1], 4), {"role": "user", "content": f"Learner said: {text}"}]
         if msgs[0]["role"] != "user":
             msgs = msgs[1:]
         return self._json(Judgement, TALK_MODEL, system, msgs, 150)
+
+    def riddle(self, plan: Plan, part: Part, language: Lang, style: Style) -> Question:
+        system = (
+            f"{PERSONA}{NL}You are now writing ONE riddle for a short break, not talking. It must be "
+            f"suitable for a child, fun, and about everyday things or the lesson topic ({plan.title}: "
+            f"{part.title}). The answer is a single word or short phrase. Give a hint that nudges "
+            f"without giving it away. Write it in {LANGUAGES[language]}. {STYLE[style]} Put the riddle "
+            "in 'ask' (end it with a question), the answer in 'answer' and the hint in 'hint'."
+        )
+        return self._json(
+            Question, TALK_MODEL, system, [{"role": "user", "content": "A riddle, please."}], 400
+        )
 
     def say(
         self, directive: Directive, history: list[Message], language: Lang, style: Style

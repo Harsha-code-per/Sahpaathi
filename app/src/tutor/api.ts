@@ -25,13 +25,26 @@ export interface Plan {
   language: Lang
   parts: Part[]
 }
+export type Activity = 'riddle' | 'maths' | 'pattern' | 'memory' | 'stretch'
+export interface Game {
+  kind: Activity
+  language: Lang
+  questions: Question[]
+  round: number
+  score: number
+  tries: number
+}
 export interface Progress {
-  mode: 'chat' | 'teach' | 'quiz' | 'done'
+  mode: 'chat' | 'teach' | 'quiz' | 'break' | 'game' | 'done'
   part: number
   q: number
   misses: number
   correct: number
   revealed: string[]
+  since_break: number
+  parts_since_break: number
+  resume: 'teach' | 'quiz' | null
+  game: Game | null
 }
 export interface TurnOut {
   reply: string
@@ -46,7 +59,7 @@ export interface Attachment {
   data: string
 }
 
-export const FRESH: Progress = { mode: 'chat', part: 0, q: 0, misses: 0, correct: 0, revealed: [] }
+export const FRESH: Progress = { mode: 'chat', part: 0, q: 0, misses: 0, correct: 0, revealed: [], since_break: 0, parts_since_break: 0, resume: null, game: null }
 const MAX_FILE = 5 * 1024 * 1024
 
 /** The tutor is open to anyone (no login); the server caps what it can spend per day. */

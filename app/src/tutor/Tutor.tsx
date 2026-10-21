@@ -2,6 +2,7 @@ import { ArrowUpIcon, AudioLinesIcon, BookOpenIcon, CheckIcon, PaperclipIcon, Sq
 import { useEffect, useRef, useState, type ChangeEvent, type SubmitEvent } from 'react'
 import { LogoMark } from '@/components/Logo'
 import { FRESH, makePlan, readAttachment, speakUrl, turn, type Attachment, type Lang, type Plan, type Progress, type Style, type Turn } from './api'
+import MemoryGame from './MemoryGame'
 import { canListen, listen, speak, type Listener, type Speaker } from './speech'
 import './tutor.css'
 
@@ -25,6 +26,15 @@ const QUICK: [string, string][] = [
   ['Explain again', 'Please explain this again, I did not understand.'],
   ['Like I’m 5', 'Please explain it like I am five years old.'],
   ['I’m ready', 'I am ready.'],
+  ['I need a break', 'I am tired, I need a break.'],
+]
+const BREAKS: [string, string][] = [
+  ['🧩 Riddle', 'Give me a riddle.'],
+  ['➕ Quick maths', 'Let us do quick maths.'],
+  ['🔢 Number pattern', 'Give me a number pattern puzzle.'],
+  ['🃏 Memory game', 'Let us play the memory game.'],
+  ['🧘 Stretch', 'Let us do a stretch.'],
+  ['Back to lesson', 'Back to the lesson please.'],
 ]
 
 const chip =
@@ -256,6 +266,7 @@ export default function Tutor() {
   const shown = turns.filter((t) => !t.hidden)
   const part = plan?.parts[progress.part]
   const inLesson = plan && (progress.mode === 'teach' || progress.mode === 'quiz')
+  const onBreak = plan && (progress.mode === 'break' || progress.mode === 'game')
   return (
     <div className="flex min-h-dvh flex-col bg-[#0b1413] text-[#f2efe6]">
       <header className="mx-auto flex w-full max-w-3xl items-center gap-3 px-5 py-4">
@@ -299,11 +310,16 @@ export default function Tutor() {
                     {now && inLesson && part && (
                       <span className="ml-auto text-sm font-normal">{progress.mode === 'quiz' ? `Question ${progress.q + 1} of ${part.quiz.length}` : 'Learning'}</span>
                     )}
+                    {now && onBreak && <span className="ml-auto text-sm font-normal">☕ Break time</span>}
                   </li>
                 )
               })}
             </ol>
           </section>
+        )}
+
+        {progress.mode === 'game' && progress.game?.kind === 'memory' && (
+          <MemoryGame onDone={(tries) => void submit(`I finished the memory game in ${tries} tries.`)} />
         )}
 
         <div className="flex-1 space-y-3 overflow-y-auto py-2" aria-live="polite">
@@ -334,6 +350,15 @@ export default function Tutor() {
       </main>
 
       <footer className="sticky bottom-0 mx-auto w-full max-w-3xl space-y-2 bg-gradient-to-t from-[#0b1413] via-[#0b1413] to-transparent px-5 pt-4 pb-5">
+        {onBreak && (
+          <div className="flex flex-wrap justify-center gap-2" role="group" aria-label="Break choices">
+            {BREAKS.filter(([label]) => progress.mode === 'break' || label === 'Back to lesson').map(([label, text]) => (
+              <button key={label} type="button" className={chip} onClick={() => quick(text)}>
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
         {inLesson && (
           <div className="flex flex-wrap justify-center gap-2" role="group" aria-label="Ask the teacher">
             {QUICK.filter(([label]) => label !== 'I’m ready' || progress.mode === 'teach').map(([label, text]) => (
