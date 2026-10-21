@@ -1,15 +1,35 @@
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
-import { useState, type SubmitEvent } from 'react'
+import { useEffect, useState, type SubmitEvent } from 'react'
 import { Button } from '@/components/ui/button'
-import { ApiError } from '@/studio/api'
+import { ApiError, BASE } from '@/studio/api'
 import { LogoMark } from './Logo'
 import './login.css'
 
 const field =
   'h-11 w-full rounded-xl border border-input bg-card px-3 text-base text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40'
 
-/** Demo build only: inlined into the public bundle on purpose, so evaluators can sign in without asking. Unset = emails only. */
-const DEMO_PASSWORD = import.meta.env.VITE_DEMO_PASSWORD as string | undefined
+/**
+ * The demo password for the test accounts. The server hands it out (GET /auth/demo) only when it has
+ * DEMO_PASSWORD set, i.e. when it has seeded those accounts, so it is never in git or in this bundle.
+ * VITE_DEMO_PASSWORD still works as an override. Neither: the card says to ask the team.
+ */
+const BUILD_PASSWORD = import.meta.env.VITE_DEMO_PASSWORD as string | undefined
+
+function useDemoPassword(enabled: boolean) {
+  const [served, setServed] = useState<string | undefined>()
+  useEffect(() => {
+    if (!enabled) return
+    let live = true
+    fetch(`${BASE}/auth/demo`)
+      .then((r) => (r.ok ? (r.json() as Promise<{ password: string }>) : null))
+      .then((j) => live && j && setServed(j.password))
+      .catch(() => undefined) // a server without demo accounts, or asleep: fall back below
+    return () => {
+      live = false
+    }
+  }, [enabled])
+  return BUILD_PASSWORD || served
+}
 
 export type DemoAccount = { role: string; email: string }
 
@@ -20,6 +40,7 @@ export function LoginCard(props: { product: string; blurb: string; demo?: DemoAc
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const [show, setShow] = useState(false)
+  const demoPassword = useDemoPassword(Boolean(props.demo))
 
   async function submit(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -81,7 +102,7 @@ export function LoginCard(props: { product: string; blurb: string; demo?: DemoAc
                   variant="outline"
                   onClick={() => {
                     setEmail(d.email)
-                    setPassword(DEMO_PASSWORD ?? '')
+                    setPassword(demoPassword ?? '')
                     setError('')
                   }}
                 >
@@ -90,7 +111,7 @@ export function LoginCard(props: { product: string; blurb: string; demo?: DemoAc
               </div>
             ))}
             <p className="text-sm text-muted-foreground">
-              Password: {DEMO_PASSWORD ? <code className="rounded bg-card px-1.5 py-0.5 font-semibold text-foreground">{DEMO_PASSWORD}</code> : 'ask the team'}
+              Password: {demoPassword ? <code className="rounded bg-card px-1.5 py-0.5 font-semibold text-foreground">{demoPassword}</code> : 'ask the team'}
             </p>
           </div>
         )}
