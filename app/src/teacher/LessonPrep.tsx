@@ -1,7 +1,8 @@
-import { CheckIcon, PlayIcon } from 'lucide-react'
+import { CheckIcon, PlayIcon, PrinterIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
 import type { Episode } from '../lib/types'
+import LessonCard from './LessonCard'
 import { useT } from './i18n'
 
 /** Before-class screen: what to gather and what to draw on the blackboard, then Start. */
@@ -40,6 +41,11 @@ export default function LessonPrep({
       )}
 
       {beforeStart}
+
+      <Button variant="ghost" onClick={() => window.print()}>
+        <PrinterIcon aria-hidden /> {t.printCard}
+      </Button>
+      <LessonCard episode={episode} />
 
       <Button size="lg" className="mt-auto h-16 text-xl" onClick={onStart}>
         <PlayIcon className="size-6" aria-hidden /> {t.startLesson}
