@@ -8,7 +8,7 @@ from app.factory.judge import Review
 from app.factory.schema import Episode
 from app.factory.scriptwriter import ScriptwriterError
 from app.main import app
-from app.models import EpisodeRecord
+from app.models import EpisodeRecord, User
 from app.seed import seed
 
 SAMPLES = episodes.settings.content_dir / "samples"
@@ -68,6 +68,24 @@ def test_generate_runs_in_background_then_waits_for_review(api, monkeypatch):
     assert detail["status"] == "in_review" and detail["title"] == EPISODE.title
     assert detail["passed"] is False and detail["scores"]["accuracy"] == 4
     assert len(detail["review"]["gloss"]) == len(EPISODE.lines())
+
+
+def test_the_studio_writes_at_most_the_daily_limit(api, monkeypatch):
+    """Each lesson costs Claude credits, so a day stops at the limit; library loads do not count."""
+    monkeypatch.setattr(episodes.judge, "generate", lambda *a: (EPISODE, REVIEW))
+    monkeypatch.setattr(episodes.settings, "generate_daily_limit", 2)
+    with SessionLocal() as db:
+        reviewer = db.query(User).filter_by(role="reviewer").one()
+        lib = {"lesson_id": "l", "district_id": "d", "created_by_id": reviewer.id}
+        db.add(EpisodeRecord(**lib, status="generating", source="library"))
+        db.commit()
+    h = auth(api, "reviewer")
+    assert [api.post("/api/v1/episodes", json=NEW, headers=h).status_code for _ in range(2)] == [
+        202,
+        202,
+    ]
+    res = api.post("/api/v1/episodes", json=NEW, headers=h)
+    assert res.status_code == 429 and "limit of 2" in res.json()["detail"]
 
 
 def test_generation_failure_is_recorded(api, monkeypatch):

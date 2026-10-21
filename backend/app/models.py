@@ -65,6 +65,8 @@ class EpisodeRecord(Base):
     review_notes: Mapped[str | None] = mapped_column(Text)
     # Reviewer corrections: line id -> {"before": the AI's text, "by": name, "at": ISO time}
     edits: Mapped[dict | None] = mapped_column(JSON(none_as_null=True))
+    # "factory": written by this server (counts towards the daily cap); "library": from files
+    source: Mapped[str] = mapped_column(String(10), default="factory", server_default="factory")
     created_by_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     reviewed_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
