@@ -7,7 +7,7 @@
 Sahpaathi brings back Interactive Radio Instruction (IRI) using frontier AI:
 - **Claude writes the episodes.** It turns an NCERT/state textbook chapter and a NIPUN learning outcome into an IRI script localised to the district: names, crops, festivals, free props like pebbles and seeds. Every segment comes with pre-generated *easier / core / stretch* branches.
 - **It adapts offline.** After each segment the teacher taps *Most / Some / Few got it*, and the episode switches branch on the device.
-- **It starts in the home language.** Lessons begin in the child's home language (e.g. Santali, or Hindi for migrant children) and bridge into the school language (Odia, Tamil).
+- **It starts in the home language.** Lessons begin in the child's home language (e.g. Hindi for migrant children in Tamil Nadu) and bridge into the school language (Tamil, Odia). Santali is next: its splicer is built, and the community phrase bank is waiting for consented recordings.
 - **It reaches absent children.** A free call-back plays the missed lesson's recap on any basic phone.
 
 | Problem in the challenge | How Sahpaathi answers it |
@@ -153,7 +153,7 @@ npm run dev
 |---|---|---|---|
 | Anthropic Claude Sonnet 5.5 (`claude-sonnet-5-5`) | Writes the IRI episode script and branches as structured JSON | `backend/app/factory/` | `ANTHROPIC_API_KEY` |
 | Anthropic Claude Haiku 5.5 (`claude-haiku-5-5`) | Blind English back-translation of every line, then a six-criterion rubric review (pedagogy, age fit, accuracy, language bridge, localisation, safety) | `backend/app/factory/` | `ANTHROPIC_API_KEY` |
-| Sarvam AI Bulbul v3 (`bulbul:v3`) | Tamil / Hindi / Odia / English voices, generated in the cloud before packing (never in class). Santali is spliced from consented recordings instead | `backend/app/voice/` | `TTS_API_KEY` |
+| Sarvam AI Bulbul v3 (`bulbul:v3`) | Tamil / Hindi / Odia / English voices, generated in the cloud before packing (never in class). Santali will be spliced from consented community recordings instead (splicer built, recordings pending) | `backend/app/voice/` | `TTS_API_KEY` |
 | Exotel / Twilio | Absentee catch-up call + DTMF keypad branching | `backend/app/ivr/` | `TELEPHONY_*` |
 
 Nothing above runs in the classroom. The teacher player works with **zero connectivity** once a weekly pack is on the phone.
@@ -178,7 +178,7 @@ Live app: **https://sahpaathi.vercel.app**. All three accounts share one passwor
 **Sample inputs for the Studio's "Write a new lesson"** (about five minutes each; Claude writes, a second model reviews):
 1. Grade 1 · NCERT numbers 1 to 20 · **Chennai: Hindi to Tamil** (a migrant child's home language bridged to the Tamil-medium school)
 2. Grade 1 · NCERT addition (putting together) · **Madurai: Tamil**
-3. Grade 2 · NCERT tens and ones · **Mayurbhanj: Santali to Odia** (Santali lines are limited to the recorded phrase bank)
+3. Grade 2 · NCERT tens and ones · **Madurai: Tamil**
 4. Grade 3 · NCERT subtraction with regrouping · Chennai: Hindi to Tamil
 5. Grade 3 · NCERT multiplication as equal groups · Madurai: Tamil
 
