@@ -9,7 +9,11 @@ export default defineConfig({
   timeout: 60_000,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['github'], ['list']] : 'list',
-  use: { baseURL: 'http://localhost:4174', trace: 'retain-on-failure', ...devices['Desktop Chrome'] },
+  expect: { timeout: 15_000 }, // CI runners are slower than laptops
+  // The service worker precaches ~850 KB in parallel with the page on the first visit, which starved CI's
+  // connections (6 requests stuck, the landing never loaded). It is not what this test checks: offline
+  // play is covered by the lab tests in docs/TESTING_LOG.md.
+  use: { baseURL: 'http://localhost:4174', trace: 'retain-on-failure', serviceWorkers: 'block', ...devices['Desktop Chrome'] },
   projects: [
     { name: 'desktop', use: { viewport: { width: 1440, height: 900 } } },
     { name: 'phone', use: { ...devices['Pixel 7'] } },
