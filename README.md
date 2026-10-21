@@ -16,6 +16,16 @@ Sahpaathi brings back Interactive Radio Instruction (IRI) using frontier AI:
 | Home language ≠ school language | Episodes bridge from the home language to the school language |
 | Absenteeism leaves gaps | An IVR catch-up call to the parent's basic phone |
 
+## Two modes
+| | Offline classroom | Online AI teacher |
+|---|---|---|
+| For | A group in one room, one teacher phone and a ₹500 speaker | One learner on a phone with a signal |
+| Internet | **None needed** | Needed |
+| Does | Plays signed lesson packs, branches on the teacher's *Most / Some / Few* taps, takes attendance, calls absent children's parents | Talks like a teacher: plans a topic or textbook page into parts, teaches, quizzes, reteaches, answers doubts in any of four languages, takes breaks with riddles and games |
+| Open | [`/teacher`](https://sahpaathi.vercel.app/teacher) | [`/tutor`](https://sahpaathi.vercel.app/tutor) |
+
+They share one curriculum and are kept separate on purpose; a hybrid is planned. What is built and what is not, in each: [docs/MODES.md](docs/MODES.md).
+
 ## Status
 Build stage (18 Oct – 1 Nov 2026), submission target Sat 31 Oct. Plan and ownership: [docs/TEAM_PLAN.md](docs/TEAM_PLAN.md). Live: **https://sahpaathi.vercel.app** · API docs: **https://sahpaathi-api.onrender.com/docs**.
 
@@ -114,7 +124,7 @@ Packs are stored in Postgres (under 2 MB each); move them to object storage if t
 ## Repository
 ```
 backend/   FastAPI API, content factory (Claude), voice + pack builder, IVR
-app/       Offline PWA: teacher player (/teacher), Studio (/studio), CRP dashboard + IVR simulator (/admin)
+app/       Offline PWA: teacher player (/teacher), Studio (/studio), CRP dashboard + IVR simulator (/admin); online AI teacher (/tutor)
 content/   curriculum text, district profiles, sample episodes, consented community voice clips
 docs/      product, architecture, episode contract, API, plan, testing log, submission checklist
 ```

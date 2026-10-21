@@ -1,6 +1,7 @@
 import { ArrowUpIcon, AudioLinesIcon, BookOpenIcon, CheckIcon, PaperclipIcon, SquareIcon, XIcon } from 'lucide-react'
-import { useEffect, useRef, useState, type ChangeEvent, type SubmitEvent } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore, type ChangeEvent, type SubmitEvent } from 'react'
 import { LogoMark } from '@/components/Logo'
+import { ModeSwitch } from '@/components/ModeSwitch'
 import { FRESH, makePlan, readAttachment, speakUrl, turn, type Attachment, type Lang, type Plan, type Progress, type Style, type Turn } from './api'
 import MemoryGame from './MemoryGame'
 import { canListen, listen, speak, type Listener, type Speaker } from './speech'
@@ -37,6 +38,21 @@ const BREAKS: [string, string][] = [
   ['Back to lesson', 'Back to the lesson please.'],
 ]
 
+/** Whether the browser says it has a network. Online mode needs one; the offline classroom does not. */
+function useOnline() {
+  return useSyncExternalStore(
+    (notify) => {
+      window.addEventListener('online', notify)
+      window.addEventListener('offline', notify)
+      return () => {
+        window.removeEventListener('online', notify)
+        window.removeEventListener('offline', notify)
+      }
+    },
+    () => navigator.onLine,
+  )
+}
+
 const chip =
   'inline-flex h-10 items-center rounded-full border border-white/25 bg-white/5 px-4 text-sm font-semibold outline-none hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-ring aria-pressed:border-[#f2efe6] aria-pressed:bg-[#f2efe6] aria-pressed:text-[#0b1413]'
 
@@ -45,6 +61,7 @@ const chip =
  * it analyses the topic into parts and teaches them in order, checking each, as the server's rules dictate.
  */
 export default function Tutor() {
+  const online = useOnline()
   const [lang, setLang] = useState<Lang>('en')
   const [style, setStyle] = useState<Style>('normal')
   const [study, setStudy] = useState(false)
@@ -152,6 +169,10 @@ export default function Tutor() {
 
   /** Whatever the student said or typed: starts a study plan when asked to, else carries on the conversation. */
   async function submit(text: string, hidden = false) {
+    if (!navigator.onLine) {
+      stop()
+      return setError('You are offline. The AI teacher needs the internet. The offline classroom works without it.')
+    }
     const { study, attached } = settings.current
     if (!planRef.current && (study || attached)) return startStudy(text, attached)
     return converse(text, false, hidden)
@@ -274,8 +295,11 @@ export default function Tutor() {
           <span className="grid size-10 place-items-center rounded-xl bg-primary text-primary-foreground">
             <LogoMark className="size-6" />
           </span>
-          <span className="font-heading text-xl font-bold">Ask the teacher</span>
+          <span className="font-heading text-xl font-bold max-sm:sr-only">Ask the teacher</span>
         </a>
+        <div className="ml-auto">
+          <ModeSwitch current="online" tone="dark" />
+        </div>
       </header>
 
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 px-5">
@@ -342,6 +366,11 @@ export default function Tutor() {
           <div ref={end} />
         </div>
 
+        {!online && (
+          <p role="status" className="rounded-xl bg-[#3a2f12] px-3 py-2 text-[#f4d58a]">
+            You are offline, so the AI teacher cannot answer. Open the <a href="/teacher" className="font-semibold underline underline-offset-4">offline classroom</a>: it works without internet.
+          </p>
+        )}
         {error && (
           <p role="alert" className="rounded-xl bg-[#3a1f1a] px-3 py-2 text-[#ffb4a2]">
             {error}

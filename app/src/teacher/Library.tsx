@@ -2,6 +2,7 @@ import { CloudCheckIcon, CloudDownloadIcon, CloudUploadIcon, DownloadIcon, Penci
 import { useCallback, useEffect, useState, type ChangeEvent } from 'react'
 import { cn } from 'cn'
 import { LogoMark } from '@/components/Logo'
+import { ModeSwitch } from '@/components/ModeSwitch'
 import { Button } from '@/components/ui/button'
 import type { Episode } from '../lib/types'
 import { ClassroomSetup } from '../attendance/Attendance'
@@ -199,6 +200,8 @@ export default function Library({ onOpen, pending }: { onOpen: (lesson: OpenLess
             ))}
           </select>
         </header>
+
+        <ModeSwitch current="offline" />
 
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           <p className="text-muted-foreground">{classroom ? t.classLine(classroom.classroom_id, classroom.rolls.length) : t.chooseLesson}</p>
