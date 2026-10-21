@@ -1,0 +1,332 @@
+{
+  "date": "2026-10-21",
+  "model": "claude-haiku-5-5",
+  "tokens": {
+    "input": 799133,
+    "output": 408684
+  },
+  "cost_usd": 0.284,
+  "rows": [
+    {
+      "episode": "g1-numbers-to-20-chennai-migrant",
+      "mutation": "clean",
+      "tier1": [],
+      "passed": false,
+      "issues": 7
+    },
+    {
+      "episode": "g1-numbers-to-20-chennai-migrant",
+      "mutation": "wrong_sum",
+      "tier1": true,
+      "pinpointed": true,
+      "score_drop": true,
+      "scores": {
+        "pedagogy": 3,
+        "age_fit": 4,
+        "accuracy": 2,
+        "language_bridge": 4,
+        "localisation": 4,
+        "safety": 4
+      }
+    },
+    {
+      "episode": "g1-numbers-to-20-chennai-migrant",
+      "mutation": "out_of_range",
+      "tier1": false,
+      "pinpointed": true,
+      "score_drop": true,
+      "scores": {
+        "pedagogy": 3,
+        "age_fit": 3,
+        "accuracy": 4,
+        "language_bridge": 3,
+        "localisation": 4,
+        "safety": 4
+      }
+    },
+    {
+      "episode": "g1-numbers-to-20-chennai-migrant",
+      "mutation": "no_bridge",
+      "tier1": true,
+      "pinpointed": true,
+      "score_drop": false,
+      "scores": {
+        "pedagogy": 3,
+        "age_fit": 4,
+        "accuracy": 4,
+        "language_bridge": 3,
+        "localisation": 4,
+        "safety": 4
+      }
+    },
+    {
+      "episode": "g1-numbers-to-20-chennai-migrant",
+      "mutation": "unsafe",
+      "tier1": false,
+      "pinpointed": true,
+      "score_drop": true,
+      "scores": {
+        "pedagogy": 4,
+        "age_fit": 4,
+        "accuracy": 3,
+        "language_bridge": 4,
+        "localisation": 4,
+        "safety": 1
+      }
+    },
+    {
+      "episode": "g1-numbers-to-20-chennai-migrant",
+      "mutation": "answer_first",
+      "tier1": false,
+      "pinpointed": true,
+      "score_drop": false,
+      "scores": {
+        "pedagogy": 4,
+        "age_fit": 4,
+        "accuracy": 5,
+        "language_bridge": 3,
+        "localisation": 4,
+        "safety": 4
+      }
+    },
+    {
+      "episode": "g1-numbers-to-20-chennai-migrant",
+      "mutation": "no_pauses",
+      "tier1": false,
+      "pinpointed": true,
+      "score_drop": false,
+      "scores": {
+        "pedagogy": 3,
+        "age_fit": 4,
+        "accuracy": 3,
+        "language_bridge": 4,
+        "localisation": 4,
+        "safety": 3
+      }
+    },
+    {
+      "episode": "g1-numbers-to-20-chennai-migrant",
+      "mutation": "wrong_checkpoint",
+      "tier1": false,
+      "pinpointed": true,
+      "score_drop": false,
+      "scores": {
+        "pedagogy": 3,
+        "age_fit": 4,
+        "accuracy": 4,
+        "language_bridge": 4,
+        "localisation": 4,
+        "safety": 3
+      }
+    },
+    {
+      "episode": "g3-place-value-hundreds-chennai-migrant",
+      "mutation": "clean",
+      "tier1": [],
+      "passed": false,
+      "issues": 5
+    },
+    {
+      "episode": "g3-place-value-hundreds-chennai-migrant",
+      "mutation": "wrong_sum",
+      "tier1": true,
+      "pinpointed": false,
+      "score_drop": true,
+      "scores": {
+        "pedagogy": 4,
+        "age_fit": 4,
+        "accuracy": 3,
+        "language_bridge": 3,
+        "localisation": 4,
+        "safety": 4
+      }
+    },
+    {
+      "episode": "g3-place-value-hundreds-chennai-migrant",
+      "mutation": "out_of_range",
+      "tier1": false,
+      "pinpointed": true,
+      "score_drop": true,
+      "scores": {
+        "pedagogy": 3,
+        "age_fit": 2,
+        "accuracy": 3,
+        "language_bridge": 3,
+        "localisation": 4,
+        "safety": 4
+      }
+    },
+    {
+      "episode": "g3-place-value-hundreds-chennai-migrant",
+      "mutation": "no_bridge",
+      "tier1": true,
+      "pinpointed": false,
+      "score_drop": false,
+      "scores": {
+        "pedagogy": 4,
+        "age_fit": 5,
+        "accuracy": 5,
+        "language_bridge": 3,
+        "localisation": 5,
+        "safety": 5
+      }
+    },
+    {
+      "episode": "g3-place-value-hundreds-chennai-migrant",
+      "mutation": "unsafe",
+      "tier1": false,
+      "pinpointed": true,
+      "score_drop": true,
+      "scores": {
+        "pedagogy": 3,
+        "age_fit": 4,
+        "accuracy": 5,
+        "language_bridge": 3,
+        "localisation": 4,
+        "safety": 1
+      }
+    },
+    {
+      "episode": "g3-place-value-hundreds-chennai-migrant",
+      "mutation": "answer_first",
+      "tier1": false,
+      "pinpointed": true,
+      "score_drop": false,
+      "scores": {
+        "pedagogy": 4,
+        "age_fit": 4,
+        "accuracy": 5,
+        "language_bridge": 3,
+        "localisation": 4,
+        "safety": 4
+      }
+    },
+    {
+      "episode": "g3-place-value-hundreds-chennai-migrant",
+      "mutation": "no_pauses",
+      "tier1": false,
+      "pinpointed": false,
+      "score_drop": true,
+      "scores": {
+        "pedagogy": 3,
+        "age_fit": 4,
+        "accuracy": 4,
+        "language_bridge": 3,
+        "localisation": 5,
+        "safety": 5
+      }
+    },
+    {
+      "episode": "g3-place-value-hundreds-chennai-migrant",
+      "mutation": "wrong_checkpoint",
+      "tier1": false,
+      "pinpointed": true,
+      "score_drop": true,
+      "scores": {
+        "pedagogy": 3,
+        "age_fit": 4,
+        "accuracy": 4,
+        "language_bridge": 3,
+        "localisation": 4,
+        "safety": 5
+      }
+    },
+    {
+      "episode": "g3-place-value-hundreds-madurai-tamil",
+      "mutation": "clean",
+      "tier1": [],
+      "passed": true,
+      "issues": 2
+    },
+    {
+      "episode": "g3-place-value-hundreds-madurai-tamil",
+      "mutation": "wrong_sum",
+      "tier1": true,
+      "pinpointed": true,
+      "score_drop": true,
+      "scores": {
+        "pedagogy": 4,
+        "age_fit": 4,
+        "accuracy": 3,
+        "language_bridge": 5,
+        "localisation": 5,
+        "safety": 5
+      }
+    },
+    {
+      "episode": "g3-place-value-hundreds-madurai-tamil",
+      "mutation": "out_of_range",
+      "tier1": false,
+      "pinpointed": true,
+      "score_drop": true,
+      "scores": {
+        "pedagogy": 3,
+        "age_fit": 3,
+        "accuracy": 5,
+        "language_bridge": 5,
+        "localisation": 4,
+        "safety": 5
+      }
+    },
+    {
+      "episode": "g3-place-value-hundreds-madurai-tamil",
+      "mutation": "unsafe",
+      "tier1": false,
+      "pinpointed": true,
+      "score_drop": true,
+      "scores": {
+        "pedagogy": 3,
+        "age_fit": 4,
+        "accuracy": 4,
+        "language_bridge": 4,
+        "localisation": 4,
+        "safety": 2
+      }
+    },
+    {
+      "episode": "g3-place-value-hundreds-madurai-tamil",
+      "mutation": "answer_first",
+      "tier1": false,
+      "pinpointed": false,
+      "score_drop": true,
+      "scores": {
+        "pedagogy": 3,
+        "age_fit": 4,
+        "accuracy": 3,
+        "language_bridge": 5,
+        "localisation": 4,
+        "safety": 4
+      }
+    },
+    {
+      "episode": "g3-place-value-hundreds-madurai-tamil",
+      "mutation": "no_pauses",
+      "tier1": false,
+      "pinpointed": true,
+      "score_drop": true,
+      "scores": {
+        "pedagogy": 3,
+        "age_fit": 4,
+        "accuracy": 5,
+        "language_bridge": 5,
+        "localisation": 5,
+        "safety": 5
+      }
+    },
+    {
+      "episode": "g3-place-value-hundreds-madurai-tamil",
+      "mutation": "wrong_checkpoint",
+      "tier1": false,
+      "pinpointed": true,
+      "score_drop": true,
+      "scores": {
+        "pedagogy": 3,
+        "age_fit": 4,
+        "accuracy": 5,
+        "language_bridge": 5,
+        "localisation": 5,
+        "safety": 5
+      }
+    }
+  ]
+}
