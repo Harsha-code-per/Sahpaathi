@@ -35,145 +35,35 @@
   background: radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(0, 0, 0, 0.55));
 }
 
-/* The speaker: a lit cylinder with a speaker-cloth grille, a marigold status ring and sound rings spreading across the floor. */
-.spk-stage {
-  perspective: 1100px;
-}
-.spk {
-  position: absolute;
-  left: 27%;
-  top: 12%;
-  width: 46%;
-  height: 62%;
-  transform-style: preserve-3d;
-}
-.spk-body {
-  position: absolute;
-  inset: 7% 0 0; /* the flat top of the cylinder sits at the middle of the cap below */
-  border-radius: 0 0 50% 50% / 0 0 6% 6%;
-  background: linear-gradient(90deg, #040807, #243a36 24%, #4a6560 46%, #2b4440 62%, #101b19 84%, #040807);
-  box-shadow: inset 0 -1.5rem 2rem rgba(0, 0, 0, 0.55), 0 2.5rem 4rem rgba(0, 0, 0, 0.6);
-}
-.spk-grille {
-  position: absolute;
-  inset: 14% 8% 10%;
-  border-radius: 38% / 6%;
-  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.75) 1.3px, transparent 1.8px);
-  background-size: 8px 8px;
-  mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
-}
-.spk-led {
-  position: absolute;
-  left: 50%;
-  bottom: 5%;
-  width: 14%;
-  height: 0.28rem;
-  translate: -50% 0;
-  border-radius: 9999px;
-  background: #f4b23e;
-  box-shadow: 0 0 0.9rem 0.2rem rgba(244, 178, 62, 0.8);
-  animation: led 2.4s ease-in-out infinite;
-}
-/* The top face: an ellipse exactly as wide as the body, centred on its top edge, so the two read as one
-   cylinder. A thin lit ring sits inside it, like the light ring on a smart speaker. */
-.spk-cap {
-  position: absolute;
-  inset: 0 0 auto;
-  height: 14%;
-  border-radius: 50%;
-  background: radial-gradient(ellipse at 50% 35%, #5f7d77, #243936 62%, #121f1d);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  box-shadow: inset 0 -3px 7px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.5);
-}
-.spk-cap::before {
-  content: '';
-  position: absolute;
-  inset: 17% 11%;
-  border-radius: 50%;
-  border: 2px solid rgba(244, 178, 62, 0.85);
-  box-shadow: 0 0 0.55rem rgba(244, 178, 62, 0.45), inset 0 0 0.45rem rgba(244, 178, 62, 0.25);
-  animation: led 2.4s ease-in-out infinite;
-}
-.spk-cap::after {
-  content: '';
-  position: absolute;
-  inset: 38% 40%;
-  border-radius: 50%;
-  background: radial-gradient(circle at 50% 35%, #31504b, #0c1514);
-  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.12);
-}
-.spk-base {
-  position: absolute;
-  inset: auto -6% -3% -6%;
-  height: 8%;
-  border-radius: 50%;
-  background: radial-gradient(ellipse, rgba(244, 178, 62, 0.5), transparent 70%);
-  filter: blur(6px);
+/* The speaker is WebGL (Speaker3D.tsx). The canvas fades out at its edges so the sound rings never hit a hard border. */
+.spk3d-canvas {
+  mask-image: radial-gradient(closest-side, #000 72%, transparent);
 }
 .spk-backlight {
-  background: radial-gradient(circle, rgba(244, 178, 62, 0.28), transparent 65%);
+  background: radial-gradient(circle, rgba(244, 178, 62, 0.22), transparent 65%);
   animation: breathe 5s ease-in-out infinite;
 }
-.spk-wave {
-  left: 8%;
-  top: 72%;
-  width: 90%;
-  height: 26%;
-  transform: rotateX(72deg) scale(0.4);
-  animation: floorwave 3.6s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
-}
 
-/* Words circle the speaker in a tilted ring. Each slot turns with the ring and each word turns back, so the text always faces you. */
-.spk-orbit {
-  position: absolute;
-  inset: 0;
-  transform-style: preserve-3d;
-  transform: rotateX(-14deg);
-  animation: orbit 36s linear infinite;
-}
-.spk-slot {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform-style: preserve-3d;
-  transform: rotateY(var(--a)) translateZ(min(15rem, 26vw)) rotateY(calc(var(--a) * -1));
-}
+/* Words orbit the speaker; Speaker3D sets their position, size, opacity and layer every frame. */
 .spk-word {
-  display: block;
-  translate: -50% -50%;
   white-space: nowrap;
   padding: 0.4rem 1rem;
   border-radius: 9999px;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  background: rgba(15, 25, 24, 0.7);
-  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(11, 20, 19, 0.72);
+  backdrop-filter: blur(8px);
   font-size: clamp(0.8rem, 3.2vw, 1.125rem);
   font-weight: 600;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  animation: unorbit 36s linear infinite;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  will-change: transform, opacity;
+  animation: chip-in 1s ease 0.9s backwards; /* no end keyframe, so the per-frame opacity takes over */
 }
-
-@keyframes floorwave {
-  to {
-    transform: rotateX(72deg) scale(1.35);
+@keyframes chip-in {
+  from {
     opacity: 0;
   }
 }
-@keyframes orbit {
-  to {
-    transform: rotateX(-14deg) rotateY(360deg);
-  }
-}
-@keyframes unorbit {
-  to {
-    transform: rotateY(-360deg);
-  }
-}
-@keyframes led {
-  50% {
-    opacity: 0.45;
-  }
-}
+
 @keyframes breathe {
   50% {
     transform: scale(1.08);
@@ -187,10 +77,6 @@
 .cine-off *::after {
   animation-play-state: paused !important;
 }
-.spk-orbit,
-.spk-wave {
-  will-change: transform;
-}
 @media (pointer: coarse) {
   .cine-grain,
   .cine-beam {
@@ -200,6 +86,20 @@
     backdrop-filter: none;
     background: rgba(15, 25, 24, 0.9);
   }
+}
+
+/* Steps: dim until the scroll line reaches them (only when motion runs; otherwise all are lit). */
+.step-num,
+.step-dot {
+  transition:
+    opacity 0.4s,
+    background-color 0.4s;
+}
+.steps-anim .step:not(.is-on) .step-num {
+  opacity: 0.25;
+}
+.steps-anim .step:not(.is-on) .step-dot {
+  background-color: var(--background);
 }
 
 /* Sections fade up as they scroll in, where the browser supports scroll-driven animation. */

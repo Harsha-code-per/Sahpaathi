@@ -22,7 +22,6 @@ export function setupMotion(root: HTMLElement): () => void {
     // Opening shot: the letterbox bars slide away, the speaker rises into the light.
     gsap.to('[data-bar]', { scaleY: 0, duration: 1.4, ease: 'expo.inOut', delay: 0.15, transformOrigin: (i: number) => (i === 0 ? 'top' : 'bottom') })
     gsap.from('[data-speaker]', { translate: '0px 80px', opacity: 0, duration: 1.6, ease: 'expo.out', delay: 0.3 })
-    gsap.from('.spk-word', { opacity: 0, duration: 1, stagger: 0.15, delay: 1.1 })
     // Scores count up from zero as each number scrolls into view.
     gsap.utils.toArray<HTMLElement>('[data-count]').forEach((el) => {
       const m = /^([\d,.]+)(.*)$/.exec(el.dataset.count ?? '')
@@ -64,19 +63,25 @@ export function setupMotion(root: HTMLElement): () => void {
     const dialNum = root.querySelector<HTMLElement>('[data-dialnum]')!
     gsap.set('[data-dial]', { strokeDashoffset: 276.5 })
     scene.to('[data-dial]', { strokeDashoffset: 36, duration: 1.2 }, 0.3).to(score, { v: 87, duration: 1.2, onUpdate: () => void (dialNum.textContent = String(Math.round(score.v))) }, 0.3)
-    // How it works: on desktop the steps pin and slide sideways, each turning flat as it arrives.
-    gsap.matchMedia().add('(min-width: 1024px)', () => {
-      const track = root.querySelector<HTMLElement>('[data-track]')!
-      const dist = () => track.scrollWidth - (window.innerWidth - track.getBoundingClientRect().left) + 48
-      const slide = gsap.to(track, {
-        x: () => -dist(),
+    // How it works: a line draws across the four steps as you scroll, and each step lights up as the line reaches it.
+    const list = root.querySelector<HTMLElement>('[data-steps-list]')!
+    const steps = gsap.utils.toArray<HTMLElement>('[data-step]')
+    list.classList.add('steps-anim')
+    gsap.fromTo(
+      '[data-steps-fill]',
+      { scaleX: 0 },
+      {
+        scaleX: 1,
         ease: 'none',
-        scrollTrigger: { trigger: '[data-hscroll]', start: 'top top', end: () => `+=${dist()}`, pin: true, scrub: 0.6, invalidateOnRefresh: true },
-      })
-      gsap.utils.toArray<HTMLElement>('[data-step]').forEach((el) =>
-        gsap.fromTo(el, { rotateY: -35, transformPerspective: 1000, opacity: 0.4 }, { rotateY: 0, opacity: 1, ease: 'none', scrollTrigger: { trigger: el, containerAnimation: slide, start: 'left 95%', end: 'left 55%', scrub: true } }),
-      )
-    })
+        scrollTrigger: {
+          trigger: list,
+          start: 'top 75%',
+          end: 'bottom 70%',
+          scrub: 0.6,
+          onUpdate: (st) => steps.forEach((el) => el.classList.toggle('is-on', st.progress * list.offsetWidth >= el.offsetLeft - 1)),
+        },
+      },
+    )
   }, root)
 
   return () => {
