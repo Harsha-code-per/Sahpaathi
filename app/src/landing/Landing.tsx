@@ -1,10 +1,13 @@
 import { ArrowRightIcon, BookOpenCheckIcon, LayoutDashboardIcon, MessagesSquareIcon, PlayIcon, SpeakerIcon, WifiIcon, WifiOffIcon } from 'lucide-react'
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
 import { LogoMark } from '@/components/Logo'
 import { MODES, type ModeId } from '@/lib/modes'
 import './landing.css'
 import { setupMotion } from './motion'
 import Scene from './Scene'
+
+// three.js is about 130 KB gz, so the speaker loads after the page has painted, in its own chunk.
+const Speaker3D = lazy(() => import('./Speaker3D'))
 
 const REPO = 'https://github.com/Harsha-code-per/Sahpaathi'
 
@@ -116,31 +119,12 @@ export default function Landing() {
             </div>
           </div>
 
-          <div data-orb className="spk-stage relative mx-auto aspect-square w-full max-w-lg" aria-hidden>
-            <span className="spk-backlight absolute inset-[8%] rounded-full" />
-            {[0, 1, 2].map((d) => (
-              <span
-                key={d}
-                className="spk-wave absolute rounded-full border-2"
-                style={{ animationDuration: `${level.secs}s`, animationDelay: `${(d * level.secs) / 3}s`, borderColor: level.color }}
-              />
-            ))}
-            <div data-speaker className="spk">
-              <span className="spk-body">
-                <span className="spk-grille" />
-                <span className="spk-led" />
-              </span>
-              <span className="spk-cap" />
-              <span className="spk-base" />
-            </div>
-            <div className="spk-orbit">
-              {WORDS.map((w, i) => (
-                <span key={w.lang} className="spk-slot" style={{ '--a': `${(360 / WORDS.length) * i}deg` } as CSSProperties}>
-                  <span lang={w.lang} className="spk-word">
-                    {w.text}
-                  </span>
-                </span>
-              ))}
+          <div data-orb className="relative mx-auto aspect-square w-full max-w-xl" aria-hidden>
+            <span className="spk-backlight absolute inset-[12%] rounded-full" />
+            <div data-speaker className="absolute inset-0">
+              <Suspense fallback={null}>
+                <Speaker3D pulse={level} words={WORDS} />
+              </Suspense>
             </div>
           </div>
         </section>
@@ -210,17 +194,19 @@ export default function Landing() {
           </div>
         </section>
 
-        <section id="how" data-hscroll className="scroll-mt-8 overflow-hidden py-24">
-          <div className="mx-auto max-w-7xl space-y-12 px-5 md:px-8">
-            <div className="space-y-4">
-              <h2 className="max-w-3xl font-heading text-4xl leading-tight font-extrabold md:text-5xl">Written by Claude. Checked four times. Played offline.</h2>
-            </div>
-            <ol data-track className="grid gap-4 sm:grid-cols-2 lg:flex lg:w-max lg:gap-6">
+        <section id="how" data-steps className="scroll-mt-8 py-24 lg:py-32">
+          <div className="mx-auto max-w-7xl space-y-14 px-5 md:px-8">
+            <h2 className="max-w-3xl font-heading text-4xl leading-tight font-extrabold md:text-5xl">Written by Claude. Checked four times. Played offline.</h2>
+            <ol data-steps-list className="relative grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
+              <span aria-hidden className="absolute inset-x-0 top-0 hidden h-0.5 bg-border lg:block">
+                <span data-steps-fill className="block h-full origin-left bg-primary" />
+              </span>
               {STEPS.map(([title, text], i) => (
-                <li key={title} data-step className="space-y-3 rounded-3xl border border-border bg-card p-6 shadow-[0_10px_30px_rgba(23,37,36,0.06)] lg:w-[26rem] lg:shrink-0 lg:space-y-5 lg:p-9">
-                  <p className="font-heading text-5xl font-extrabold text-[#8a5a00] lg:text-7xl">0{i + 1}</p>
-                  <h3 className="text-lg font-bold lg:text-2xl">{title}</h3>
-                  <p className="leading-relaxed text-muted-foreground lg:text-lg">{text}</p>
+                <li key={title} data-step className="step relative space-y-4 border-t-2 border-border pt-8 lg:border-t-0 lg:pt-10">
+                  <span aria-hidden className="step-dot absolute -top-[0.4rem] left-0 hidden size-3.5 rounded-full border-2 border-primary bg-primary lg:block" />
+                  <p className="step-num font-heading text-6xl leading-none font-extrabold text-[#8a5a00] lg:text-7xl">0{i + 1}</p>
+                  <h3 className="text-xl font-bold lg:text-2xl">{title}</h3>
+                  <p className="max-w-xs text-lg leading-relaxed text-muted-foreground">{text}</p>
                 </li>
               ))}
             </ol>

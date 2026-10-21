@@ -6,6 +6,9 @@ const LEVELS = [
   ['Few got it', '#e8704a'],
 ] as const
 
+/** A speech-like waveform for the now-playing strip. */
+const BARS = [30, 55, 80, 45, 65, 95, 70, 40, 60, 85, 50, 35, 75, 90, 55, 40, 70, 60, 30, 50, 80, 45, 65, 35, 55, 25, 45, 30]
+
 /** The real teacher screen, drawn in HTML so it can tilt in 3D. Decorative: the facts live in the copy beside it. */
 function PhoneScreen() {
   return (
@@ -31,8 +34,16 @@ function PhoneScreen() {
           </div>
         ))}
       </div>
-      <div className="mt-auto h-1.5 rounded-full bg-[#2e4441]">
-        <div className="h-full w-2/5 rounded-full bg-[#f4b23e]" />
+      <div className="mt-auto space-y-3 rounded-2xl bg-[#223633] p-3">
+        <div className="flex items-center justify-between text-[11px] text-[#a9b8b3]">
+          <span className="font-semibold text-[#f2efe6]">Part 2 · Touch and count</span>
+          <span className="tabular-nums">1:12</span>
+        </div>
+        <div className="flex h-8 items-center gap-[3px]">
+          {BARS.map((b, i) => (
+            <span key={i} className="flex-1 rounded-full" style={{ height: `${b}%`, background: i < 17 ? '#f4b23e' : '#3d5551' }} />
+          ))}
+        </div>
       </div>
     </div>
   )
@@ -76,7 +87,7 @@ export default function Scene() {
                 key={label}
                 data-float
                 aria-hidden
-                className={`absolute rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold shadow-[0_10px_30px_rgba(23,37,36,0.15)] ${['top-[8%] -left-2', 'top-[44%] -right-4', 'bottom-[10%] -left-4'][i]}`}
+                className={`absolute rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold shadow-[0_10px_30px_rgba(23,37,36,0.15)] ${['top-[8%] -left-2', 'top-[44%] -right-4', 'bottom-[30%] -left-6'][i]}`}
                 
               >
                 <span className="mr-2 inline-block size-2.5 rounded-full align-middle" style={{ background: color }} />
