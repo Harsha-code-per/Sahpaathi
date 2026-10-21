@@ -5,7 +5,7 @@ import { adminApi, ApiError, insightsApi, type DataView, type Insights } from '.
 import { SampleBanner } from './SampleBanner'
 import { C, card, tooltip } from './theme'
 import { Empty, Panel, Tile } from './ui'
-import { CLASS_STATUS, lessonTitles, mixBar, partName, pct } from './view'
+import { CLASS_STATUS, lessonTitles, mixBar, partName, pct, weekSummary } from './view'
 
 const shortDate = (d: string) => new Date(d).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
 
@@ -97,9 +97,11 @@ export default function Classes({ view, onView, onSignedOut }: { view: DataView;
                         )}
                       </p>
                     </div>
-                    <span title={CLASS_STATUS[c.status].hint} className={`justify-self-start rounded-full px-3 py-1 text-sm font-bold md:justify-self-end ${CLASS_STATUS[c.status].tone}`}>
-                      {c.status}
-                    </span>
+                    {/* The hint is visible text, not a tooltip: touch, keyboard and screen-reader users need it too. */}
+                    <div className="grid justify-items-start gap-1 md:justify-items-end">
+                      <span className={`rounded-full px-3 py-1 text-sm font-bold ${(CLASS_STATUS[c.status] ?? CLASS_STATUS['not enough taps yet']).tone}`}>{c.status}</span>
+                      <span className="text-xs text-muted-foreground md:text-right">{CLASS_STATUS[c.status]?.hint}</span>
+                    </div>
                   </li>
                 )
               })}
@@ -132,9 +134,9 @@ export default function Classes({ view, onView, onSignedOut }: { view: DataView;
             </Panel>
 
             <Panel title="Week by week" note="Share of taps, last 8 weeks">
-              <div className="h-56">
+              <div className="h-56" role="img" aria-label={weekSummary(weeks)}>
                 <ResponsiveContainer>
-                  <LineChart data={weeks} margin={{ left: -18, right: 12 }}>
+                  <LineChart data={weeks} accessibilityLayer={false} margin={{ left: -18, right: 12 }}>
                     <CartesianGrid vertical={false} stroke={C.grid} />
                     <XAxis dataKey="label" tick={{ fill: C.muted, fontSize: 12 }} axisLine={false} tickLine={false} />
                     <YAxis domain={[0, 100]} unit="%" tick={{ fill: C.muted, fontSize: 12 }} axisLine={false} tickLine={false} />

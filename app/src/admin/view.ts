@@ -132,6 +132,15 @@ export const CLASS_STATUS: Record<ClassStatus, { tone: string; hint: string }> =
   'not enough taps yet': { tone: 'bg-secondary text-secondary-foreground', hint: 'Fewer than 8 deliberate taps, too few to say anything.' },
 }
 
+/** The week-by-week chart in words, for screen readers (the chart itself is drawn, not read). */
+export function weekSummary(weeks: { label: string; Most: number | null; Few: number | null }[]) {
+  const seen = weeks.filter((w) => w.Most !== null)
+  if (!seen.length) return 'Week by week: no taps in the last 8 weeks.'
+  const first = seen[0]
+  const last = seen[seen.length - 1]
+  return `Week by week, ${seen.length} weeks with taps. "Most got it" went from ${first.Most}% (${first.label}) to ${last.Most}% (${last.label}); "Few got it" from ${first.Few ?? 0}% to ${last.Few ?? 0}%.`
+}
+
 /** Widths (summing to 100) for a Most / Some / Few bar; all zero when nobody has tapped. */
 export function mixBar(m: Mix) {
   const total = (m.pct_most ?? 0) + (m.pct_some ?? 0) + (m.pct_few ?? 0)
