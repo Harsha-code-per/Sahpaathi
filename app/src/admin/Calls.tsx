@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState, type SubmitEvent } from 'react'
+import { Waking } from '@/components/Waking'
 import { adminApi, ApiError, type CallSummary, type PackSummary } from './api'
 import Phone from './Phone'
+import { badge } from '../studio/view'
 import { callableEpisodes, CALL_STATUS, OUTCOME } from './view'
 
 const card = 'rounded-2xl border border-border bg-card p-5'
@@ -139,7 +141,10 @@ export default function Calls({ onSignedOut }: { onSignedOut: () => void }) {
       <section className={card} aria-labelledby="calls">
         <h2 id="calls" className="mb-3 font-semibold">Catch-up calls</h2>
         {!loaded ? (
-          <p className="text-muted-foreground">Loading…</p>
+          <div className="space-y-2">
+            <p className="text-muted-foreground">Loading…</p>
+            <Waking />
+          </div>
         ) : calls.length === 0 ? (
           <p className="text-muted-foreground">No calls yet. A call is queued for every child marked absent.</p>
         ) : (
@@ -151,8 +156,8 @@ export default function Calls({ onSignedOut }: { onSignedOut: () => void }) {
                   <p className="text-sm text-muted-foreground">{c.episode_slug}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${CALL_STATUS[c.status].tone}`}>{CALL_STATUS[c.status].label}</span>
-                  {c.outcome && <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${OUTCOME[c.outcome].tone}`}>{OUTCOME[c.outcome].label}</span>}
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${badge(CALL_STATUS, c.status).tone}`}>{badge(CALL_STATUS, c.status).label}</span>
+                  {c.outcome && <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${badge(OUTCOME, c.outcome).tone}`}>{badge(OUTCOME, c.outcome).label}</span>}
                   {c.status === 'queued' && (
                     <>
                       <button className={quiet} onClick={() => setActive(c)}>Simulate</button>

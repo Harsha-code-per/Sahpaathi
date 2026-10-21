@@ -66,7 +66,21 @@ export const session = {
   get: () => sessionStorage.getItem(TOKEN_KEY),
   set: (token: string) => sessionStorage.setItem(TOKEN_KEY, token),
   clear: () => sessionStorage.removeItem(TOKEN_KEY),
+  /** The role inside the token (display only; the server checks it on every request). */
+  role: (): string | null => {
+    try {
+      return JSON.parse(atob(session.get()!.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).role ?? null
+    } catch {
+      return null
+    }
+  },
 }
+
+/** Fired when the server rejects the token, so Studio and Admin return to the sign-in card from any screen. */
+export const SIGNED_OUT = 'sahpaathi:signed-out'
+
+// The free-tier server sleeps and takes up to about a minute to wake; past this, give up with a clear message.
+const TIMEOUT_MS = 90_000
 
 export async function call<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = session.get()
@@ -74,11 +88,20 @@ export async function call<T>(path: string, init: RequestInit = {}): Promise<T> 
   try {
     res = await fetch(BASE + path, {
       ...init,
+      signal: init.signal ?? AbortSignal.timeout(TIMEOUT_MS),
       headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
     })
-  } catch {
+  } catch (err) {
+    if (err instanceof DOMException && err.name === 'TimeoutError') throw new ApiError('The server took too long to answer. Try again in a minute.', 0)
     throw new ApiError('Cannot reach the Sahpaathi server. Check the internet connection.', 0)
   }
+  if (res.status === 401 && token) {
+    session.clear()
+    window.dispatchEvent(new Event(SIGNED_OUT))
+  }
+  // A missing API URL makes the request hit the web app, which answers with its HTML page.
+  if (!res.headers.get('content-type')?.includes('application/json'))
+    throw new ApiError(res.ok ? 'The server sent an unexpected answer. Try again.' : `The server answered ${res.status}.`, res.ok ? 502 : res.status)
   if (!res.ok) {
     const detail = await res.json().then((b) => b.detail, () => null)
     throw new ApiError(typeof detail === 'string' ? detail : `The server answered ${res.status}.`, res.status)

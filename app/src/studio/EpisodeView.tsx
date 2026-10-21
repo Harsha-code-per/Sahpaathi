@@ -1,11 +1,12 @@
 import { ArrowLeftIcon, PencilIcon, SparklesIcon } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
+import { Waking } from '@/components/Waking'
 import { cn } from 'cn'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import type { Episode, Line } from '../lib/types'
 import { api, ApiError, type Detail, type Edit, type Issue, type PartTaps, type Status } from './api'
-import { CRITERIA, LANG_NAMES, STATUS, glossById, issuesByLine, minutes, schoolShare, svgDataUrl } from './view'
+import { badge, CRITERIA, LANG_NAMES, STATUS, glossById, issuesByLine, minutes, schoolShare, svgDataUrl } from './view'
 
 const POLL_MS = 5000
 const SPEAKER: Record<Line['speaker'], string | null> = { guide: null, child: 'Child voice', song: 'Sung' }
@@ -302,7 +303,7 @@ function Decision({ detail, onDecided, onError }: { detail: Detail; onDecided: (
     return (
       <div className={card}>
         <p className="font-semibold">
-          {STATUS[detail.status].label} by {detail.reviewed_by}
+          {badge(STATUS, detail.status).label} by {detail.reviewed_by}
         </p>
         {detail.review_notes && <p className="mt-1 text-muted-foreground">{detail.review_notes}</p>}
       </div>
@@ -380,7 +381,13 @@ export default function EpisodeView(props: {
     return () => clearInterval(t)
   }, [detail?.status, load])
 
-  if (!detail) return <p className="text-muted-foreground">Loading…</p>
+  if (!detail)
+    return (
+      <div className="space-y-2">
+        <p className="text-muted-foreground">Loading…</p>
+        <Waking />
+      </div>
+    )
   const ep = detail.episode
   const edits = detail.edits ?? {}
   const onEdit =
@@ -422,7 +429,7 @@ export default function EpisodeView(props: {
           )}
           {detail.status === 'failed' && <p className="text-bad-foreground">{detail.error}</p>}
         </div>
-        <span className={`rounded-full px-3 py-1 text-sm font-semibold ${STATUS[detail.status].tone}`}>{STATUS[detail.status].label}</span>
+        <span className={`rounded-full px-3 py-1 text-sm font-semibold ${badge(STATUS, detail.status).tone}`}>{badge(STATUS, detail.status).label}</span>
       </header>
 
       {ep && ctx && detail.review && (
@@ -431,6 +438,7 @@ export default function EpisodeView(props: {
             <dl className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:gap-2.5">
               {CRITERIA.map((c) => {
                 const s = detail.review!.rubric.scores[c.key]
+                if (!s) return null // an older review may lack a criterion
                 return (
                   <div key={c.key} title={s.reason} className={cn('min-w-0 rounded-xl border px-3 py-2.5 sm:min-w-28 sm:px-3.5', scoreFill(s.score), s.score <= 2 ? 'border-few' : 'border-black/5')}>
                     <dt className="text-[0.8125rem] text-muted-foreground">{c.label}</dt>

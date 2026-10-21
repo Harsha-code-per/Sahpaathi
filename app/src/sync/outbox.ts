@@ -1,9 +1,10 @@
+import { uuid } from '@/lib/utils'
 import { getDB, isCode, MAX_ABSENT, type AttendanceEvent, type OutboxEvent, type TapEvent } from '../storage/db'
 
 // Everything the classroom produces is written here first and only leaves the device via flushOutbox (client.ts).
 
 export async function recordTap(e: Pick<TapEvent, 'episode_id' | 'segment_id' | 'tap' | 'auto'>, now = new Date()) {
-  const event: TapEvent = { kind: 'tap', event_id: crypto.randomUUID(), at: now.toISOString(), ...e }
+  const event: TapEvent = { kind: 'tap', event_id: uuid(), at: now.toISOString(), ...e }
   await (await getDB()).add('outbox', event)
   return event
 }
@@ -17,7 +18,7 @@ export async function recordAttendance(
   const bad = [e.classroom_id, ...e.absent].find((c) => !isCode(c))
   if (bad) throw new Error(`"${bad}" is not a classroom or roll code: letters, digits and hyphen, starting with a letter or digit, up to 40 characters.`)
   if (e.absent.length > MAX_ABSENT) throw new Error(`At most ${MAX_ABSENT} children can be marked absent at once.`)
-  const event: AttendanceEvent = { kind: 'attendance', event_id: crypto.randomUUID(), at: now.toISOString(), ...e }
+  const event: AttendanceEvent = { kind: 'attendance', event_id: uuid(), at: now.toISOString(), ...e }
   await (await getDB()).add('outbox', event)
   return event
 }

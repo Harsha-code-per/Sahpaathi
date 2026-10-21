@@ -3,7 +3,7 @@ import sample from '../../../content/samples/g1-numbers-to-20-chennai-migrant.js
 import review from '../../../content/samples/g1-numbers-to-20-chennai-migrant.review.json'
 import type { Episode } from '../lib/types'
 import type { Review } from './api'
-import { allLines, glossById, issuesByLine, schoolShare, svgDataUrl } from './view'
+import { allLines, glossById, issuesByLine, schoolShare, svgDataUrl, badge, STATUS } from './view'
 
 const ep = sample as unknown as Episode
 const rev = review as unknown as Review
@@ -32,5 +32,12 @@ describe('studio view helpers', () => {
     const url = svgDataUrl('<svg onload="alert(1)"></svg>')
     expect(url.startsWith('data:image/svg+xml')).toBe(true)
     expect(url).not.toContain('<')
+  })
+})
+
+describe('badge', () => {
+  it('falls back for a status this build does not know', () => {
+    expect(badge(STATUS, 'approved').label).toBe('Approved')
+    expect(badge(STATUS, 'on_hold').label).toBe('on hold')
   })
 })

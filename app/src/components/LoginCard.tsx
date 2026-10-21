@@ -1,5 +1,6 @@
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useEffect, useState, type SubmitEvent } from 'react'
+import { Waking } from '@/components/Waking'
 import { Button } from '@/components/ui/button'
 import { ApiError, BASE } from '@/studio/api'
 import { LogoMark } from './Logo'
@@ -123,6 +124,7 @@ export function LoginCard(props: { product: string; blurb: string; demo?: DemoAc
         <Button type="submit" className="w-full" disabled={busy}>
           {busy ? 'Logging in…' : 'Log in'}
         </Button>
+        {busy && <Waking className="text-center" />}
       </form>
     </main>
   )

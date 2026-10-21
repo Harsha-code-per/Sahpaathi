@@ -1,9 +1,9 @@
-import { api as studio, ApiError, BASE, call, session } from '../studio/api'
+import { api as studio, ApiError, BASE, call, session, SIGNED_OUT } from '../studio/api'
 import type { Summary } from '../studio/api'
 import { packFilename } from './view'
 
 // Admin talks to the same backend as the Studio (docs/API.md) and shares its login token.
-export { ApiError, session }
+export { ApiError, session, SIGNED_OUT }
 
 export interface Understanding {
   taps: number // deliberate taps only
