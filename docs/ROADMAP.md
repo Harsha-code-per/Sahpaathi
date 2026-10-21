@@ -25,3 +25,22 @@ This is deliberately **not** in the Build-stage submission. The classroom offlin
 - Voice + pen-stroke micro-capsules (<100 KB) between teachers over 2G.
 - Wi-Fi Direct study pods for village peer groups.
 - Step-locked worked solutions; an anonymous "lost here" pulse.
+
+## What it costs
+Lessons are written once per language × grade × chapter and then shared by every classroom that needs them, so the content cost per classroom falls as Sahpaathi spreads. The variable costs are the speaker and the catch-up calls.
+
+**Per lesson, once (about ₹205):** Claude writes it and Haiku reviews it, about $1 or ₹84 (measured: the 19 Oct batch cost $12 for 12 lessons, at ₹84 per US$). Sarvam Bulbul v3 voices it, about 7,000 characters at ₹30 per 10,000, so ₹21 (measured on the three voiced packs). A native-speaker reviewer spends about 20 minutes on it, about ₹100 at ₹300 an hour.
+
+**One language, Grades 1–3, a full year:** 3 lessons a week × 36 weeks × 3 grades = 324 lessons, so about **₹66,000, once**, reused every following year.
+
+**Per classroom per year:**
+
+| Classrooms | Content share | Speaker (₹500 over 3 years) | Catch-up calls | Hosting | **Per classroom** | **Per child** (30) | Without calls |
+|---|---|---|---|---|---|---|---|
+| 10 (pilot, 1 language) | ₹6,640 | ₹167 | ₹2,592 | free tiers | **₹9,400** | **₹313** | ₹227 per child |
+| 1,000 (a district, 1 language) | ₹66 | ₹167 | ₹2,592 | ~₹24 | **₹2,850** | **₹95** | ₹9 per child |
+| 1,00,000 (10 languages) | ₹7 | ₹167 | ₹2,592 | ~₹10 | **₹2,780** | **₹93** | ₹6 per child |
+
+**Catch-up calls are about 90% of the cost at scale:** 30 children × 20% absent × 108 lesson days = 648 calls a classroom a year, each about 4 minutes at about ₹1 a minute. Exotel does not publish per-minute rates; third-party figures are ₹0.50–1.50, so this line is the one to confirm with Exotel's rate card. Ways to bring it down: one weekly call per absent child instead of one per day missed, or playing the recaps on existing state IVR lines and community radio slots (see Integration above). The teacher's own phone and the content are almost free at scale; everything else is a few rupees per child per year.
+
+Sources: [Sarvam API pricing](https://sarvam.ai/api-pricing) (Bulbul v3, beta), [Exotel's note that outbound calls bill two legs](https://docs.exotel.com/business-phone-system/why-am-i-charged-for-incoming-calls), third-party Exotel rate estimates ([Edesy](https://edesy.in/ai-voice-agent/providers/exotel)). Our own measurements: the 19 Oct batch cost and the voiced packs (docs/TESTING_LOG.md, V1–V3).
