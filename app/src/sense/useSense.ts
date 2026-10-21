@@ -229,7 +229,7 @@ export function useSense(opts: { getContext: () => SenseContext; onCheckIn: (i: 
     a.download = 'my-sense-session.csv'
     a.click()
     URL.revokeObjectURL(a.href)
-  }, [])
+  }, [session])
 
   return { status, error, insight, stream, saved, start, stop, label, exportCsv, deleteNow }
 }
