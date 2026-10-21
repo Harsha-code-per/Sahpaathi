@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest'
 import type { Summary } from '../studio/api'
 import type { PackSummary } from './api'
-import { anyBuilding, callableEpisodes, dayBars, endMessage, formatSize, KEYPAD, packFilename, packRows, pct, pipeline } from './view'
+import { anyBuilding, callableEpisodes, CLASS_STATUS, dayBars, endMessage, formatSize, KEYPAD, lessonTitles, mixBar, packFilename, packRows, partName, pct, pipeline } from './view'
 
 const ep = (id: number, status: Summary['status']): Summary => ({
   id, lesson_id: 'l', district_id: 'd', status, title: `Episode ${id}`, passed: true, scores: null, error: null,
@@ -84,4 +84,27 @@ test('pipeline puts each lesson in one column, from writing to classroom use', (
   const ids = Object.fromEntries(cols.map((c) => [c.key, c.cards.map((x) => x.episode.id)]))
   expect(ids).toEqual({ writing: [2, 1], review: [3], approved: [4], packed: [6], used: [5] })
   expect(cols.find((c) => c.key === 'used')!.cards[0].usage).toBe(usage)
+})
+
+test('mixBar scales Most, Some and Few to fill a bar, and is empty with no taps', () => {
+  const bar = mixBar({ taps: 20, pct_most: 50, pct_some: 30, pct_few: 20 })
+  expect(bar).toEqual({ most: 50, some: 30, few: 20 })
+  expect(mixBar({ taps: 10, pct_most: 49.9, pct_some: 30, pct_few: 20 }).most + mixBar({ taps: 10, pct_most: 49.9, pct_some: 30, pct_few: 20 }).some + mixBar({ taps: 10, pct_most: 49.9, pct_some: 30, pct_few: 20 }).few).toBeCloseTo(100)
+  expect(mixBar({ taps: 0, pct_most: null, pct_some: null, pct_few: null })).toEqual({ most: 0, some: 0, few: 0 })
+})
+
+test('every class status has a look and a plain-words hint', () => {
+  expect(Object.keys(CLASS_STATUS).sort()).toEqual(['doing well', 'needs support', 'not enough taps yet', 'watch'])
+  for (const s of Object.values(CLASS_STATUS)) expect(s.hint.length).toBeGreaterThan(10)
+})
+
+test('partName turns a segment id into words and leaves anything else alone', () => {
+  expect(partName('s3')).toBe('Part 3')
+  expect(partName('intro')).toBe('intro')
+})
+
+test('lessonTitles maps an episode id (lesson-district) to the Studio title', () => {
+  const e = { ...ep(1, 'approved'), lesson_id: 'g1-numbers-to-20', district_id: 'chennai-migrant', title: 'Counting to 20' }
+  expect(lessonTitles([e, { ...ep(2, 'approved'), title: null }]).get('g1-numbers-to-20-chennai-migrant')).toBe('Counting to 20')
+  expect(lessonTitles([{ ...ep(2, 'approved'), title: null }]).size).toBe(0)
 })

@@ -1,5 +1,5 @@
 import type { Summary } from '../studio/api'
-import type { CallOutcome, CallStatus, Day, EpisodeUsage, PackStatus, PackSummary } from './api'
+import type { CallOutcome, CallStatus, ClassStatus, Day, EpisodeUsage, Mix, PackStatus, PackSummary } from './api'
 
 // Pure helpers for the Admin screens (tested in view.test.ts).
 
@@ -122,4 +122,27 @@ export function pipeline(episodes: Summary[], packs: PackSummary[], usage: Episo
     else cols.approved.cards.push(card)
   }
   return Object.values(cols)
+}
+
+/** How each class status looks and what it means in words a block officer can act on. */
+export const CLASS_STATUS: Record<ClassStatus, { tone: string; hint: string }> = {
+  'needs support': { tone: 'bg-bad text-bad-foreground', hint: 'About a third or more of the checkpoints were "Few got it". Visit, or send an easier lesson.' },
+  watch: { tone: 'bg-warn text-warn-foreground', hint: 'A quarter or more said "Few got it", or nothing has synced for over two weeks.' },
+  'doing well': { tone: 'bg-ok text-ok-foreground', hint: 'Most children are following.' },
+  'not enough taps yet': { tone: 'bg-secondary text-secondary-foreground', hint: 'Fewer than 8 deliberate taps, too few to say anything.' },
+}
+
+/** Widths (summing to 100) for a Most / Some / Few bar; all zero when nobody has tapped. */
+export function mixBar(m: Mix) {
+  const total = (m.pct_most ?? 0) + (m.pct_some ?? 0) + (m.pct_few ?? 0)
+  if (!m.taps || total === 0) return { most: 0, some: 0, few: 0 }
+  return { most: ((m.pct_most ?? 0) * 100) / total, some: ((m.pct_some ?? 0) * 100) / total, few: ((m.pct_few ?? 0) * 100) / total }
+}
+
+/** "Part 3" from a segment id like "s3". */
+export const partName = (segmentId: string) => (/^s(\d+)$/.exec(segmentId) ? `Part ${/^s(\d+)$/.exec(segmentId)![1]}` : segmentId)
+
+/** A lesson's own id is "<lesson>-<district>"; this maps it to its title from the Studio list. */
+export function lessonTitles(episodes: Summary[]): Map<string, string> {
+  return new Map(episodes.filter((e) => e.title).map((e) => [`${e.lesson_id}-${e.district_id}`, e.title!]))
 }

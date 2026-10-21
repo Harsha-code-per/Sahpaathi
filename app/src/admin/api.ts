@@ -44,7 +44,14 @@ export interface Dashboard {
   episodes_by_status: Record<string, number>
   packs_ready: number
   catchup_calls: CatchupStats
+  data: DataView
+  /** How many of the taps and calls are invented sample data (always labelled in the screens). */
+  sample_taps: number
+  sample_calls: number
 }
+
+/** Which rows a screen counts: everything, only phones' real data, or only the labelled sample classrooms. */
+export type DataView = 'all' | 'real' | 'sample'
 
 export type PackStatus = 'building' | 'ready' | 'failed'
 
@@ -87,7 +94,7 @@ export interface CallStep {
 export const adminApi = {
   login: studio.login,
   episodes: studio.episodes,
-  dashboard: () => call<Dashboard>('/dashboard'),
+  dashboard: (data: DataView = 'all') => call<Dashboard>(`/dashboard?data=${data}`),
   packs: () => call<PackSummary[]>('/packs'),
   buildPack: (episodeId: number) => call<PackSummary>(`/episodes/${episodeId}/pack`, { method: 'POST' }),
   calls: () => call<CallSummary[]>('/ivr/calls'),
@@ -135,3 +142,61 @@ export async function downloadPack(pack: PackSummary): Promise<void> {
 }
 
 export type { Summary }
+
+// ---- Class health (GET /insights): which classes need support, which lesson parts lose children --------------------
+
+export interface Mix {
+  taps: number
+  pct_most: number | null
+  pct_some: number | null
+  pct_few: number | null
+}
+export interface SegmentStat extends Mix {
+  episode_id: string
+  segment_id: string
+  auto: number
+}
+export type ClassStatus = 'doing well' | 'watch' | 'needs support' | 'not enough taps yet'
+export interface ClassroomStat extends Mix {
+  classroom_id: string
+  sample: boolean
+  lesson_days: number
+  episodes: string[]
+  last_active: string | null
+  calls: number
+  calls_answered: number
+  calls_help: number
+  avg_rating: number | null
+  status: ClassStatus
+}
+export interface WeekStat {
+  week_start: string
+  taps: number
+  classrooms: number
+  pct_most: number | null
+  pct_few: number | null
+}
+export interface FeedbackSummary {
+  count: number
+  avg_rating: number | null
+  ratings: Record<string, number>
+  tags: Record<string, number>
+  by_episode: Record<string, number>
+}
+export interface Insights {
+  data: DataView
+  totals: Record<'taps' | 'auto_taps' | 'classrooms' | 'lessons_played' | 'episodes' | 'calls' | 'feedback', number>
+  weeks: WeekStat[]
+  hardest_parts: SegmentStat[]
+  segments: SegmentStat[]
+  classrooms: ClassroomStat[]
+  feedback: FeedbackSummary
+  sample: { taps: number; calls: number; feedback: number }
+}
+
+export const insightsApi = {
+  get: (data: DataView) => call<Insights>(`/insights?data=${data}`),
+  /** Loads clearly labelled SAMPLE classrooms (replacing any earlier sample set). */
+  loadSample: () => call<{ taps: number; calls: number; feedback: number }>('/insights/sample-data', { method: 'POST' }),
+  removeSample: () => call<{ taps: number; calls: number; feedback: number }>('/insights/sample-data', { method: 'DELETE' }),
+}
