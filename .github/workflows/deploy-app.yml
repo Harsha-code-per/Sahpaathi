@@ -1,0 +1,46 @@
+name: deploy-app
+
+# Vercel's Git integration blocks commits whose author is not on the Vercel team ("Deployment was
+# blocked"), which leaves a red X on main and skips the deploy. A deploy started here uses a token, so
+# it does not depend on who wrote the commit. Does nothing until the three secrets below exist, so it
+# is safe to merge first. "Run workflow" on the Actions tab is also a one-click redeploy of main.
+#
+# Secrets (repo Settings > Secrets and variables > Actions), from the Vercel project:
+#   VERCEL_TOKEN       Vercel > Account Settings > Tokens
+#   VERCEL_ORG_ID      project Settings > General (or .vercel/project.json after `npx vercel link`)
+#   VERCEL_PROJECT_ID  same place
+on:
+  push:
+    branches: [main]
+    paths: [app/**, content/**, .github/workflows/deploy-app.yml]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-app
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - name: Skip until the Vercel secrets are set
+        if: env.VERCEL_TOKEN == '' || env.VERCEL_ORG_ID == '' || env.VERCEL_PROJECT_ID == ''
+        run: echo "::notice::VERCEL_TOKEN, VERCEL_ORG_ID or VERCEL_PROJECT_ID is not set; nothing deployed."
+      - uses: actions/checkout@v4
+        if: env.VERCEL_TOKEN != '' && env.VERCEL_ORG_ID != '' && env.VERCEL_PROJECT_ID != ''
+      - uses: actions/setup-node@v4
+        if: env.VERCEL_TOKEN != '' && env.VERCEL_ORG_ID != '' && env.VERCEL_PROJECT_ID != ''
+        with:
+          node-version: 24
+      # Run at the repo root: the project's Root Directory is app/, and .vercelignore uploads only app/ and content/.
+      - name: Build and deploy to production
+        if: env.VERCEL_TOKEN != '' && env.VERCEL_ORG_ID != '' && env.VERCEL_PROJECT_ID != ''
+        run: |
+          npx --yes vercel@latest pull --yes --environment=production --token="$VERCEL_TOKEN"
+          npx --yes vercel@latest build --prod --token="$VERCEL_TOKEN"
+          npx --yes vercel@latest deploy --prebuilt --prod --token="$VERCEL_TOKEN"
