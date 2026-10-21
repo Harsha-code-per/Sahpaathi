@@ -121,6 +121,29 @@ class SyncEvent(Base):
     received_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
+    # The opaque classroom code of the phone that sent it (never a name). None for phones that have
+    # no classroom set up and for every tap sent before this column existed.
+    classroom_id: Mapped[str | None] = mapped_column(String(40), index=True)
+
+
+class LessonFeedback(Base):
+    """A teacher's answer to "was this lesson clear?" after playing it: a 1 to 5 rating, a few
+    tags and an optional short note. No names or phone numbers: the classroom is an opaque code.
+    `event_id` is made on the device so a retried upload is counted once."""
+
+    __tablename__ = "lesson_feedback"
+    __table_args__ = (CheckConstraint("rating >= 1 AND rating <= 5", name="rating_in_range"),)
+
+    event_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    episode_id: Mapped[str] = mapped_column(String(100), index=True)
+    classroom_id: Mapped[str | None] = mapped_column(String(40))
+    rating: Mapped[int] = mapped_column(Integer)
+    tags: Mapped[list] = mapped_column(JSON)
+    comment: Mapped[str] = mapped_column(String(300))
+    at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    received_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
 
 
 CALL_STATUSES = ("queued", "in_progress", "completed", "no_response")

@@ -10,7 +10,7 @@ import sys
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app import library
+from app import library, sample_data
 from app.auth import hash_password
 from app.config import settings
 from app.db import SessionLocal
@@ -39,4 +39,7 @@ if __name__ == "__main__":
     with SessionLocal() as db:
         seed(db, settings.demo_password)
         added = library.load(db)
-    print(f"seeded {len(DEMO_USERS)} demo accounts; added {added} reviewed episodes")
+        extra = ""
+        if settings.demo_data:  # clearly labelled SAMPLE classrooms, see app/sample_data.py
+            extra = f"; loaded sample data {sample_data.load(db)}"
+    print(f"seeded {len(DEMO_USERS)} demo accounts; added {added} reviewed episodes{extra}")

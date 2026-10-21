@@ -1,4 +1,4 @@
-"""POST /api/v1/sync: the player uploads its outbox of checkpoint taps whenever it finds signal.
+"""POST /api/v1/sync: the player uploads its outbox (taps, attendance, feedback) when it has signal.
 
 Rules that keep a 2G classroom queue draining (docs/API.md):
 - Idempotent by `event_id`: a retried or repeated event is counted once and still answered 2xx.
@@ -21,7 +21,7 @@ from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.orm import Session
 
 from app import db as database
-from app.models import CatchupCall, SyncEvent
+from app.models import CatchupCall, LessonFeedback, SyncEvent
 
 router = APIRouter(prefix="/api/v1", tags=["sync"])
 DB = Annotated[Session, Depends(database.get_db)]
@@ -41,6 +41,9 @@ class TapIn(BaseModel):
     tap: Literal["few", "some", "most"]
     auto: bool
     at: datetime  # ISO 8601 with a timezone
+    classroom_id: str | None = Field(
+        default=None, pattern=REF
+    )  # optional, so older phones still work
 
 
 class AttendanceIn(BaseModel):
@@ -57,7 +60,45 @@ class AttendanceIn(BaseModel):
     at: datetime
 
 
-EVENT = TypeAdapter(Annotated[TapIn | AttendanceIn, Field(discriminator="kind")])
+FEEDBACK_TAGS = (
+    "clear",
+    "too fast",
+    "too slow",
+    "kids engaged",
+    "needs more examples",
+    "audio unclear",
+    "good local examples",
+)
+
+
+class FeedbackIn(BaseModel):
+    """A teacher's answer to "was this lesson clear?": a 1 to 5 rating, a few tags from a fixed
+    list and a short optional note. Taps say what the children understood; this says what the
+    teacher thought of the lesson itself. No names or phone numbers, only the classroom code."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    kind: Literal["feedback"]
+    event_id: str = Field(min_length=8, max_length=64, pattern=r"^[A-Za-z0-9-]+$")
+    episode_id: str = Field(max_length=100, pattern=SLUG.pattern)
+    classroom_id: str | None = Field(default=None, pattern=REF)
+    rating: int = Field(ge=1, le=5)
+    tags: list[
+        Literal[
+            "clear",
+            "too fast",
+            "too slow",
+            "kids engaged",
+            "needs more examples",
+            "audio unclear",
+            "good local examples",
+        ]
+    ] = Field(default_factory=list, max_length=7)
+    comment: str = Field(default="", max_length=300)
+    at: datetime
+
+
+EVENT = TypeAdapter(Annotated[TapIn | AttendanceIn | FeedbackIn, Field(discriminator="kind")])
 
 
 class SyncIn(BaseModel):
@@ -78,7 +119,7 @@ class SyncOut(BaseModel):
 def _reason(e: ValidationError) -> str:
     first = e.errors()[0]
     if first["type"] in ("union_tag_invalid", "union_tag_not_found"):
-        return "kind: must be tap or attendance"
+        return "kind: must be tap, attendance or feedback"
     loc = first["loc"][1:] if first["loc"][:1] in (("tap",), ("attendance",)) else first["loc"]
     return f"{'.'.join(str(p) for p in loc) or 'event'}: {first['msg']}"
 
@@ -96,6 +137,7 @@ def _insert_ignoring_duplicates(db: Session, model, rows: list[dict], key: list[
 def sync(body: SyncIn, db: DB) -> SyncOut:
     taps: dict[str, dict] = {}
     attendance: dict[str, AttendanceIn] = {}
+    feedback: dict[str, dict] = {}
     rejected: list[Rejected] = []
     for raw in body.events:
         try:
@@ -113,6 +155,11 @@ def sync(body: SyncIn, db: DB) -> SyncOut:
             continue
         if isinstance(event, TapIn):
             taps[event.event_id] = event.model_dump(exclude={"kind"})
+        elif isinstance(event, FeedbackIn):
+            feedback[event.event_id] = {
+                **event.model_dump(exclude={"kind"}),
+                "tags": sorted(set(event.tags)),
+            }
         else:
             attendance[event.event_id] = event
 
@@ -138,6 +185,13 @@ def sync(body: SyncIn, db: DB) -> SyncOut:
             else 0
         )
         accepted += 1 if (new or not calls) else 0
+    if feedback:
+        seen = set(
+            db.scalars(select(LessonFeedback.event_id).where(LessonFeedback.event_id.in_(feedback)))
+        )
+        new_rows = [row for event_id, row in feedback.items() if event_id not in seen]
+        if new_rows:
+            accepted += _insert_ignoring_duplicates(db, LessonFeedback, new_rows, ["event_id"])
     db.commit()
     # Repeats inside one batch collapse into one stored row, so they count as duplicates too.
     return SyncOut(

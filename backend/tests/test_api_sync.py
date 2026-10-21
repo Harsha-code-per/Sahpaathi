@@ -146,5 +146,5 @@ def test_children_must_be_opaque_codes_not_names_or_phone_numbers(api):
         {"kind": "mystery", "event_id": "abcdefgh-1234"},
     )
     assert out["accepted"] == 0 and len(out["rejected"]) == 6
-    assert out["rejected"][5]["reason"] == "kind: must be tap or attendance"
+    assert out["rejected"][5]["reason"] == "kind: must be tap, attendance or feedback"
     assert calls() == []
