@@ -42,6 +42,7 @@ def queue(db: Session, path: Path, lesson_id: str, district_id: str) -> EpisodeR
         episode=Episode.model_validate(out["episode"]).model_dump(),
         review=Review.model_validate(out["review"]).model_dump(),
         created_by_id=_reviewer(db).id,
+        source="library",
     )
     db.add(rec)
     db.commit()
@@ -82,6 +83,7 @@ def load(db: Session, library: Path = LIBRARY) -> int:
                 edits=data.get("edits"),
                 created_by_id=reviewer.id,
                 reviewed_by_id=reviewer.id,
+                source="library",
             )
         )
         added += 1

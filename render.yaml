@@ -18,6 +18,8 @@ services:
         sync: false
       - key: DEMO_PASSWORD # password of the three demo accounts in the README
         sync: false
+      - key: GENERATE_DAILY_LIMIT # new lessons per UTC day (~$1 of Claude credits each)
+        value: "10"
       - key: TTS_API_KEY
         sync: false
       - key: PACK_SIGNING_KEY

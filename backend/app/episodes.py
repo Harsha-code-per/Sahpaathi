@@ -6,12 +6,12 @@ instance; move to a job queue if we ever run more than one backend instance.
 """
 
 import logging
-from datetime import UTC, datetime
+from datetime import UTC, datetime, time
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from pydantic import BaseModel, Field
-from sqlalchemy import select, update
+from sqlalchemy import func, select, update
 from sqlalchemy.orm import Session
 
 from app import db as database
@@ -150,6 +150,18 @@ class GenerateIn(BaseModel):
 def generate(body: GenerateIn, user: Reviewer, db: DB, tasks: BackgroundTasks) -> Summary:
     if body.lesson_id not in lessons() or body.district_id not in districts():
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Unknown lesson or district.")
+    today = datetime.combine(datetime.now(UTC).date(), time(), UTC)
+    written = db.scalar(
+        select(func.count())
+        .select_from(EpisodeRecord)
+        .where(EpisodeRecord.source == "factory", EpisodeRecord.created_at >= today)
+    )
+    if written >= settings.generate_daily_limit:
+        raise HTTPException(
+            status.HTTP_429_TOO_MANY_REQUESTS,
+            f"Today's limit of {settings.generate_daily_limit} new lessons is reached. "
+            "Review the ones waiting, or write more tomorrow.",
+        )
     rec = EpisodeRecord(
         lesson_id=body.lesson_id, district_id=body.district_id, created_by_id=user.id
     )

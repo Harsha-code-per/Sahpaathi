@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ["http://localhost:5173"]
     anthropic_api_key: str = ""
     demo_password: str = ""  # password of the seeded demo accounts (app/seed.py)
+    # Lessons the Studio may write per UTC day (~$1 of Claude credits each); protects the budget.
+    generate_daily_limit: int = 10
     # Lessons, district profiles, samples, voice clips. Repo layout locally; /srv/content in Docker.
     content_dir: Path = Path(__file__).parents[2] / "content"
     # Real catch-up calls (app/ivr/exotel.py). Empty: only the Admin keypad simulator works.
