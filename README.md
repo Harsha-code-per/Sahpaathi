@@ -200,7 +200,7 @@ npm test                                       # unit tests, including the priva
 | Sarvam AI Bulbul v3 (again) | **AI teacher:** speaks each reply; if no key is set the browser's own voice is used | `backend/app/tutor/` | `TTS_API_KEY` (optional) |
 | Google MediaPipe face and pose landmarkers (Apache-2.0) | **Opt-in sensing:** read facial cues and posture **in the learner's browser**; the model files load from Google's storage and the runtime from jsDelivr on first use (about 10 MB). Nothing is sent to them | `app/src/sense/` | none |
 | LangGraph (library) | Runs the four perception agents in parallel and the orchestrator that weighs them | `backend/app/tutor/sense/` | none |
-| Exotel / Twilio | Absentee catch-up call + DTMF keypad branching | `backend/app/ivr/` | `TELEPHONY_*` |
+| Exotel / Twilio | Absentee catch-up call + DTMF keypad branching | `backend/app/ivr/` | `EXOTEL_*` (calls ring only `EXOTEL_ALLOWED_NUMBERS`) |
 
 Nothing above runs in the offline classroom. The teacher player works with **zero connectivity** once a weekly pack is on the phone. The AI teacher is the online mode and needs a connection.
 
@@ -209,7 +209,7 @@ Live: app **https://sahpaathi.vercel.app** (teacher player at `/teacher`, `/stud
 
 - **Database: Neon.** Create a project and copy its `postgresql://...` connection string.
 - **Backend: Render.** New → Blueprint → this repo (`render.yaml`). Paste `DATABASE_URL`, `ANTHROPIC_API_KEY`, `DEMO_PASSWORD`, `CORS_ORIGINS` (the app's URL as a JSON list), `TTS_API_KEY`, `PACK_SIGNING_KEY`. `JWT_SECRET` is generated. Optional caps on the AI teacher, which is open to anyone: `TUTOR_DAILY_TURNS` and `TUTOR_DAILY_VOICE` (default 600 each per UTC day, then HTTP 429). Each start runs migrations and refreshes the demo accounts.
-- **App: Vercel.** Import the repo with root directory `app/`, and set `VITE_API_URL` (the Render URL), `VITE_PACK_PUBLIC_KEY` and, to show the demo accounts with a **Fill in** button on the Studio and Admin sign-in pages, `VITE_DEMO_PASSWORD` (the same value as Render's `DEMO_PASSWORD`; it is inlined into the public JavaScript, so use it only for the test accounts). `app/vercel.json` serves `index.html` for `/studio` and `/admin`. From a laptop instead of a Git import: `npx vercel deploy --prod` at the repo root; `.vercelignore` uploads only `app/` and `content/`. Then put the Vercel URL in Render's `CORS_ORIGINS`, e.g. `["https://sahpaathi.vercel.app"]`; without it the browser blocks every API call, including the player's sync.
+- **App: Vercel.** Import the repo with root directory `app/`, and set `VITE_API_URL` (the Render URL) and `VITE_PACK_PUBLIC_KEY`. The Studio and Admin sign-in pages fetch the demo accounts' password from the API (`GET /api/v1/auth/demo`), so no Vercel setting is needed for it. Every merge to `main` deploys through `.github/workflows/deploy-app.yml`. `app/vercel.json` serves `index.html` for `/studio` and `/admin`. From a laptop instead of a Git import: `npx vercel deploy --prod` at the repo root; `.vercelignore` uploads only `app/` and `content/`. Then put the Vercel URL in Render's `CORS_ORIGINS`, e.g. `https://sahpaathi.vercel.app`; without it the browser blocks every API call, including the player's sync.
 - **One signing key for the team.** `PACK_SIGNING_KEY` (private) lives only in Render and in the `backend/.env` of whoever builds packs locally; `VITE_PACK_PUBLIC_KEY` is its public half. A pack signed with any other key is refused by the app.
 
 ## Test credentials and sample inputs
