@@ -117,7 +117,7 @@
   left: 50%;
   top: 50%;
   transform-style: preserve-3d;
-  transform: rotateY(var(--a)) translateZ(min(15rem, 38vw)) rotateY(calc(var(--a) * -1));
+  transform: rotateY(var(--a)) translateZ(min(15rem, 26vw)) rotateY(calc(var(--a) * -1));
 }
 .spk-word {
   display: block;
@@ -128,7 +128,7 @@
   border: 1px solid rgba(255, 255, 255, 0.22);
   background: rgba(15, 25, 24, 0.7);
   backdrop-filter: blur(6px);
-  font-size: 1.125rem;
+  font-size: clamp(0.8rem, 3.2vw, 1.125rem);
   font-weight: 600;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   animation: unorbit 36s linear infinite;
