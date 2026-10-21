@@ -16,8 +16,9 @@ from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
 from app.models import CatchupCall, LessonFeedback, SyncEvent
+from app.sync import FEEDBACK_TAGS, SAMPLE_PREFIX
 
-PREFIX = "demo-"
+PREFIX = SAMPLE_PREFIX
 
 # (code, episode slug, children on the roll, how well the class usually follows)
 CLASSROOMS = [
@@ -37,15 +38,7 @@ SEGMENTS = {
 }
 # Some parts are harder than others, for every class alike (added to the chance of "Few got it").
 HARDER = {"s1": -0.04, "s2": 0.0, "s3": 0.09, "s4": 0.05, "s5": 0.12}
-TAGS = [
-    "clear",
-    "too fast",
-    "too slow",
-    "kids engaged",
-    "needs more examples",
-    "audio unclear",
-    "good local examples",
-]
+TAGS = list(FEEDBACK_TAGS)
 WEEKS = 6
 
 

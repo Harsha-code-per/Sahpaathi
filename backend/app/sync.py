@@ -14,7 +14,7 @@ from datetime import datetime
 from typing import Annotated, Any, Literal
 
 from fastapi import APIRouter, Depends
-from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, ValidationError
+from pydantic import AfterValidator, BaseModel, ConfigDict, Field, TypeAdapter, ValidationError
 from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
@@ -29,21 +29,34 @@ DB = Annotated[Session, Depends(database.get_db)]
 MAX_EVENTS = 200  # the player sends 100 at a time
 SLUG = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 REF = r"^[A-Za-z0-9][A-Za-z0-9-]{0,39}$"  # a classroom code or roll number, never a name
+SAMPLE_PREFIX = "demo-"  # reserved for app/sample_data.py, which deletes by this prefix
+
+
+def _not_sample(v: str | None) -> str | None:
+    """Real classrooms and events may not use the sample prefix, or removing the sample would
+    delete them (and a fake "sample" tap could be slipped in)."""
+    if v is not None and v.lower().startswith(SAMPLE_PREFIX):
+        raise ValueError(f'"{SAMPLE_PREFIX}" is reserved for sample data')
+    return v
+
+
+Ref = Annotated[str, Field(pattern=REF), AfterValidator(_not_sample)]
+EventId = Annotated[
+    str, Field(min_length=8, max_length=64, pattern=r"^[A-Za-z0-9-]+$"), AfterValidator(_not_sample)
+]
 
 
 class TapIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     kind: Literal["tap"]
-    event_id: str = Field(min_length=8, max_length=64, pattern=r"^[A-Za-z0-9-]+$")
+    event_id: EventId
     episode_id: str = Field(max_length=100, pattern=SLUG.pattern)
     segment_id: str = Field(max_length=100, pattern=SLUG.pattern)
     tap: Literal["few", "some", "most"]
     auto: bool
     at: datetime  # ISO 8601 with a timezone
-    classroom_id: str | None = Field(
-        default=None, pattern=REF
-    )  # optional, so older phones still work
+    classroom_id: Ref | None = None  # optional, so older phones still work
 
 
 class AttendanceIn(BaseModel):
@@ -53,8 +66,8 @@ class AttendanceIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     kind: Literal["attendance"]
-    event_id: str = Field(min_length=8, max_length=64, pattern=r"^[A-Za-z0-9-]+$")
-    classroom_id: str = Field(pattern=REF)
+    event_id: EventId
+    classroom_id: Ref
     episode_id: str = Field(max_length=100, pattern=SLUG.pattern)
     absent: list[Annotated[str, Field(pattern=REF)]] = Field(max_length=100)
     at: datetime
@@ -79,21 +92,11 @@ class FeedbackIn(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     kind: Literal["feedback"]
-    event_id: str = Field(min_length=8, max_length=64, pattern=r"^[A-Za-z0-9-]+$")
+    event_id: EventId
     episode_id: str = Field(max_length=100, pattern=SLUG.pattern)
-    classroom_id: str | None = Field(default=None, pattern=REF)
+    classroom_id: Ref | None = None
     rating: int = Field(ge=1, le=5)
-    tags: list[
-        Literal[
-            "clear",
-            "too fast",
-            "too slow",
-            "kids engaged",
-            "needs more examples",
-            "audio unclear",
-            "good local examples",
-        ]
-    ] = Field(default_factory=list, max_length=7)
+    tags: list[Literal[FEEDBACK_TAGS]] = Field(default_factory=list, max_length=len(FEEDBACK_TAGS))
     comment: str = Field(default="", max_length=300)
     at: datetime
 
@@ -120,7 +123,8 @@ def _reason(e: ValidationError) -> str:
     first = e.errors()[0]
     if first["type"] in ("union_tag_invalid", "union_tag_not_found"):
         return "kind: must be tap, attendance or feedback"
-    loc = first["loc"][1:] if first["loc"][:1] in (("tap",), ("attendance",)) else first["loc"]
+    kinds = (("tap",), ("attendance",), ("feedback",))
+    loc = first["loc"][1:] if first["loc"][:1] in kinds else first["loc"]
     return f"{'.'.join(str(p) for p in loc) or 'event'}: {first['msg']}"
 
 

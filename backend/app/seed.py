@@ -40,6 +40,8 @@ if __name__ == "__main__":
         seed(db, settings.demo_password)
         added = library.load(db)
         extra = ""
-        if settings.demo_data:  # clearly labelled SAMPLE classrooms, see app/sample_data.py
+        # SAMPLE classrooms (app/sample_data.py), only when none are loaded, so an admin
+        # who pressed Remove does not get them back on the next restart.
+        if settings.demo_data and not any(sample_data.counts(db).values()):
             extra = f"; loaded sample data {sample_data.load(db)}"
     print(f"seeded {len(DEMO_USERS)} demo accounts; added {added} reviewed episodes{extra}")
