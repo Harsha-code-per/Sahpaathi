@@ -29,6 +29,7 @@ export default function Admin() {
     return (
       <LoginCard
         product="Admin"
+        demo={[{ role: 'Admin', email: 'admin@sahpaathi.test' }]}
         blurb="How classrooms are using the lessons, and the packs that go to them."
         login={async (email, password) => {
           const res = await adminApi.login(email, password)

@@ -8,8 +8,13 @@ import './login.css'
 const field =
   'h-11 w-full rounded-xl border border-input bg-card px-3 text-base text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40'
 
-/** Sign-in for the desk tools. `login` throws an ApiError whose message is shown as is. */
-export function LoginCard(props: { product: string; blurb: string; login: (email: string, password: string) => Promise<void> }) {
+/** Demo build only: inlined into the public bundle on purpose, so evaluators can sign in without asking. Unset = emails only. */
+const DEMO_PASSWORD = import.meta.env.VITE_DEMO_PASSWORD as string | undefined
+
+export type DemoAccount = { role: string; email: string }
+
+/** Sign-in for the desk tools. `login` throws an ApiError whose message is shown as is. `demo` lists test accounts that one tap fills in. */
+export function LoginCard(props: { product: string; blurb: string; demo?: DemoAccount[]; login: (email: string, password: string) => Promise<void> }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -62,6 +67,33 @@ export function LoginCard(props: { product: string; blurb: string; login: (email
             </button>
           </span>
         </label>
+        {props.demo && (
+          <div className="space-y-2 rounded-2xl bg-secondary p-3">
+            <p className="text-sm font-semibold">Demo accounts for evaluators</p>
+            {props.demo.map((d) => (
+              <div key={d.email} className="flex items-center gap-2">
+                <div className="min-w-0 flex-1 text-sm">
+                  <p className="font-semibold">{d.role}</p>
+                  <p className="truncate text-muted-foreground">{d.email}</p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setEmail(d.email)
+                    setPassword(DEMO_PASSWORD ?? '')
+                    setError('')
+                  }}
+                >
+                  Fill in
+                </Button>
+              </div>
+            ))}
+            <p className="text-sm text-muted-foreground">
+              Password: {DEMO_PASSWORD ? <code className="rounded bg-card px-1.5 py-0.5 font-semibold text-foreground">{DEMO_PASSWORD}</code> : 'ask the team'}
+            </p>
+          </div>
+        )}
         {error && (
           <p role="alert" className="rounded-xl bg-bad px-3 py-2 text-bad-foreground">
             {error}
