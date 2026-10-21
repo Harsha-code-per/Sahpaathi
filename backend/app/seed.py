@@ -34,10 +34,11 @@ def seed(db: Session, password: str) -> None:
 
 
 if __name__ == "__main__":
-    if not settings.demo_password:
-        sys.exit("DEMO_PASSWORD is not set; no demo accounts created.")
     with SessionLocal() as db:
-        seed(db, settings.demo_password)
+        if settings.demo_password:
+            seed(db, settings.demo_password)
+        else:  # still load the lessons, and still let the server start (the Dockerfile uses &&)
+            print("DEMO_PASSWORD is not set; no demo accounts created.", file=sys.stderr)
         added = library.load(db)
         extra = ""
         # SAMPLE classrooms (app/sample_data.py), only when none are loaded, so an admin

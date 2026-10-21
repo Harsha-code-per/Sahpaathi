@@ -23,6 +23,7 @@ def exo(monkeypatch):
         "exotel_flow_id": "999",
         "exotel_webhook_key": KEY,
         "public_api_url": "https://api.example.test",
+        "exotel_allowed_numbers": ["+919800000001", "9800000002"],
     }.items():
         monkeypatch.setattr(settings, name, value)
     dialled: list[tuple[str, int]] = []
@@ -125,3 +126,19 @@ def test_a_failed_dial_leaves_the_call_queued(api, voiced, monkeypatch, exo):
     )
     assert res.status_code == 502
     assert api.get("/api/v1/ivr/calls", headers=admin).json()[0]["status"] == "queued"
+
+
+def test_only_listed_numbers_are_called_and_only_a_few_a_day(api, voiced, exo, monkeypatch):
+    """The demo admin login is public: it must not ring strangers or run up the bill."""
+    admin = auth(api, "admin")
+    api.post(f"/api/v1/episodes/{make_episode()}/pack", headers=admin)
+
+    def dial(phone):
+        call = queue(api)
+        url = f"/api/v1/ivr/calls/{call['id']}/dial"
+        return api.post(url, json={"phone": phone}, headers=admin)
+
+    assert dial("+919811111111").status_code == 403 and exo == []
+    monkeypatch.setattr(settings, "exotel_daily_calls", 1)
+    assert dial("09800000001").status_code == 200  # same number, written differently
+    assert dial("+919800000001").status_code == 429
