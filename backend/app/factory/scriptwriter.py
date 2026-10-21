@@ -15,7 +15,7 @@ from pydantic import BaseModel, ValidationError
 
 from app.config import settings
 from app.factory import rules
-from app.factory.schema import Episode, Lang
+from app.factory.schema import Episode, Lang, Segment
 
 MODEL = "claude-sonnet-5-5"
 log = logging.getLogger(__name__)
@@ -226,6 +226,76 @@ def write_episode(
         log.info("repair broke the contract or a rule, keeping the first attempt: %s", error)
         return valid.model_copy(update={"id": episode_id})
     raise ScriptwriterError(f"episode still invalid after repair: {error}")
+
+
+def rewrite_segment(
+    lesson: Lesson,
+    district: District,
+    episode: Episode,
+    segment_id: str,
+    evidence: str,
+    phrase_bank: list[str] | None = None,
+    client: anthropic.Anthropic | None = None,
+) -> Episode:
+    """After classroom use: rewrites one segment from what classes showed (tap rates) and what the
+    reviewer asks, keeping the rest of the episode. One repair turn, like write_episode."""
+    client = client or anthropic.Anthropic(api_key=settings.anthropic_api_key or None)
+    index = next(i for i, seg in enumerate(episode.segments) if seg.id == segment_id)
+    old = episode.segments[index]
+    prefix = old.teach[0].id.rsplit("-", 1)[0]  # the line-id prefix this part uses, e.g. "s2"
+    brief = f"""{_brief(lesson, district, phrase_bank)}
+
+This episode has been used in classrooms. Rewrite only segment "{segment_id}" ("{old.title}") and \
+return that one segment.
+
+What classrooms showed, and what the reviewer asks:
+{evidence}
+
+Keep its id "{segment_id}". Give every line a new id starting with "{prefix}-", unique in \
+the episode. Fit it to the segments around it: the same children's names, props and language \
+handover. Keep its numbers within the learning outcome.
+
+The whole episode as it is now:
+{episode.model_dump_json(exclude={"chalk_sketch_svg"})}"""
+    messages: list = [{"role": "user", "content": brief}]
+    error = ""
+    for _attempt in range(2):
+        with client.beta.messages.stream(
+            model=MODEL,
+            max_tokens=64000,  # one segment: a fraction of a whole episode
+            system=SYSTEM,
+            messages=messages,
+            output_config={
+                "format": {"type": "json_schema", "schema": anthropic.transform_schema(Segment)}
+            },
+            cache_control={"type": "ephemeral"},
+            betas=["server-side-fallback-2026-07-01"],
+            fallbacks="default",
+        ) as stream:
+            message = stream.get_final_message()
+        log.info("%s %s usage=%s", message.model, message.stop_reason, message.usage)
+        if message.stop_reason in ("refusal", "max_tokens"):
+            raise ScriptwriterError(f"rewrite stopped: {message.stop_reason}")
+        text = next(b.text for b in message.content if b.type == "text")
+        try:
+            segment = Segment.model_validate_json(text).model_copy(update={"id": segment_id})
+            segments = [*episode.segments[:index], segment, *episode.segments[index + 1 :]]
+            new = Episode.model_validate({**episode.model_dump(), "segments": segments})
+            error = "\n".join(rules.check(new))
+        except ValidationError as e:
+            error = str(e)
+        if not error:
+            return new
+        log.info("rewrite repair needed: %s", error)
+        messages += [
+            {"role": "assistant", "content": message.content},
+            {
+                "role": "user",
+                "content": f"The episode failed these checks with your segment. Return the "
+                f"complete corrected segment.\n{error}",
+            },
+        ]
+    raise ScriptwriterError(f"segment still invalid after repair: {error}")
 
 
 if __name__ == "__main__":

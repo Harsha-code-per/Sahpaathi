@@ -88,6 +88,16 @@ export async function call<T>(path: string, init: RequestInit = {}): Promise<T> 
 
 const post = (body: unknown): RequestInit => ({ method: 'POST', body: JSON.stringify(body) })
 
+/** How classrooms answered one part's checkpoint (deliberate taps; `auto` = nobody tapped). */
+export interface PartTaps {
+  segment_id: string
+  taps: number
+  most: number
+  some: number
+  few: number
+  auto: number
+}
+
 export const api = {
   login: (email: string, password: string) =>
     call<{ token: string; role: string; name: string }>('/auth/login', post({ email, password })),
@@ -99,4 +109,7 @@ export const api = {
     call<Detail>(`/episodes/${id}/review`, post({ decision, notes })),
   editLine: (id: number, lineId: string, text: string) =>
     call<Detail>(`/episodes/${id}/lines/${lineId}`, { method: 'PATCH', body: JSON.stringify({ text }) }),
+  classroom: (id: number) => call<PartTaps[]>(`/episodes/${id}/classroom`),
+  /** Claude rewrites one part as a new version, which then goes through review like any lesson. */
+  rewrite: (id: number, segmentId: string, note: string) => call<Summary>(`/episodes/${id}/segments/${segmentId}/rewrite`, post({ note })),
 }

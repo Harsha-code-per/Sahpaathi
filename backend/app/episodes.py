@@ -17,10 +17,10 @@ from sqlalchemy.orm import Session
 from app import db as database
 from app.auth import require
 from app.config import settings
-from app.factory import judge, rules
+from app.factory import judge, rules, scriptwriter
 from app.factory.schema import Episode
 from app.factory.scriptwriter import District, Lesson
-from app.models import EpisodeRecord, User
+from app.models import EpisodeRecord, SyncEvent, User
 from app.voice.splicer import load_phrasebank
 
 log = logging.getLogger(__name__)
@@ -146,10 +146,8 @@ class GenerateIn(BaseModel):
     district_id: str
 
 
-@router.post("/episodes", status_code=status.HTTP_202_ACCEPTED)
-def generate(body: GenerateIn, user: Reviewer, db: DB, tasks: BackgroundTasks) -> Summary:
-    if body.lesson_id not in lessons() or body.district_id not in districts():
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Unknown lesson or district.")
+def _check_daily_limit(db: Session) -> None:
+    """New lessons and rewrites both cost Claude credits; stop at the day's limit (UTC)."""
     today = datetime.combine(datetime.now(UTC).date(), time(), UTC)
     written = db.scalar(
         select(func.count())
@@ -162,6 +160,13 @@ def generate(body: GenerateIn, user: Reviewer, db: DB, tasks: BackgroundTasks) -
             f"Today's limit of {settings.generate_daily_limit} new lessons is reached. "
             "Review the ones waiting, or write more tomorrow.",
         )
+
+
+@router.post("/episodes", status_code=status.HTTP_202_ACCEPTED)
+def generate(body: GenerateIn, user: Reviewer, db: DB, tasks: BackgroundTasks) -> Summary:
+    if body.lesson_id not in lessons() or body.district_id not in districts():
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Unknown lesson or district.")
+    _check_daily_limit(db)
     rec = EpisodeRecord(
         lesson_id=body.lesson_id, district_id=body.district_id, created_by_id=user.id
     )
@@ -251,3 +256,111 @@ def review_episode(episode_id: int, body: ReviewIn, user: Reviewer, db: DB) -> D
     rec.reviewed_by_id, rec.review_notes = user.id, body.notes.strip() or None
     db.commit()
     return get_episode(episode_id, user, db)
+
+
+class PartTaps(BaseModel):
+    """How classrooms answered one part's checkpoint, from the synced teacher taps."""
+
+    segment_id: str
+    taps: int  # deliberate taps; `auto` counts the checkpoints nobody tapped
+    most: int
+    some: int
+    few: int
+    auto: int
+
+
+def _taps(db: Session, rec: EpisodeRecord) -> list[PartTaps]:
+    rows = db.execute(
+        select(SyncEvent.segment_id, SyncEvent.tap, SyncEvent.auto, func.count())
+        .where(SyncEvent.episode_id == rec.episode["id"])
+        .group_by(SyncEvent.segment_id, SyncEvent.tap, SyncEvent.auto)
+    ).all()
+    out = {s["id"]: PartTaps(segment_id=s["id"], taps=0, most=0, some=0, few=0, auto=0)
+           for s in rec.episode["segments"]}  # fmt: skip
+    for seg, tap, auto, n in rows:
+        part = out.get(seg)
+        if part is None:
+            continue  # a segment an older version had
+        if auto:
+            part.auto += n
+        elif tap in ("most", "some", "few"):
+            setattr(part, tap, getattr(part, tap) + n)
+            part.taps += n
+    return list(out.values())
+
+
+@router.get("/episodes/{episode_id}/classroom")
+def classroom(episode_id: int, _: Reviewer, db: DB) -> list[PartTaps]:
+    rec = _get(db, episode_id)
+    return _taps(db, rec) if rec.episode else []
+
+
+class RewriteIn(BaseModel):
+    note: str = Field(default="", max_length=1000)  # what the reviewer wants changed
+
+
+def evidence(part: PartTaps, note: str) -> str:
+    """What the scriptwriter is told about how this part went in class."""
+    lines = []
+    if part.taps:
+        pct = {k: round(100 * getattr(part, k) / part.taps) for k in ("most", "some", "few")}
+        lines.append(
+            f"Teachers tapped this part's checkpoint {part.taps} times: most got it "
+            f"{pct['most']}%, some got it {pct['some']}%, few got it {pct['few']}%."
+        )
+    if part.auto:
+        lines.append(f"{part.auto} times nobody tapped, so the core branch played.")
+    if note.strip():
+        lines.append(f"Reviewer: {note.strip()}")
+    return "\n".join(lines)
+
+
+@router.post(
+    "/episodes/{episode_id}/segments/{segment_id}/rewrite", status_code=status.HTTP_202_ACCEPTED
+)
+def rewrite(
+    episode_id: int,
+    segment_id: str,
+    body: RewriteIn,
+    user: Reviewer,
+    db: DB,
+    tasks: BackgroundTasks,
+) -> Summary:
+    """Claude rewrites one part from classroom data and the reviewer's note, as a new version that
+    goes through the guardrails and human review again. Approving it makes it the version used."""
+    rec = _get(db, episode_id)
+    if rec.episode is None or rec.status not in ("in_review", "approved"):
+        raise HTTPException(status.HTTP_409_CONFLICT, f"This episode is {rec.status}.")
+    part = next((p for p in _taps(db, rec) if p.segment_id == segment_id), None)
+    if part is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No such part.")
+    why = evidence(part, body.note)
+    if not why:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_CONTENT,
+            "No classroom taps for this part yet: add a note saying what to change.",
+        )
+    _check_daily_limit(db)
+    new = EpisodeRecord(lesson_id=rec.lesson_id, district_id=rec.district_id, created_by_id=user.id)
+    db.add(new)
+    db.commit()
+    tasks.add_task(run_rewrite, new.id, rec.id, segment_id, why)
+    return Summary(**_summary(new))
+
+
+def run_rewrite(record_id: int, source_id: int, segment_id: str, why: str) -> None:
+    with database.SessionLocal() as db:
+        rec, source = db.get(EpisodeRecord, record_id), db.get(EpisodeRecord, source_id)
+        try:
+            lesson, district = lessons()[rec.lesson_id], districts()[rec.district_id]
+            bank = santali_bank() if district.home_lang == "sat" else None
+            old = Episode.model_validate(source.episode)
+            episode = scriptwriter.rewrite_segment(lesson, district, old, segment_id, why, bank)
+            review = judge.review(episode, lesson, district)
+        except Exception as e:  # any failure must end the job, or it shows "generating" forever
+            log.exception("rewrite %s failed", record_id)
+            rec.status, rec.error = "failed", f"{type(e).__name__}: {e}"[:2000]
+        else:
+            rec.status = "in_review"
+            rec.episode, rec.review = episode.model_dump(), review.model_dump()
+        db.commit()
