@@ -37,7 +37,7 @@ export function LoginCard(props: { product: string; blurb: string; demo?: DemoAc
     <main className="relative isolate grid min-h-dvh place-items-center overflow-hidden bg-background p-4">
       <div aria-hidden className="login-bg absolute inset-0 -z-10">
         {[1, 3].map((n) => (
-          <video key={n} src={`/media/landing-${n}.mp4`} muted loop playsInline autoPlay preload="metadata" />
+          <img key={n} src={`/media/landing-${n}.jpg`} alt="" decoding="async" />
         ))}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(248,246,239,0.92),rgba(248,246,239,0.55)_55%,rgba(248,246,239,0.25))]" />
       </div>
