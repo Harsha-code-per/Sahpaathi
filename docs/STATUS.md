@@ -1,8 +1,8 @@
 # Sahpaathi status (21 Oct 2026)
 
-**Short answer:** the **offline classroom product is complete**, and everything in the original build plan works. **Online Mode was never in this round:** in the plan agreed on 18 Oct it is a roadmap item, prototyped only if we reach the Top 10 (10–18 Nov), so it is unbuilt by design. What stands between us and a winning submission is mostly **evidence and people**, not code.
+**Short answer:** the **offline classroom product is complete**, and everything in the original build plan works. The plan agreed on 18 Oct left **Online Mode** for the Top 10 stage; **a prototype of it was built early on 21 Oct and sits in open pull requests** (section 2). Whether it ships in the 31 Oct submission is a **decision for the team** (section 2). What stands between us and a winning submission is mostly **evidence and people**, not code.
 
-Live: app https://sahpaathi.vercel.app (all four routes load), API https://sahpaathi-api.onrender.com (healthy, CORS works). 67 PRs merged, CI green on main. Open: #68 (landing hero, needs fixes).
+Live: app https://sahpaathi.vercel.app (all four routes load), API https://sahpaathi-api.onrender.com (healthy, CORS works). CI green on main. Merged since the first version of this report: the cinematic landing (#68), the demo-account **Fill in** button (#69), speed-ups (#72). Open: #73 (hero performance), #74 (deploy from GitHub Actions), and the Online Mode stack #75, #76, #77, #78 (section 2). **Every open PR shows a red X only because of the Vercel check:** it blocks commits from accounts that are not on the Vercel team; the app, backend and docker checks pass.
 
 ## 1. The original plan, item by item
 
@@ -16,28 +16,42 @@ Live: app https://sahpaathi.vercel.app (all four routes load), API https://sahpa
 | 6 | **Choral mic sensing** | ✅ Done | Suggests a branch; the teacher decides |
 | 7 | **Absentee catch-up calls** | 🟡 Built, not live | Queue, keypad simulator, real Exotel calling ([EXOTEL.md](EXOTEL.md)). **Not configured on Render; no real call made yet** |
 | 8 | **Studio + dashboard** | ✅ Done, beyond plan | Line editing, collapsible sidebar, charts, lesson-pipeline Kanban, **classroom feedback loop** |
-| 9 | **Roles + test accounts** | 🟡 Mostly | Teacher, reviewer and admin work. The README password is still a placeholder; the "Fill in" button (#69) merged into the #68 branch, not main |
+| 9 | **Roles + test accounts** | 🟡 Mostly | Teacher, reviewer and admin work, and the Studio and Admin sign-in pages now show the accounts with a **Fill in** button (merged). The README password is still a placeholder, and the button shows the password only once `VITE_DEMO_PASSWORD` is set on Vercel |
 | Upgrades | Choral mic, simpler-analogy button, morning chalk sketch | ✅ All done | |
 
 **Built beyond the plan:** the Chalk & Marigold redesign with logo and favicon, the landing page, the teacher app in three languages, in-app lesson download, the classroom feedback loop (Claude rewrites the part classes struggled with), the guardrail evaluation, the cost model ([ROADMAP.md](ROADMAP.md#what-it-costs)), a daily cap on lesson generation, and keep-warm for the judging week.
 
-**Deliberately cut, on the roadmap:** RAG over the curriculum, a job queue, mesh pods and micro-capsules, Online Mode.
+**Deliberately cut, on the roadmap:** RAG over the curriculum, a job queue, mesh pods and micro-capsules. (Online Mode was cut too, then prototyped early: section 2.)
 
-## 2. Online Mode
-Planned (18 Oct) as a 1-on-1 AI tutor for connected older learners sharing the same curriculum, with on-device confusion signals and parental consent under the DPDP Act 2023. Described in [ROADMAP.md](ROADMAP.md) and the deck. **0% built, on purpose:** the challenge assumes no child devices, and the classroom mode is what this round judges. It becomes the finale differentiator **if we reach the Top 10**, on a separate branch and deploy, 10–18 Nov.
+## 2. Online Mode: built early as a prototype, decision needed
+Planned on 18 Oct as a 1-on-1 AI tutor for connected learners, to be prototyped only in the Top 10 stage on a separate branch. **A working prototype was built on 21 Oct** and is in open pull requests, not yet in `main`. Plan and feature-by-feature status: [MODES.md](MODES.md); the camera part: [SENSE.md](SENSE.md).
+
+| Piece | PR | Status |
+|---|---|---|
+| The AI teacher at `/tutor`: chat, study mode (topic, PDF or photo analysed into parts), teach, quiz, hint, reteach, breaks and games, four languages, voice in and out | #75 | ✅ Built and tested (about 40 backend tests on the engine, breaks and API, and real-Claude runs in a real browser). Voice not tried with a real microphone |
+| Two modes made visible: landing section, mode switch, offline warning, docs | #76 | ✅ Built |
+| The `langgraph` dependency (the repo asks for dependencies in a tiny separate PR) | #77 | ✅ CI green, Docker image builds |
+| Opt-in camera and microphone sensing: four LangGraph agents plus an orchestrator, on-device, a gentle "are you okay?" check-in, auto-deletion, consent gate, training tools | #78 | 🟡 Built and tested with synthetic numbers and a fake camera. **Not tested with real faces**; rule-based; needs legal review (DPDP Act 2023) before any child uses it |
+| Deploy from GitHub Actions, to avoid the Vercel block | #74 | 🟡 Written, not run: needs three Vercel secrets from the Vercel owner |
+
+**Decision needed (M1): does Online Mode ship in the 31 Oct submission?**
+- *For:* it is a differentiator, and it works.
+- *Against:* the plan said the submitted build stays the offline classroom; the AI teacher's answers do not go through the four guardrails; there are no learner accounts or verifiable parental consent; the camera feature needs legal review; and it adds Claude and Sarvam spend (capped at 600 turns a day each).
+- *Suggestion:* merge #77, #75 and #76 so the two-modes story is visible, label it a **prototype** in the deck and video, and keep #78 (camera) either off the demo or adults-only. If the team prefers to stay frozen, leave the stack open and merge it after the submission (the Top 10 branch).
 
 ## 3. Submission checklist (due 1 Nov; target 31 Oct, 18:00 IST)
 
 | Item | Status |
 |---|---|
 | Hosted link up and kept warm through 2–9 Nov | ✅ |
-| Test accounts and sample inputs in README | 🟡 password still to fill in |
+| Test accounts and sample inputs in README | 🟡 password still to fill in; Fill-in button waits on `VITE_DEMO_PASSWORD` |
 | AI services listed, `.env.example` files | ✅ |
 | **User testing log** (35% criterion) | ❌ **empty**: interview #1 pending |
 | **3-minute video** | ❌ script ready ([VIDEO_SCRIPT.md](VIDEO_SCRIPT.md)), not recorded |
 | **Deck** | 🟡 draft; needs testing pages, guardrail numbers, costs, honest Santali status |
 | Repo public, evaluator access, secrets scan, tag `v1.0-build` | ❌ submission day |
-| Native-speaker check of the app text and voices | ❌ |
+| Native-speaker check of the app text and voices (and the AI teacher's Hindi, Tamil and Odia, which no native speaker has reviewed) | ❌ |
+| Online Mode decision (above), then a one-line honest label in the deck and video: prototype, rule-based sensing, not tested with real faces | ❌ |
 | Real phone and ₹500 speaker test (3 m) | ❌ |
 
 ## 4. Where we stand on each criterion
@@ -57,9 +71,10 @@ Planned (18 Oct) as a 1-on-1 AI tutor for connected older learners sharing the s
 3. **Native speakers** check the Tamil, Hindi and Odia app text (`app/src/teacher/strings.ts`) and listen to one voice pack.
 
 **Unblock the live demo (M3)**
-4. Set `VITE_PACK_PUBLIC_KEY` on Vercel and build the 3 packs on Render, so judges can download and **hear a real Tamil lesson**.
+4. Set `VITE_PACK_PUBLIC_KEY` on Vercel (and `VITE_DEMO_PASSWORD`) and build the 3 packs on Render, so judges can download and **hear a real Tamil lesson**. The Grade 1 voiced pack is built and passes QA, saved outside the repo. The public key (safe to share) is `xCrGGtubBBisXI/FYyp0unCnqm6ez7YhLY8bkRToqKo=`, valid only if Render's `PACK_SIGNING_KEY` is the same key as the one it came from.
 5. Send the Grade 1 pack file, to ship it as the **built-in real-voice lesson** (offline, no login).
-6. Fix #68 (rebase, the failing preview build, four language words) so the cinematic landing and the "Fill in" button reach main.
+6. ~~Fix #68~~ done: the cinematic landing and the Fill-in button are in main. **Ask Harsha to add loktrishal-05 to the Vercel team** (the red X on every PR), then merge #77, #75, #76, #78, #73 in that order with Rebase and merge; the stacked ones need a quick rebase after each.
+6b. **Collect real data for the perception model** (optional): 10 to 15 people use `/tutor` with the camera on and press *I get it / I'm lost*, then Colab ([ml/COLAB_PROMPT.md](../ml/COLAB_PROMPT.md)). Until then the rules are used, and nothing trained on invented data may ship.
 
 **Optional, if people can be found**
 7. Exotel: settings on Render and one real call to a team phone.

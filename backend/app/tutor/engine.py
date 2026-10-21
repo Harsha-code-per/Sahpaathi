@@ -187,9 +187,6 @@ def step(brain: Brain, turn: TurnIn, rng: random.Random | None = None) -> TurnOu
         p.game is None or (p.game.questions and p.game.round >= len(p.game.questions))
     ):
         raise LessonError("The break game does not match the progress.")
-    if not turn.text:
-        raise LessonError("Say something to continue.")
-
     part = plan.parts[p.part]
 
     def d(action: str, **kw) -> Directive:
@@ -197,6 +194,19 @@ def step(brain: Brain, turn: TurnIn, rng: random.Random | None = None) -> TurnOu
 
     def speak(action: str, **kw) -> str:
         return _say(brain, d(action, **kw), history, lang, style)
+
+    if turn.signal and not turn.text:  # the perception agents suggest a gentle check-in
+        if p.mode not in ("teach", "quiz"):
+            raise LessonError("There is no lesson moment to check in on.")
+        if turn.signal == "tired":  # a tired learner is offered a break, like one who says so
+            p.resume, p.mode = p.mode, "break"  # type: ignore[assignment]
+            reply = speak("offer_break", text="you look a little tired")
+        else:
+            # Only the check-in: the open question comes back after they answer it.
+            reply = speak("check_in", kind=turn.signal, text="; ".join(turn.reasons))
+        return TurnOut(reply=reply, progress=p, language=lang, style=style, intent=None)
+    if not turn.text:
+        raise LessonError("Say something to continue.")
 
     question: Question | None = None
     if p.mode == "quiz":

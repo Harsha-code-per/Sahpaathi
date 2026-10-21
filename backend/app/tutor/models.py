@@ -4,6 +4,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from app.tutor.sense.schema import Signal
+
 Lang = Literal["en", "hi", "ta", "or"]
 Style = Literal["normal", "simple"]  # "simple": explain like I am five
 LANGUAGES = {"en": "English", "hi": "Hindi", "ta": "Tamil", "or": "Odia"}
@@ -104,6 +106,9 @@ class TurnIn(BaseModel):
     )  # earlier turns, oldest first
     text: str = Field(default="", max_length=1000)  # what the student just said; empty with `begin`
     begin: bool = False  # start teaching part 1 of a freshly made plan
+    # The perception agents noticed something and suggest a gentle check-in (no student words).
+    signal: Signal | None = None
+    reasons: list[str] = Field(default_factory=list, max_length=4)
     plan: Plan | None = None
     progress: Progress = Field(default_factory=Progress)
     language: Lang = "en"

@@ -161,6 +161,14 @@ def _instruction(d: Directive) -> str:
                 "on the screen, or a little stretch. They can also say 'back to the lesson'. Ask what "
                 f"they would like.{tired}"
             )
+        case "check_in":
+            ask = {
+                "confused": "The learner may be puzzled by what you just said. Say softly that they look a little unsure, then ask if it is clear so far, or if they would like you to explain it again in a different way or in another language.",
+                "distracted": "The learner may be distracted. Ask gently if something is distracting them and whether they are okay to carry on or would like a short break.",
+                "noisy": "There is noise around the learner. Ask if the sound is bothering them, and offer to wait a moment or take a short break until it is quieter.",
+                "uncomfortable": "The learner may be uncomfortable. Ask kindly if everything is okay and if anything is bothering them. Say they can tell you anything.",
+            }.get(d.kind, "Ask kindly if everything is okay.")
+            return f"{ask} Two short sentences at most. Do not mention cameras, microphones or watching, and do not blame them. Do not ask the lesson question now."
         case "game_intro":
             if d.kind == "memory":
                 return (
@@ -328,7 +336,8 @@ class ClaudeBrain:
             "the content; 'ready' = they are ready or agree to continue; 'answer' = they attempt an "
             "answer to the open question (also 'I do not know', which is a wrong answer); 'skip' = "
             "they want to skip; 'stop' = they want to end the lesson; 'break' = they say they are "
-            "tired, bored or want a break, or ask for a game, riddle or puzzle; 'other' = unrelated "
+            "tired, bored or want a break, or ask for a game, riddle or puzzle, or say noise or "
+            "something around them is disturbing them; 'other' = unrelated "
             f"chat.{NL}"
             "verdict (only when intent is 'answer'): 'correct' if it means the same as the reference "
             "answer (wording, spelling and language may differ; numbers must be exactly equal), "

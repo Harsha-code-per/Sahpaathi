@@ -1,7 +1,15 @@
 import { ArrowUpIcon, AudioLinesIcon, BookOpenIcon, CheckIcon, PaperclipIcon, SquareIcon, XIcon } from 'lucide-react'
-import { useEffect, useRef, useState, type ChangeEvent, type SubmitEvent } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore, type ChangeEvent, type SubmitEvent } from 'react'
 import { LogoMark } from '@/components/Logo'
+import { ModeSwitch } from '@/components/ModeSwitch'
 import { FRESH, makePlan, readAttachment, speakUrl, turn, type Attachment, type Lang, type Plan, type Progress, type Style, type Turn } from './api'
+import { countFillers } from '../sense/features'
+import { SensePanel } from '../sense/SensePanel'
+import { useSense, type Insight } from '../sense/useSense'
+
+// Camera/mic perception stays hidden unless the build sets VITE_SENSE_ENABLED=true (docs/SENSE.md):
+// it needs legal review and parental consent before children use it. Without the panel it never starts.
+const SENSE_ENABLED = import.meta.env.VITE_SENSE_ENABLED === 'true'
 import MemoryGame from './MemoryGame'
 import { canListen, listen, speak, type Listener, type Speaker } from './speech'
 import './tutor.css'
@@ -37,6 +45,24 @@ const BREAKS: [string, string][] = [
   ['Back to lesson', 'Back to the lesson please.'],
 ]
 
+/** Whether the browser says it has a network. Online mode needs one; the offline classroom does not. */
+function useOnline() {
+  return useSyncExternalStore(
+    (notify) => {
+      window.addEventListener('online', notify)
+      window.addEventListener('offline', notify)
+      return () => {
+        window.removeEventListener('online', notify)
+        window.removeEventListener('offline', notify)
+      }
+    },
+    () => navigator.onLine,
+  )
+}
+
+/** Milliseconds on a steady clock. */
+const clock = () => performance.now()
+
 const chip =
   'inline-flex h-10 items-center rounded-full border border-white/25 bg-white/5 px-4 text-sm font-semibold outline-none hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-ring aria-pressed:border-[#f2efe6] aria-pressed:bg-[#f2efe6] aria-pressed:text-[#0b1413]'
 
@@ -45,6 +71,7 @@ const chip =
  * it analyses the topic into parts and teaches them in order, checking each, as the server's rules dictate.
  */
 export default function Tutor() {
+  const online = useOnline()
   const [lang, setLang] = useState<Lang>('en')
   const [style, setStyle] = useState<Style>('normal')
   const [study, setStudy] = useState(false)
@@ -66,12 +93,43 @@ export default function Tutor() {
   const listener = useRef<Listener | null>(null)
   const speaker = useRef<Speaker | null>(null)
   const silences = useRef(0)
+  const phaseRef = useRef<Phase>('idle')
+  const liveRef = useRef('')
+  const teacherEndedAt = useRef<number | null>(null) // when the teacher last finished speaking
+  const latency = useRef<number | null>(null) // seconds the learner took to start answering
+  const fillers = useRef(0) // "umm" and "hmm" in their last answer
   const planning = useRef(false) // a lesson plan is being made: keep the microphone closed until it is ready
   const settings = useRef({ lang, style, study, attached })
   useEffect(() => {
     settings.current = { lang, style, study, attached }
   }, [lang, style, study, attached])
   const end = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    phaseRef.current = phase
+    liveRef.current = live
+  })
+  const sense = useSense({
+    // What the lesson knows, so a frown is weighed against a missed question.
+    getContext: () => ({
+      mode: progressRef.current.mode,
+      misses: progressRef.current.misses,
+      latency_s: latency.current,
+      fillers: fillers.current,
+      silence_s: teacherEndedAt.current ? (clock() - teacherEndedAt.current) / 1000 : 0,
+      teacher_speaking: phaseRef.current === 'speaking',
+    }),
+    // The microphone also hears the teacher's own voice and the learner's: neither is "the room".
+    getSpeaking: () => phaseRef.current === 'speaking' || (phaseRef.current === 'listening' && liveRef.current !== ''),
+    onCheckIn: (i: Insight) => {
+      const inLesson = planRef.current && (progressRef.current.mode === 'teach' || progressRef.current.mode === 'quiz')
+      if (!inLesson || i.state === 'focused') return
+      if (phaseRef.current !== 'idle' && phaseRef.current !== 'listening') return // never talk over the teacher
+      listener.current?.stop()
+      listener.current = null
+      setLive('')
+      void converse('', false, false, { signal: i.state, reasons: i.reasons })
+    },
+  })
   const file = useRef<HTMLInputElement>(null)
 
   useEffect(
@@ -136,6 +194,9 @@ export default function Tutor() {
     if (mine !== generation.current) return
     speaker.current = speak(reply, settings.current.lang, url, () => {
       speaker.current = null
+      teacherEndedAt.current = clock()
+      latency.current = null
+      fillers.current = 0
       if (planning.current) setPhase('thinking')
       else if (talking.current) startListening()
       else setPhase('idle')
@@ -152,12 +213,21 @@ export default function Tutor() {
 
   /** Whatever the student said or typed: starts a study plan when asked to, else carries on the conversation. */
   async function submit(text: string, hidden = false) {
+    if (teacherEndedAt.current && text) {
+      latency.current = (clock() - teacherEndedAt.current) / 1000
+      fillers.current = countFillers(text)
+      teacherEndedAt.current = null
+    }
+    if (!navigator.onLine) {
+      stop()
+      return setError('You are offline. The AI teacher needs the internet. The offline classroom works without it.')
+    }
     const { study, attached } = settings.current
     if (!planRef.current && (study || attached)) return startStudy(text, attached)
     return converse(text, false, hidden)
   }
 
-  async function converse(text: string, begin: boolean, hidden = false) {
+  async function converse(text: string, begin: boolean, hidden = false, hint?: { signal: NonNullable<Insight['state']> & string; reasons: string[] }) {
     const mine = ++generation.current
     const prior = turnsRef.current.map(({ role, content }) => ({ role, content }))
     if (text) add({ role: 'user', content: text, hidden })
@@ -165,7 +235,7 @@ export default function Tutor() {
     setError('')
     try {
       const { lang, style } = settings.current
-      const out = await turn({ messages: prior, text, begin, plan: planRef.current, progress: progressRef.current, language: lang, style })
+      const out = await turn({ messages: prior, text, begin, plan: planRef.current, progress: progressRef.current, language: lang, style, signal: hint && hint.signal !== 'focused' ? hint.signal : null, reasons: hint?.reasons })
       if (mine !== generation.current) return
       progressRef.current = out.progress
       setProgress(out.progress)
@@ -274,8 +344,11 @@ export default function Tutor() {
           <span className="grid size-10 place-items-center rounded-xl bg-primary text-primary-foreground">
             <LogoMark className="size-6" />
           </span>
-          <span className="font-heading text-xl font-bold">Ask the teacher</span>
+          <span className="font-heading text-xl font-bold max-sm:sr-only">Ask the teacher</span>
         </a>
+        <div className="ml-auto">
+          <ModeSwitch current="online" tone="dark" />
+        </div>
       </header>
 
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 px-5">
@@ -289,6 +362,8 @@ export default function Tutor() {
             Explain like I’m 5
           </button>
         </div>
+
+        {SENSE_ENABLED && <SensePanel sense={sense} />}
 
         {plan && (
           <section aria-label="Lesson plan" className="space-y-2 rounded-3xl border border-white/15 bg-white/5 p-4">
@@ -342,6 +417,11 @@ export default function Tutor() {
           <div ref={end} />
         </div>
 
+        {!online && (
+          <p role="status" className="rounded-xl bg-[#3a2f12] px-3 py-2 text-[#f4d58a]">
+            You are offline, so the AI teacher cannot answer. Open the <a href="/teacher" className="font-semibold underline underline-offset-4">offline classroom</a>: it works without internet.
+          </p>
+        )}
         {error && (
           <p role="alert" className="rounded-xl bg-[#3a1f1a] px-3 py-2 text-[#ffb4a2]">
             {error}

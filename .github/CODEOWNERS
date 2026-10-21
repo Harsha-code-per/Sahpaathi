@@ -23,6 +23,16 @@
 /app/src/sensing/                   @loktrishal-05
 /content/voices/                    @loktrishal-05
 
+# M3 Loktrishal: the online AI teacher, its camera/mic sensing and the perception model training
+/backend/app/tutor/                 @loktrishal-05
+/backend/tests/test_api_tutor.py    @loktrishal-05
+/backend/tests/test_tutor_*.py      @loktrishal-05
+/app/src/tutor/                     @loktrishal-05
+/app/src/sense/                     @loktrishal-05
+/ml/                                @loktrishal-05
+/docs/MODES.md                      @loktrishal-05
+/docs/SENSE.md                      @loktrishal-05
+
 # M4 Cholan: sync API, IVR catch-up calls, CRP dashboard (on top of the backend core)
 /backend/app/sync.py                @Cholan-kinnera
 /backend/app/ivr/                   @Cholan-kinnera
