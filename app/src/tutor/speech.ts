@@ -57,12 +57,18 @@ export interface Speaker {
   stop: () => void
 }
 
-/** Plays `url` (the server voice) or, with none, the browser's own voice. Calls `onEnd` when finished or stopped. */
-export function speak(text: string, lang: Lang, url: string | null, onEnd: () => void): Speaker {
+/**
+ * Plays `url` (the server voice) or, with none, the browser's own voice. Calls `onEnd` when finished or
+ * stopped, and `onSilent` if the browser has no voice for this language (the text is on screen anyway).
+ * A voice that is missing, or never ends, must not freeze the lesson, so the screen moves on by itself.
+ */
+export function speak(text: string, lang: Lang, url: string | null, onEnd: () => void, onSilent?: () => void): Speaker {
   let done = false
+  const timers: ReturnType<typeof setTimeout>[] = []
   const finish = () => {
     if (done) return
     done = true
+    timers.forEach(clearTimeout)
     if (url) URL.revokeObjectURL(url)
     onEnd()
   }
@@ -80,24 +86,60 @@ export function speak(text: string, lang: Lang, url: string | null, onEnd: () =>
   }
   const synth = window.speechSynthesis
   if (!synth) {
+    onSilent?.()
     queueMicrotask(finish)
     return { stop: finish }
   }
-  const u = new SpeechSynthesisUtterance(text)
-  u.lang = BCP47[lang]
-  u.rate = 0.9
-  u.onend = finish
-  u.onerror = finish
-  try {
-    synth.cancel()
-    synth.speak(u)
-  } catch {
-    queueMicrotask(finish) // no usable voice: the text is on screen, so end quietly
-  }
+  // Is there a voice for this language on this device? Browsers fill the list in a moment after loading.
+  void voicesReady(synth).then((voices) => {
+    if (done) return
+    const code = BCP47[lang].slice(0, 2)
+    if (!voices.some((v) => v.lang.toLowerCase().replace('_', '-').startsWith(code))) {
+      onSilent?.() // the text is on screen; do not mumble it in the wrong language or wait for nothing
+      finish()
+      return
+    }
+    const u = new SpeechSynthesisUtterance(text)
+    u.lang = BCP47[lang]
+    u.rate = 0.9
+    u.onend = finish
+    u.onerror = finish
+    // Never wait longer than the sentence could take to say, plus a margin.
+    timers.push(
+      setTimeout(() => {
+        synth.cancel()
+        finish()
+      }, Math.max(5000, text.length * 95 + 3000)),
+    )
+    try {
+      synth.cancel()
+      synth.speak(u)
+    } catch {
+      onSilent?.()
+      finish()
+    }
+  })
   return {
     stop: () => {
       synth.cancel()
       finish()
     },
   }
+}
+
+/** The browser's voices, waiting a moment for them to load if the list is still empty. */
+function voicesReady(synth: SpeechSynthesis): Promise<SpeechSynthesisVoice[]> {
+  const now = synth.getVoices()
+  if (now.length) return Promise.resolve(now)
+  return new Promise((resolve) => {
+    const t = setTimeout(() => resolve(synth.getVoices()), 1500)
+    synth.addEventListener(
+      'voiceschanged',
+      () => {
+        clearTimeout(t)
+        resolve(synth.getVoices())
+      },
+      { once: true },
+    )
+  })
 }

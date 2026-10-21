@@ -192,15 +192,25 @@ export default function Tutor() {
     setPhase('speaking')
     const url = await speakUrl(reply, settings.current.lang)
     if (mine !== generation.current) return
-    speaker.current = speak(reply, settings.current.lang, url, () => {
-      speaker.current = null
-      teacherEndedAt.current = clock()
-      latency.current = null
-      fillers.current = 0
-      if (planning.current) setPhase('thinking')
-      else if (talking.current) startListening()
-      else setPhase('idle')
-    })
+    const silent = () => {
+      setNote('There is no voice for this language on this device, so my answer is shown on the screen only.')
+      setTimeout(() => setNote(''), 8000)
+    }
+    speaker.current = speak(
+      reply,
+      settings.current.lang,
+      url,
+      () => {
+        speaker.current = null
+        teacherEndedAt.current = clock()
+        latency.current = null
+        fillers.current = 0
+        if (planning.current) setPhase('thinking')
+        else if (talking.current) startListening()
+        else setPhase('idle')
+      },
+      silent,
+    )
   }
 
   function fail(e: unknown, mine: number) {
