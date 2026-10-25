@@ -80,6 +80,8 @@ test('teacher plays the built-in lesson offline-first', async ({ page }) => {
 })
 
 test('teacher: the Plan and Shelf tabs open and are accessible', async ({ page }) => {
+  // The tabs fade in over half a second; axe would measure the text mid-fade, when it is half transparent.
+  await page.emulateMedia({ reducedMotion: 'reduce' })
   const errors = watch(page)
   await page.goto('/teacher')
   await page.getByRole('button', { name: 'Plan' }).click()
