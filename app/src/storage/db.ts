@@ -96,6 +96,19 @@ export interface RecordingRecord {
   review?: RecordingReview | { note: string } | null
 }
 
+/** A PDF the teacher put on her shelf (a book chapter, a worksheet, her notes), kept for offline reading. */
+export interface NoteRecord {
+  id: string
+  title: string
+  /** 'general' when it is not for one subject. */
+  subject: 'numeracy' | 'literacy' | 'general'
+  /** 0 means every grade. */
+  grade: number
+  size: number
+  blob: Blob
+  at: string
+}
+
 /** What the lesson list needs; kept apart from the audio so listing lessons stays cheap. */
 export interface StoredPack {
   id: string
@@ -117,6 +130,7 @@ interface SahpaathiDB extends DBSchema {
   packs: { key: string; value: StoredPack }
   pack_files: { key: string; value: StoredPackFiles }
   classroom: { key: string; value: ClassroomRecord }
+  notes: { key: string; value: NoteRecord }
   recordings: { key: string; value: RecordingRecord; indexes: { episode_id: string } }
 }
 
@@ -124,7 +138,7 @@ const DB_NAME = 'sahpaathi'
 let db: Promise<IDBPDatabase<SahpaathiDB>> | undefined
 
 export function getDB() {
-  db ??= openDB<SahpaathiDB>(DB_NAME, 5, {
+  db ??= openDB<SahpaathiDB>(DB_NAME, 6, {
     // Each version only adds stores, so phones upgrading from any older version keep their data.
     upgrade(d, oldVersion) {
       if (oldVersion < 1) d.createObjectStore('outbox', { keyPath: 'event_id' }).createIndex('at', 'at')
@@ -134,6 +148,7 @@ export function getDB() {
       }
       if (oldVersion < 3) d.createObjectStore('classroom', { keyPath: 'id' })
       if (oldVersion < 4) d.createObjectStore('history', { keyPath: 'event_id' }).createIndex('at', 'at')
+      if (oldVersion < 6) d.createObjectStore('notes', { keyPath: 'id' })
       if (oldVersion < 5) d.createObjectStore('recordings', { keyPath: 'id' }).createIndex('episode_id', 'episode_id')
     },
   })
