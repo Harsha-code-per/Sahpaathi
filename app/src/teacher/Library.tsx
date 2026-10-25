@@ -1,4 +1,4 @@
-import { CloudCheckIcon, CloudDownloadIcon, CloudUploadIcon, DownloadIcon, PencilIcon, PlayIcon, Share2Icon, Trash2Icon } from 'lucide-react'
+import { CalendarCheckIcon, CloudCheckIcon, CloudDownloadIcon, CloudUploadIcon, DownloadIcon, PencilIcon, PlayIcon, Share2Icon, Trash2Icon } from 'lucide-react'
 import { useCallback, useEffect, useState, type ChangeEvent } from 'react'
 import { cn } from 'cn'
 import { LogoMark } from '@/components/Logo'
@@ -8,9 +8,11 @@ import type { Episode } from '../lib/types'
 import { ClassroomSetup } from '../attendance/Attendance'
 import { getClassroom } from '../attendance/classroom'
 import { sharePack } from '../packs/share'
+import { listHistory } from '../storage/history'
+import { todaysPlan } from './plan'
 import { deletePack, importPack, listPacks, loadPackFiles } from '../packs/store'
 import { PackError } from '../packs/verify'
-import type { ClassroomRecord, StoredPack } from '../storage/db'
+import type { ClassroomRecord, OutboxEvent, StoredPack } from '../storage/db'
 import GetLessons from './GetLessons'
 import { useT } from './i18n'
 import { UI_LANGS, type UiLang } from './strings'
@@ -116,6 +118,7 @@ export default function Library({ onOpen, pending }: { onOpen: (lesson: OpenLess
   const [classroom, setClassroom] = useState<ClassroomRecord | null>(null)
   const [editingClassroom, setEditingClassroom] = useState(false)
   const [getting, setGetting] = useState(false)
+  const [history, setHistory] = useState<OutboxEvent[]>([])
 
   const refresh = useCallback(
     () =>
@@ -128,6 +131,9 @@ export default function Library({ onOpen, pending }: { onOpen: (lesson: OpenLess
   useEffect(() => {
     refresh()
   }, [refresh])
+  useEffect(() => {
+    listHistory().then(setHistory, (e) => console.error('Could not read the class history', e))
+  }, [])
   useEffect(() => {
     getClassroom().then(setClassroom, (e) => console.error('Could not read the classroom', e))
   }, [])
@@ -173,6 +179,11 @@ export default function Library({ onOpen, pending }: { onOpen: (lesson: OpenLess
   }
 
   const [newest, ...rest] = packs
+  const plan = todaysPlan([...packs.map((p) => p.episode), samplePack.episode], history)
+  const openById = (id: string) => {
+    const p = packs.find((x) => x.id === id)
+    return p ? open(p) : onOpen(samplePack)
+  }
 
   return (
     <main className="theme-board min-h-dvh bg-background text-foreground">
@@ -232,6 +243,28 @@ export default function Library({ onOpen, pending }: { onOpen: (lesson: OpenLess
           <p role="status" className={cn('rounded-2xl p-4 text-lg', notice.kind === 'ok' ? 'bg-ok text-ok-foreground' : 'bg-bad text-bad-foreground')}>
             {notice.text}
           </p>
+        )}
+
+        {plan && packs.length > 0 && (
+          <section aria-label={t.planTitle} className="space-y-3 rounded-2xl border border-border bg-card p-4">
+            <h2 className="flex items-center gap-2 text-[0.8125rem] font-bold tracking-[0.08em] text-primary uppercase">
+              <CalendarCheckIcon className="size-4" aria-hidden /> {t.planTitle}
+            </h2>
+            <p className="text-lg font-semibold" lang={plan.episode.school_lang}>
+              {plan.episode.title}
+            </p>
+            <p className="text-muted-foreground">
+              {plan.reason === 'new' ? t.planNew : plan.reason === 'revisit' ? t.planRevisit(plan.fewPct ?? 0) : t.planNext}
+            </p>
+            {plan.episode.materials.length > 0 && (
+              <p className="text-sm" lang={plan.episode.school_lang}>
+                <b>{t.keepReady}:</b> {plan.episode.materials.join(' · ')}
+              </p>
+            )}
+            <Button variant="outline" size="lg" className="w-full" onClick={() => openById(plan.episode.id)}>
+              <PlayIcon aria-hidden /> {t.openLesson}
+            </Button>
+          </section>
         )}
 
         <ul className="flex flex-col gap-3">

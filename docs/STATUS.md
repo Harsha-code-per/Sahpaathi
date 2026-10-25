@@ -36,7 +36,7 @@ The deck is the reason we were selected, so its core loop comes first. Checked a
 | Packs move phone-to-phone, SD, weekly | Signed packs, Web Share, resumable download | live site refuses packs until `VITE_PACK_PUBLIC_KEY` is set; Nearby Share/SD are the OS file picker, not custom code |
 | Guardrails: rules, rubric, back-translation, native review | All four, 18/20 strict | native-speaker sign-off needs people |
 | Attendance, sync queue, CRP dashboard | Done | none |
-| "Plans the week around each grade's progress"; packs "re-tuned to the class" | Feedback loop rewrites weak parts; no automatic weekly planner | **not built**; say "re-tuned from feedback" in the deck |
+| "Plans the week around each grade's progress"; packs "re-tuned to the class" | Feedback loop rewrites weak parts; Today's plan card | Partly built: a **Today's plan** card on the lesson list suggests a new lesson, one the class struggled with, or the one played longest ago, with what to keep ready (`teacher/plan.ts`, from the phone's own taps, offline). Packs are not re-tuned automatically: say "re-tuned from feedback" |
 | Bhashini / IndicTrans2 / RAG pgvector / Kotlin app | Sarvam TTS, PWA | the deck's stack slide differs from what shipped; update it |
 
 What blocks the rest is config and people, not code: Vercel key, Exotel, Santali speaker, native reviewers, a real-phone test.
