@@ -46,7 +46,7 @@ export default function Help() {
     <div className="flex flex-col gap-5">
       <h1 className="font-heading text-2xl font-bold">{t.helpTitle}</h1>
 
-      <section aria-label={t.speakerTitle} className="space-y-3 rounded-2xl border border-border bg-card p-5">
+      <section aria-label={t.speakerTitle} className="space-y-3 slate-card rounded-2xl p-5">
         <h2 className="flex items-center gap-2 font-heading text-xl font-bold">
           <Volume2Icon className="size-5 text-primary" aria-hidden /> {t.speakerTitle}
         </h2>
@@ -68,7 +68,7 @@ export default function Help() {
         <h2 className="font-heading text-xl font-bold">{t.fiveSteps}</h2>
         <ol className="space-y-3">
           {t.steps.map((step, i) => (
-            <li key={i} className="flex gap-3 rounded-2xl border border-border bg-card p-4">
+            <li key={i} className="flex gap-3 slate-card rounded-2xl p-4">
               <span className="grid size-9 shrink-0 place-items-center rounded-full bg-primary font-heading font-bold text-primary-foreground">{i + 1}</span>
               <p className="leading-relaxed">{step}</p>
             </li>

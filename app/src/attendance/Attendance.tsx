@@ -41,7 +41,7 @@ export function ClassroomSetup({
   }
 
   return (
-    <section className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5">
+    <section className="flex flex-col gap-4 slate-card rounded-2xl p-5">
       <h2 className="font-heading text-xl font-bold">{t.thisClassroom}</h2>
       <label className="flex flex-col gap-2 text-lg">
         <span className="text-muted-foreground">{t.codeLabel}</span>
@@ -112,7 +112,7 @@ export default function Attendance({ episodeId, onSaved }: { episodeId: string; 
   }
 
   return (
-    <section className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5">
+    <section className="flex flex-col gap-4 slate-card rounded-2xl p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="font-heading text-xl font-bold">{t.whoAbsent}</h2>
         <span className="text-muted-foreground">{t.classCode(classroom.classroom_id)}</span>

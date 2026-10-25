@@ -73,7 +73,7 @@ export default function MyClass() {
               {results.map((r) => {
                 const total = r.taps.most + r.taps.some + r.taps.few
                 return (
-                  <li key={r.episode_id} className="space-y-2.5 rounded-2xl border border-border bg-card p-4">
+                  <li key={r.episode_id} className="space-y-2.5 slate-card rounded-2xl p-4">
                     <p className="font-semibold">{titles.get(r.episode_id) ?? r.episode_id}</p>
                     <p className="text-sm text-muted-foreground">
                       {t.playedDays(r.plays)} · {day(r.lastPlayed)}
@@ -124,7 +124,7 @@ export default function MyClass() {
           {log.length > 0 && (
             <section aria-label={t.recentTitle} className="space-y-3">
               <h2 className="font-heading text-xl font-bold">{t.recentTitle}</h2>
-              <ul className="divide-y divide-border rounded-2xl border border-border bg-card">
+              <ul className="divide-y divide-border slate-card rounded-2xl">
                 {log.map((l) => (
                   <li key={l.at} className="flex items-center justify-between gap-3 px-4 py-3">
                     <span className="min-w-0 truncate">{titles.get(l.episode_id) ?? l.episode_id}</span>

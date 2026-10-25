@@ -36,7 +36,7 @@ export default function LessonFeedback({ episodeId, onSaved }: { episodeId: stri
   }
 
   return (
-    <section aria-label={t.feedbackTitle} className="space-y-3 rounded-2xl border border-border bg-card p-4">
+    <section aria-label={t.feedbackTitle} className="space-y-3 slate-card rounded-2xl p-4">
       <h3 className="font-heading text-lg font-bold">{t.feedbackTitle}</h3>
       <div role="radiogroup" aria-label={t.feedbackTitle} className="flex justify-between gap-1">
         {[1, 2, 3, 4, 5].map((n) => (

@@ -70,7 +70,7 @@ export default function GetLessons({ have, onImported }: { have: Set<string>; on
   }
 
   return (
-    <section className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5" aria-labelledby="get-lessons">
+    <section className="flex flex-col gap-4 slate-card rounded-2xl p-5" aria-labelledby="get-lessons">
       <div className="flex items-center justify-between gap-3">
         <h2 id="get-lessons" className="font-heading text-xl font-bold">
           {t.newLessons}
