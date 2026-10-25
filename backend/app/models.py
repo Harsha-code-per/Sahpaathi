@@ -5,6 +5,7 @@ from sqlalchemy import (
     Boolean,
     CheckConstraint,
     DateTime,
+    Float,
     ForeignKey,
     Integer,
     LargeBinary,
@@ -182,3 +183,35 @@ class CatchupCall(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
+
+
+class TeacherRecording(Base):
+    """A teacher's own voice recording of one topic, sent from her phone and reviewed by the AI.
+
+    The id is made on the phone so a retried upload stores one row. The audio is small (opus, a
+    minute is ~200 KB), so it lives in the database, deferred so listing never loads it.
+    `status`: received (stored, review pending), reviewed, or unreviewed (review could not run).
+    """
+
+    __tablename__ = "teacher_recordings"
+    __table_args__ = (
+        CheckConstraint(_in("subject", ("numeracy", "literacy")), name="recording_subject_known"),
+        CheckConstraint(
+            _in("status", ("received", "reviewed", "unreviewed")), name="recording_status_known"
+        ),
+    )
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    episode_id: Mapped[str] = mapped_column(String(100), index=True)  # the topic's own slug
+    subject: Mapped[str] = mapped_column(String(10))
+    grade: Mapped[int] = mapped_column(Integer)
+    lang: Mapped[str] = mapped_column(String(3), default="en")
+    classroom_id: Mapped[str | None] = mapped_column(String(40))
+    duration_sec: Mapped[float] = mapped_column(Float)
+    mime: Mapped[str] = mapped_column(String(60))
+    audio: Mapped[bytes] = mapped_column(LargeBinary, deferred=True)
+    status: Mapped[str] = mapped_column(String(12), default="received")
+    transcript: Mapped[str | None] = mapped_column(Text)
+    review: Mapped[dict | None] = mapped_column(JSON)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

@@ -63,6 +63,39 @@ export interface ClassroomRecord {
   rolls: string[]
 }
 
+/** The AI's review of one recording (backend/app/recordings.py): scores 1 to 5 and a few tips. */
+export interface RecordingReview {
+  clarity: number
+  accuracy: number
+  pace: number
+  child_friendly: number
+  safe: boolean
+  summary: string
+  tips: string[]
+}
+
+/**
+ * A teacher's own voice recording of one topic. It is kept on the phone first (so it survives a missing signal
+ * and a closed app), sent when she is signed in and online, then updated with the server's AI review.
+ * `id` is made here, so a retried upload cannot store it twice.
+ */
+export interface RecordingRecord {
+  id: string
+  episode_id: string
+  subject: 'numeracy' | 'literacy'
+  grade: number
+  lang: 'ta' | 'hi' | 'or' | 'en'
+  classroom_id?: string
+  duration_sec: number
+  mime: string
+  audio: Blob
+  at: string
+  /** saved: only on this phone; sent: the server has it; reviewed / unreviewed: the AI did / could not review it. */
+  status: 'saved' | 'sent' | 'reviewed' | 'unreviewed'
+  transcript?: string | null
+  review?: RecordingReview | { note: string } | null
+}
+
 /** What the lesson list needs; kept apart from the audio so listing lessons stays cheap. */
 export interface StoredPack {
   id: string
@@ -84,13 +117,14 @@ interface SahpaathiDB extends DBSchema {
   packs: { key: string; value: StoredPack }
   pack_files: { key: string; value: StoredPackFiles }
   classroom: { key: string; value: ClassroomRecord }
+  recordings: { key: string; value: RecordingRecord; indexes: { episode_id: string } }
 }
 
 const DB_NAME = 'sahpaathi'
 let db: Promise<IDBPDatabase<SahpaathiDB>> | undefined
 
 export function getDB() {
-  db ??= openDB<SahpaathiDB>(DB_NAME, 4, {
+  db ??= openDB<SahpaathiDB>(DB_NAME, 5, {
     // Each version only adds stores, so phones upgrading from any older version keep their data.
     upgrade(d, oldVersion) {
       if (oldVersion < 1) d.createObjectStore('outbox', { keyPath: 'event_id' }).createIndex('at', 'at')
@@ -100,6 +134,7 @@ export function getDB() {
       }
       if (oldVersion < 3) d.createObjectStore('classroom', { keyPath: 'id' })
       if (oldVersion < 4) d.createObjectStore('history', { keyPath: 'event_id' }).createIndex('at', 'at')
+      if (oldVersion < 5) d.createObjectStore('recordings', { keyPath: 'id' }).createIndex('episode_id', 'episode_id')
     },
   })
   return db
