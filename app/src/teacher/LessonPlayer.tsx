@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import type { Episode, Line, Tap } from '../lib/types'
 import Attendance from '../attendance/Attendance'
 import LessonPrep from './LessonPrep'
-import { CHECKPOINT_TIMEOUT_SEC, advance, analogy, currentLine, start, tap, type Phase } from './player'
+import { CHECKPOINT_TIMEOUT_SEC, advance, analogy, currentLine, start, tap, upcoming, type Phase } from './player'
 import { recordTap } from '../sync/outbox'
 import LessonFeedback from './LessonFeedback'
 import { useChoralHint } from '../sensing/useChoralHint'
@@ -159,6 +159,19 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
     const onPause = (on: boolean) => (on ? startAnswer() : stopAnswer())
     return playLine(line, audio[line.id], () => setPhase((p) => advance(episode, p)), onPause)
   }, [line, audio, episode, startAnswer, stopAnswer])
+
+  // Warm the audio that could play next (the following line, or all three branches at a checkpoint)
+  // so a tap or a line change starts at once instead of waiting on the phone to load the file.
+  const warm = useRef<HTMLAudioElement[]>([])
+  useEffect(() => {
+    warm.current = upcoming(episode, phase).flatMap((l) => {
+      const url = audio[l.id]
+      if (!url) return []
+      const el = new Audio(url)
+      el.preload = 'auto'
+      return [el]
+    })
+  }, [phase, episode, audio])
 
   // A new segment starts with empty ears: pauses from the previous segment's easier/core/stretch
   // lines must not colour this segment's hint.

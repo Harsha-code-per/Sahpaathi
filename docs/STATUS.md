@@ -12,7 +12,7 @@ Live: app https://sahpaathi.vercel.app (all four routes load), API https://sahpa
 | 2 | **Four guardrails** | ✅ Done | Tier 1 code (every sum, language handover); tier 2 Haiku rubric; tier 3 blind back-translation beside every line (no numeric "drift score" was added); tier 4 a human edits lines and approves. **Measured: 18/20 strict, 20/20 any tier** ([GUARDRAIL_EVAL.md](GUARDRAIL_EVAL.md)) |
 | 3 | **Voice** | 🟡 Mostly | Real Sarvam voices for Tamil, Hindi, Odia with loudness QA. **Santali: splicer built, 0 of 42 phrases recorded or consented** |
 | 4 | **Packs** (signed zip; import, share, download) | 🟡 Built, blocked live | Ed25519-signed and verified; import from file, Web Share, in-app download that resumes on 2G. **The live site refuses packs: `VITE_PACK_PUBLIC_KEY` is not set on Vercel** |
-| 5 | **Offline teacher player** | ✅ Done | One-tap start, checkpoints, 10 s fallback, analogy, chalk sketch, materials, attendance, sync queue with retry; airplane mode lab-tested ([TESTING_LOG.md](TESTING_LOG.md) L1–L5); in Tamil, Hindi and Odia. The planned "<200 ms switching with pre-decoded audio" was not built: lines play one by one, which feels instant but is unmeasured |
+| 5 | **Offline teacher player** | ✅ Done | One-tap start, checkpoints, 10 s fallback, analogy, chalk sketch, materials, attendance, sync queue with retry; airplane mode lab-tested ([TESTING_LOG.md](TESTING_LOG.md) L1–L5); in Tamil, Hindi and Odia. The next line, and all three branches at a checkpoint, are now preloaded so a tap starts at once (`upcoming()` in `player.ts`); switch time is still unmeasured on a real phone |
 | 6 | **Choral mic sensing** | ✅ Done | Suggests a branch; the teacher decides |
 | 7 | **Absentee catch-up calls** | 🟡 Built, not live | Queue, keypad simulator, real Exotel calling ([EXOTEL.md](EXOTEL.md)). **Not configured on Render; no real call made yet** |
 | 8 | **Studio + dashboard** | ✅ Done, beyond plan | Line editing, collapsible sidebar, charts, lesson-pipeline Kanban, **classroom feedback loop** |
@@ -22,6 +22,24 @@ Live: app https://sahpaathi.vercel.app (all four routes load), API https://sahpa
 **Built beyond the plan:** the Chalk & Marigold redesign with logo and favicon, the landing page, the teacher app in three languages, in-app lesson download, the classroom feedback loop (Claude rewrites the part classes struggled with), the guardrail evaluation, the cost model ([ROADMAP.md](ROADMAP.md#what-it-costs)), a daily cap on lesson generation, and keep-warm for the judging week.
 
 **Deliberately cut, on the roadmap:** RAG over the curriculum, a job queue, mesh pods and micro-capsules. (Online Mode was cut too, then prototyped early: section 2.)
+
+## 1b. The pitch deck (Sahpaathi_A1pha.pdf), claim by claim
+The deck is the reason we were selected, so its core loop comes first. Checked against the code on 25 Oct.
+
+| Deck claim | In the product | Gap |
+|---|---|---|
+| Teacher taps once; the episode is already on the phone | Library, one-tap start, zero prep screen | none |
+| 15-min home-language episode: call-and-response, slate tasks, songs | Episode schema, Claude scriptwriter, 3 districts, 8 chapters | deck says 20 Grade 1-3 episodes; we have 8 chapters |
+| Most / Some / Few tap picks an easier / core / stretch branch, offline | `player.ts`, airplane-mode tested, 10 s fallback, preloaded audio | not measured on the ₹7k phone |
+| Home language bridges to school language | Lines carry `lang`; handover checked by guardrail tier 1 | Santali: 0 of 42 phrases recorded |
+| Absent children get a free call-back | Queue, IVR flow, keypad simulator, Exotel client | not configured, no real call |
+| Packs move phone-to-phone, SD, weekly | Signed packs, Web Share, resumable download | live site refuses packs until `VITE_PACK_PUBLIC_KEY` is set; Nearby Share/SD are the OS file picker, not custom code |
+| Guardrails: rules, rubric, back-translation, native review | All four, 18/20 strict | native-speaker sign-off needs people |
+| Attendance, sync queue, CRP dashboard | Done | none |
+| "Plans the week around each grade's progress"; packs "re-tuned to the class" | Feedback loop rewrites weak parts; no automatic weekly planner | **not built**; say "re-tuned from feedback" in the deck |
+| Bhashini / IndicTrans2 / RAG pgvector / Kotlin app | Sarvam TTS, PWA | the deck's stack slide differs from what shipped; update it |
+
+What blocks the rest is config and people, not code: Vercel key, Exotel, Santali speaker, native reviewers, a real-phone test.
 
 ## 2. Online Mode: built early as a prototype, live with the camera off
 Planned on 18 Oct as a 1-on-1 AI tutor for connected learners, to be prototyped only in the Top 10 stage on a separate branch. **A working prototype was built on 21 Oct** and is in `main`. Plan and feature-by-feature status: [MODES.md](MODES.md); the camera part: [SENSE.md](SENSE.md).

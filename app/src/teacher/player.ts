@@ -48,3 +48,9 @@ export function currentLine(ep: Episode, p: Phase): Line | null {
   if (p.kind === 'analogy') return ep.analogy[p.line]
   return p.kind === 'line' ? ep.segments[p.seg][p.part][p.line] : null
 }
+
+/** Lines that may play next: the following line, or the first line of each branch at a checkpoint. Used to warm audio so a tap switches instantly. */
+export function upcoming(ep: Episode, p: Phase): Line[] {
+  const next = p.kind === 'checkpoint' ? (['few', 'some', 'most'] as const).map((t) => tap(ep, p, t)) : [advance(ep, p)]
+  return next.map((n) => currentLine(ep, n)).filter((l): l is Line => l !== null)
+}
