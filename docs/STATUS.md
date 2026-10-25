@@ -39,6 +39,10 @@ The deck is the reason we were selected, so its core loop comes first. Checked a
 | "Plans the week around each grade's progress"; packs "re-tuned to the class" | Feedback loop rewrites weak parts; Today's plan card | Partly built: a **Today's plan** card on the lesson list suggests a new lesson, one the class struggled with, or the one played longest ago, with what to keep ready (`teacher/plan.ts`, from the phone's own taps, offline). Packs are not re-tuned automatically: say "re-tuned from feedback" |
 | Bhashini / IndicTrans2 / RAG pgvector / Kotlin app | Sarvam TTS, PWA | the deck's stack slide differs from what shipped; update it |
 
+Also added after phone testing (moto g34, driven over Chrome's debug port): Pause/Resume, screen kept awake during a lesson, and a confirm before leaving a lesson mid-way. Phone-tested: Most and Few taps switch branches, the Hindi bridge plays, the lesson finishes.
+
+The Vercel project is not visible to the `loktrishal` account, so `VITE_PACK_PUBLIC_KEY` must be set by Harsha.
+
 What blocks the rest is config and people, not code: Vercel key, Exotel, Santali speaker, native reviewers, a real-phone test.
 
 ## 2. Online Mode: built early as a prototype, live with the camera off

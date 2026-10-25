@@ -1,4 +1,4 @@
-import { ChevronLeftIcon, EyeIcon, LightbulbIcon, MicIcon, PartyPopperIcon, RotateCcwIcon } from 'lucide-react'
+import { ChevronLeftIcon, EyeIcon, LightbulbIcon, MicIcon, PartyPopperIcon, PauseIcon, PlayIcon, RotateCcwIcon } from 'lucide-react'
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { cn } from 'cn'
 import { Button } from '@/components/ui/button'
@@ -153,12 +153,28 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
   const choral = useChoralHint()
   const { startAnswer, stopAnswer, resetAnswer, takeHint } = choral
   const [suggested, setSuggested] = useState<Tap | null>(null)
+  const [paused, setPaused] = useState(false)
+  const playing = phase.kind !== 'idle' && phase.kind !== 'done'
+
+  // A phone that sleeps mid-lesson stops the audio, so keep the screen on while a lesson runs.
+  useEffect(() => {
+    if (!playing || !('wakeLock' in navigator)) return
+    let lock: WakeLockSentinel | undefined
+    const ask = () => navigator.wakeLock.request('screen').then((l) => (lock = l), () => {})
+    ask()
+    const again = () => document.visibilityState === 'visible' && ask() // the lock is released when the tab is hidden
+    document.addEventListener('visibilitychange', again)
+    return () => {
+      document.removeEventListener('visibilitychange', again)
+      lock?.release().catch(() => {})
+    }
+  }, [playing])
 
   useEffect(() => {
-    if (!line) return
+    if (!line || paused) return
     const onPause = (on: boolean) => (on ? startAnswer() : stopAnswer())
     return playLine(line, audio[line.id], () => setPhase((p) => advance(episode, p)), onPause)
-  }, [line, audio, episode, startAnswer, stopAnswer])
+  }, [line, audio, episode, startAnswer, stopAnswer, paused])
 
   // Warm the audio that could play next (the following line, or all three branches at a checkpoint)
   // so a tap or a line change starts at once instead of waiting on the phone to load the file.
@@ -216,7 +232,7 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
       <div className="mx-auto flex min-h-dvh max-w-xl flex-col gap-5 px-5 py-5">
         <header className="space-y-3">
           <div className="flex items-center justify-between gap-3">
-            <Button variant="ghost" className="-ml-3 text-muted-foreground" onClick={onExit}>
+            <Button variant="ghost" className="-ml-3 text-muted-foreground" onClick={() => (!playing || confirm(t.confirmExit)) && onExit()}>
               <ChevronLeftIcon aria-hidden /> {t.lessons}
             </Button>
             <SyncBadge pending={pending} />
@@ -286,8 +302,20 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
           />
         )}
 
+        {paused && (
+          <p role="status" className="rounded-2xl bg-warn p-4 text-lg text-warn-foreground">
+            {t.pausedNote}
+          </p>
+        )}
+
+        {(phase.kind === 'line' || phase.kind === 'analogy') && (
+          <Button variant={paused ? 'default' : 'outline'} size="lg" className="mt-auto h-14 text-lg" onClick={() => setPaused((v) => !v)}>
+            {paused ? <PlayIcon aria-hidden /> : <PauseIcon aria-hidden />} {paused ? t.resume : t.pause}
+          </Button>
+        )}
+
         {(phase.kind === 'line' || phase.kind === 'checkpoint') && episode.analogy.length > 0 && (
-          <Button variant="outline" size="lg" className="mt-auto" onClick={() => setPhase((p) => analogy(episode, p))}>
+          <Button variant="outline" size="lg" className={phase.kind === 'checkpoint' ? 'mt-auto' : undefined} onClick={() => setPhase((p) => analogy(episode, p))}>
             <LightbulbIcon className="text-primary" aria-hidden /> {t.needAnalogy}
           </Button>
         )}

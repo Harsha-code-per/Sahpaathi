@@ -217,8 +217,7 @@ export default function Library({ onOpen, pending }: { onOpen: (lesson: OpenLess
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           <p className="text-muted-foreground">{classroom ? t.classLine(classroom.classroom_id, classroom.rolls.length) : t.chooseLesson}</p>
           <SyncBadge pending={pending} />
-          <div className="flex-1" />
-          <Button variant="ghost" size="sm" className="-mr-3" onClick={() => setEditingClassroom((v) => !v)}>
+          <Button variant="ghost" size="sm" className="-mr-3 ml-auto" onClick={() => setEditingClassroom((v) => !v)}>
             <PencilIcon aria-hidden /> {classroom ? t.changeClass : t.setUpClass}
           </Button>
         </div>
