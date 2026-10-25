@@ -18,8 +18,8 @@ it('upgrades a version 1 database without losing queued taps', async () => {
   v1.close()
 
   const db = await getDB()
-  expect(db.version).toBe(5)
-  expect([...db.objectStoreNames].sort()).toEqual(['classroom', 'history', 'outbox', 'pack_files', 'packs', 'recordings'])
+  expect(db.version).toBe(6)
+  expect([...db.objectStoreNames].sort()).toEqual(['classroom', 'history', 'notes', 'outbox', 'pack_files', 'packs', 'recordings'])
   expect((await db.getAll('outbox')).map((e) => e.event_id)).toEqual(['e1'])
 })
 
@@ -36,7 +36,7 @@ it('upgrades a version 2 database, keeping the queue and adding the classroom st
   v2.close()
 
   const db = await getDB()
-  expect(db.version).toBe(5)
+  expect(db.version).toBe(6)
   expect([...db.objectStoreNames]).toEqual(expect.arrayContaining(['classroom', 'history']))
   expect((await db.getAll('outbox')).map((e) => e.event_id)).toEqual(['e2'])
   expect(await db.get('classroom', 'current')).toBeUndefined()

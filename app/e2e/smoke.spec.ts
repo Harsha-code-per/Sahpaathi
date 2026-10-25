@@ -79,6 +79,23 @@ test('teacher plays the built-in lesson offline-first', async ({ page }) => {
   await healthy(page, errors)
 })
 
+test('teacher: the Plan and Shelf tabs open and are accessible', async ({ page }) => {
+  const errors = watch(page)
+  await page.goto('/teacher')
+  await page.getByRole('button', { name: 'Plan' }).click()
+  await expect(page.getByRole('heading', { name: 'Plan and record' })).toBeVisible()
+  await page.getByRole('button', { name: /Maths/ }).click()
+  await expect(page.getByRole('tab', { name: /Grade 1/ })).toBeVisible()
+  await healthy(page, errors)
+  await page.getByRole('button', { name: 'Shelf' }).click()
+  await expect(page.getByRole('heading', { name: 'Books, notes and recordings' })).toBeVisible()
+  await expect(page.getByRole('link', { name: /NCERT textbooks/ })).toBeVisible()
+  await healthy(page, errors)
+  await page.getByRole('tab', { name: 'My recordings' }).click()
+  await expect(page.getByText(/No recordings yet/)).toBeVisible()
+  await healthy(page, errors)
+})
+
 test('studio: a reviewer signs in and opens a lesson', async ({ page }) => {
   const errors = watch(page)
   await page.goto('/studio')
