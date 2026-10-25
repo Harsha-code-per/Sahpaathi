@@ -119,7 +119,11 @@ export default function Phone({ call, onClose, onSignedOut }: { call: CallSummar
         {phase === 'ended' && step ? endMessage(step.status, step.outcome) : HINT[phase]}
         {phase === 'waiting' && <span className="block text-sidebar-primary">{secondsLeft} s</span>}
       </p>
-      {error && <p role="alert" className="rounded-lg bg-bad p-2 text-bad-foreground text-sm">{error}</p>}
+      {error && (
+        <p role="alert" className="rounded-lg bg-bad p-2 text-bad-foreground text-sm">
+          {error}
+        </p>
+      )}
       <div className="grid grid-cols-3 gap-2">
         {KEYPAD.flat().map((key) => (
           <button
@@ -133,12 +137,18 @@ export default function Phone({ call, onClose, onSignedOut }: { call: CallSummar
         ))}
       </div>
       {phase === 'idle' && (
-        <button onClick={dial} className="min-h-14 w-full rounded-xl bg-most text-[#0d2420] text-lg font-bold focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none">
+        <button
+          onClick={dial}
+          className="min-h-14 w-full rounded-xl bg-most text-[#0d2420] text-lg font-bold focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none"
+        >
           Dial
         </button>
       )}
       {(phase === 'ended' || phase === 'idle') && (
-        <button onClick={onClose} className="min-h-12 w-full rounded-xl border border-white/30 font-semibold hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none">
+        <button
+          onClick={onClose}
+          className="min-h-12 w-full rounded-xl border border-white/30 font-semibold hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none"
+        >
           {phase === 'ended' ? 'Hang up' : 'Cancel'}
         </button>
       )}

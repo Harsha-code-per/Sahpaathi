@@ -2,7 +2,17 @@
 
 **Short answer:** the **offline classroom product is complete**, and everything in the original build plan works. The plan agreed on 18 Oct left **Online Mode** for the Top 10 stage; **a prototype of it was built early on 21 Oct and is now in `main` and live**, with its camera sensing switched off (section 2). What stands between us and a winning submission is mostly **evidence and people**, not code.
 
-Live: app https://sahpaathi.vercel.app (all four routes load), API https://sahpaathi-api.onrender.com (healthy, CORS works). CI green on main. Merged since the first version of this report: the cinematic landing (#68), the demo-account **Fill in** button (#69), speed-ups (#72). Also merged: deploy from GitHub Actions (#74, #81: every merge to main now deploys the app), the Online Mode stack (#75–#79, #82) and **auto-merge** (#83: a PR into main merges itself once the backend and app checks pass; a draft or the `hold` label opts out). Ignore the red Vercel X on PRs: the Actions deploy replaces it.
+Live: app https://sahpaathi.vercel.app (all four routes load), API https://sahpaathi-api.onrender.com (healthy, CORS works; kept awake by an uptime monitor on `/health`). CI green on main. Merged since the first version of this report: the cinematic landing (#68), the demo-account **Fill in** button (#69), speed-ups (#72). Also merged: deploy from GitHub Actions (#74, #81: every merge to main now deploys the app), the Online Mode stack (#75–#79, #82) and **auto-merge** (#83: a PR into main merges itself once the backend and app checks pass; a draft or the `hold` label opts out). Ignore the red Vercel X on PRs: the Actions deploy replaces it.
+
+## 0. Stability audit (21 Oct)
+The site white-screened on clicks and felt unstable. Found and fixed:
+- **Tutor crash** (#92): sending any message blanked `/tutor`. An effect returned `scrollIntoView()`'s Promise to React as its cleanup.
+- **White screen after every deploy** (#92): tabs and the service worker asked for deleted code files, and Vercel answered with the HTML page. Missing assets now 404, lazy pages reload once, and an error boundary plus loading spinner cover every section.
+- **Unguarded API data, stuck sign-outs, no timeouts** (#92): status lookups fall back, a 401 signs out cleanly, there is a 90 s timeout, and a "waking the server" hint shows during cold starts.
+- **Spending and abuse** (#94, on `hold` until Render's `JWT_SECRET` is confirmed): caps are kept in the database (tutor per caller and overall, packs, sign-in), Exotel rings only an allowlist, request bodies are size-limited, the default JWT secret is refused, and the boot fails safe.
+- **Class Health board and sample data** (#90, #93): merged with fixes. The `demo-` prefix is reserved, sample calls are labelled, and the board is accessible.
+- **Sign-in background** (#95): the video is back, re-edited without the hard cuts or the watermark.
+- **Quality gates** (#96): `AGENTS.md` (the six judging criteria as rules), accessibility lint, Prettier, coverage floors, a **browser smoke test** on every PR (every page, desktop and phone, no white screen, axe clean), secret and dependency scans, Dependabot, and a live check after each deploy. It also fixed SQLite sharing one connection across threads (local and test runs only).
 
 ## 1. The original plan, item by item
 
@@ -16,10 +26,10 @@ Live: app https://sahpaathi.vercel.app (all four routes load), API https://sahpa
 | 6 | **Choral mic sensing** | ✅ Done | Suggests a branch; the teacher decides |
 | 7 | **Absentee catch-up calls** | 🟡 Built, not live | Queue, keypad simulator, real Exotel calling ([EXOTEL.md](EXOTEL.md)). **Not configured on Render; no real call made yet** |
 | 8 | **Studio + dashboard** | ✅ Done, beyond plan | Line editing, collapsible sidebar, charts, lesson-pipeline Kanban, **classroom feedback loop** |
-| 9 | **Roles + test accounts** | 🟡 Mostly | Teacher, reviewer and admin work, and the Studio and Admin sign-in pages now show the accounts with a **Fill in** button (merged). The README password is still a placeholder, and the button shows the password only once `VITE_DEMO_PASSWORD` is set on Vercel |
+| 9 | **Roles + test accounts** | 🟡 Mostly | Teacher, reviewer and admin work, and the Studio and Admin sign-in pages now show the accounts with a **Fill in** button (merged). The sign-in pages fetch the demo password from the API, so it shows with no Vercel setting |
 | Upgrades | Choral mic, simpler-analogy button, morning chalk sketch | ✅ All done | |
 
-**Built beyond the plan:** the Chalk & Marigold redesign with logo and favicon, the landing page, the teacher app in three languages, in-app lesson download, the classroom feedback loop (Claude rewrites the part classes struggled with), the guardrail evaluation, the cost model ([ROADMAP.md](ROADMAP.md#what-it-costs)), a daily cap on lesson generation, and keep-warm for the judging week.
+**Built beyond the plan:** the Chalk & Marigold redesign with logo and favicon, the landing page, the teacher app in three languages, in-app lesson download, the classroom feedback loop (Claude rewrites the part classes struggled with), the guardrail evaluation, the cost model ([ROADMAP.md](ROADMAP.md#what-it-costs)), a daily cap on lesson generation, and keep-warm for the judging week (an uptime monitor on `/health`; the GitHub cron ran too rarely to rely on).
 
 **Deliberately cut, on the roadmap:** RAG over the curriculum, a job queue, mesh pods and micro-capsules. (Online Mode was cut too, then prototyped early: section 2.)
 
@@ -67,7 +77,7 @@ Planned on 18 Oct as a 1-on-1 AI tutor for connected learners, to be prototyped 
 | Item | Status |
 |---|---|
 | Hosted link up and kept warm through 2–9 Nov | ✅ |
-| Test accounts and sample inputs in README | 🟡 password still to fill in; Fill-in button waits on `VITE_DEMO_PASSWORD` |
+| Test accounts and sample inputs in README | ✅ the sign-in pages show the demo accounts and password (served by the API) |
 | AI services listed, `.env.example` files | ✅ |
 | **User testing log** (35% criterion) | ❌ **empty**: interview #1 pending |
 | **3-minute video** | ❌ script ready ([VIDEO_SCRIPT.md](VIDEO_SCRIPT.md)), not recorded |
@@ -94,7 +104,7 @@ Planned on 18 Oct as a 1-on-1 AI tutor for connected learners, to be prototyped 
 3. **Native speakers** check the Tamil, Hindi and Odia app text (`app/src/teacher/strings.ts`) and listen to one voice pack.
 
 **Unblock the live demo (M3)**
-4. Set `VITE_PACK_PUBLIC_KEY` on Vercel (and `VITE_DEMO_PASSWORD`) and build the 3 packs on Render, so judges can download and **hear a real Tamil lesson**. The Grade 1 voiced pack is built and passes QA, saved outside the repo. The public key (safe to share) is `xCrGGtubBBisXI/FYyp0unCnqm6ez7YhLY8bkRToqKo=`, valid only if Render's `PACK_SIGNING_KEY` is the same key as the one it came from.
+4. Set `VITE_PACK_PUBLIC_KEY` on Vercel and build the 3 packs on Render, so judges can download and **hear a real Tamil lesson**. The Grade 1 voiced pack is built and passes QA, saved outside the repo. The public key (safe to share) is `xCrGGtubBBisXI/FYyp0unCnqm6ez7YhLY8bkRToqKo=`, valid only if Render's `PACK_SIGNING_KEY` is the same key as the one it came from.
 5. Send the Grade 1 pack file, to ship it as the **built-in real-voice lesson** (offline, no login).
 6. ~~Fix #68~~ done: the cinematic landing and the Fill-in button are in main. **Ask Harsha to add loktrishal-05 to the Vercel team** (the red X on every PR), then merge #77, #75, #76, #78, #73 in that order with Rebase and merge; the stacked ones need a quick rebase after each.
 6b. **Collect real data for the perception model** (optional): 10 to 15 people use `/tutor` with the camera on and press *I get it / I'm lost*, then Colab ([ml/COLAB_PROMPT.md](../ml/COLAB_PROMPT.md)). Until then the rules are used, and nothing trained on invented data may ship.

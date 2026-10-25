@@ -9,10 +9,7 @@
   "school_lang": "en",
   "district": "Chennai",
   "duration_min": 6,
-  "materials": [
-    "10 seeds or pebbles per pair",
-    "slate"
-  ],
+  "materials": ["10 seeds or pebbles per pair", "slate"],
   "chalk_sketch_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 40\" fill=\"none\" stroke=\"black\" stroke-width=\"3\"><circle cx=\"14\" cy=\"20\" r=\"7\"/><circle cx=\"34\" cy=\"20\" r=\"7\"/><path d=\"M52 20h14M59 13v14\"/><circle cx=\"80\" cy=\"20\" r=\"7\"/><circle cx=\"100\" cy=\"20\" r=\"7\"/></svg>",
   "segments": [
     {

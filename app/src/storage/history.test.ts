@@ -12,8 +12,7 @@ beforeEach(async () => {
 })
 
 const at = (day: number, hour = 4) => new Date(Date.UTC(2026, 9, day, hour))
-const tap = (day: number, tap_: TapEvent['tap'], auto = false, episode = 'ep1', segment = 's1') =>
-  recordTap({ episode_id: episode, segment_id: segment, tap: tap_, auto }, at(day))
+const tap = (day: number, tap_: TapEvent['tap'], auto = false, episode = 'ep1', segment = 's1') => recordTap({ episode_id: episode, segment_id: segment, tap: tap_, auto }, at(day))
 
 describe('taps carry the classroom', () => {
   it('adds the classroom code once the phone has one, and not before', async () => {

@@ -81,7 +81,11 @@ export default function MyClass() {
                     </p>
                     {total > 0 && (
                       <>
-                        <div className="flex h-4 overflow-hidden rounded-full bg-muted" role="img" aria-label={`${t.taps.most} ${r.taps.most}, ${t.taps.some} ${r.taps.some}, ${t.taps.few} ${r.taps.few}`}>
+                        <div
+                          className="flex h-4 overflow-hidden rounded-full bg-muted"
+                          role="img"
+                          aria-label={`${t.taps.most} ${r.taps.most}, ${t.taps.some} ${r.taps.some}, ${t.taps.few} ${r.taps.few}`}
+                        >
                           {(['most', 'some', 'few'] as const).map((k) => (
                             <span key={k} style={{ width: `${(100 * r.taps[k]) / total}%`, background: bar[k] }} />
                           ))}

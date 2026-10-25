@@ -3,6 +3,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import func, select
 
 from app import recordings
+from app.config import settings
 from app.db import Base, SessionLocal, engine
 from app.main import app
 from app.models import TeacherRecording
@@ -116,3 +117,12 @@ def test_a_failed_review_is_recorded_not_raised(api):
     with SessionLocal() as db:
         rec = db.get(TeacherRecording, REC)
         assert rec.status == "unreviewed" and "not configured" in rec.review["note"]
+
+
+def test_the_daily_cap_returns_429_but_a_retry_of_a_stored_one_still_works(api, monkeypatch):
+    monkeypatch.setattr(settings, "recording_daily_limit", 1)
+    assert put(api).status_code == 200
+    assert put(api).status_code == 200  # the retry of the stored one is not counted again
+    over = put(api, rec_id="3f2b1c9e-3333-4000-8000-000000000003")
+    assert over.status_code == 429
+    assert stored() == 1

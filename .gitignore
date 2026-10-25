@@ -36,3 +36,6 @@ pgdata/
 
 # Vercel CLI link (local only)
 /.vercel
+
+# Coverage data
+.coverage

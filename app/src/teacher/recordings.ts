@@ -38,7 +38,10 @@ async function call(path: string, init: RequestInit, fetchFn: typeof fetch) {
     throw new ApiError(NO_SIGNAL, 0)
   }
   if (!res.ok) {
-    const detail = await res.json().then((b) => b.detail, () => null)
+    const detail = await res.json().then(
+      (b) => b.detail,
+      () => null,
+    )
     throw new ApiError(typeof detail === 'string' ? detail : `The server answered ${res.status}.`, res.status)
   }
   return res
@@ -47,7 +50,13 @@ async function call(path: string, init: RequestInit, fetchFn: typeof fetch) {
 /** Sends one saved recording. A repeat is harmless: the server keeps the first and answers 200. */
 export async function sendRecording(r: RecordingRecord, token = teacherToken.get(), fetchFn: typeof fetch = fetch): Promise<RecordingRecord> {
   if (!token) throw new ApiError('Sign in to send your recording.', 401)
-  const q = new URLSearchParams({ episode_id: r.episode_id, subject: r.subject, grade: String(r.grade), duration_sec: String(Math.max(1, Math.round(r.duration_sec))), lang: r.lang })
+  const q = new URLSearchParams({
+    episode_id: r.episode_id,
+    subject: r.subject,
+    grade: String(r.grade),
+    duration_sec: String(Math.max(1, Math.round(r.duration_sec))),
+    lang: r.lang,
+  })
   if (r.classroom_id) q.set('classroom_id', r.classroom_id)
   await call(`/recordings/${r.id}?${q}`, { method: 'PUT', headers: { Authorization: `Bearer ${token}`, 'Content-Type': r.mime }, body: r.audio }, fetchFn)
   const sent: RecordingRecord = { ...r, status: r.status === 'saved' ? 'sent' : r.status }

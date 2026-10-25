@@ -88,7 +88,6 @@ export default function Scene() {
                 data-float
                 aria-hidden
                 className={`absolute rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold shadow-[0_10px_30px_rgba(23,37,36,0.15)] ${['top-[8%] -left-2', 'top-[44%] -right-4', 'bottom-[30%] -left-6'][i]}`}
-                
               >
                 <span className="mr-2 inline-block size-2.5 rounded-full align-middle" style={{ background: color }} />
                 {label}

@@ -57,7 +57,7 @@ describe('recordings', () => {
     expect((await listRecordings()).map((r) => r.status)).toEqual(['saved', 'saved'])
   })
 
-  it("pulls a finished review into the local record, and leaves ones still being reviewed", async () => {
+  it('pulls a finished review into the local record, and leaves ones still being reviewed', async () => {
     await saveRecording(rec('a-rec-0001', '2026-10-01', { status: 'sent' }))
     await saveRecording(rec('b-rec-0002', '2026-10-02', { status: 'sent' }))
     const review = { clarity: 5, accuracy: 4, pace: 4, child_friendly: 5, safe: true, summary: 'Clear.', tips: [] }

@@ -7,7 +7,19 @@ const plan = (n = 3): Plan => ({
   language: 'en',
   parts: Array.from({ length: n }, (_, i) => ({ title: `Part ${i + 1}`, points: ['p'], example: 'e', minutes: 3, quiz: [{ ask: 'q?', answer: 'a', hint: 'h' }] })),
 })
-const progress = (o: Partial<Progress>): Progress => ({ mode: 'quiz', part: 0, q: 0, misses: 0, correct: 0, revealed: [], since_break: 0, parts_since_break: 0, resume: null, game: null, ...o })
+const progress = (o: Partial<Progress>): Progress => ({
+  mode: 'quiz',
+  part: 0,
+  q: 0,
+  misses: 0,
+  correct: 0,
+  revealed: [],
+  since_break: 0,
+  parts_since_break: 0,
+  resume: null,
+  game: null,
+  ...o,
+})
 
 class Mem {
   data = new Map<string, string>()
@@ -21,7 +33,16 @@ const rec = (day: string, extra: Partial<LearningRecord> = {}): LearningRecord =
 describe('a lesson record', () => {
   it('starts empty and remembers the part titles, not any words the learner said', () => {
     const r = newRecord(plan(), 'ta', at(2026, 10, 21))
-    expect(r).toMatchObject({ title: 'Place value', language: 'ta', day: '2026-10-21', partTitles: ['Part 1', 'Part 2', 'Part 3'], partsDone: 0, correct: 0, revise: [], finished: false })
+    expect(r).toMatchObject({
+      title: 'Place value',
+      language: 'ta',
+      day: '2026-10-21',
+      partTitles: ['Part 1', 'Part 2', 'Part 3'],
+      partsDone: 0,
+      correct: 0,
+      revise: [],
+      finished: false,
+    })
     expect(Object.keys(r).sort()).toEqual(['correct', 'day', 'finished', 'id', 'language', 'partTitles', 'partsDone', 'revise', 'title'])
   })
 

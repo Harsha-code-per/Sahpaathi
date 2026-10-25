@@ -9,10 +9,7 @@
   "school_lang": "en",
   "district": "Chennai",
   "duration_min": 5,
-  "materials": [
-    "chalk or a stick to draw in the dust",
-    "slate"
-  ],
+  "materials": ["chalk or a stick to draw in the dust", "slate"],
   "chalk_sketch_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 40\" fill=\"none\" stroke=\"black\" stroke-width=\"3\"><circle cx=\"22\" cy=\"20\" r=\"14\"/><rect x=\"46\" y=\"6\" width=\"28\" height=\"28\"/><path d=\"M82 34l16-28 16 28z\"/></svg>",
   "segments": [
     {

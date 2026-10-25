@@ -132,7 +132,14 @@ export default function Timetable() {
   const grades = gradesOf(episodes, subject)
   const g = grade !== null && grades.includes(grade) ? grade : (grades[0] ?? null)
   const key = `${subject}-${g}`
-  const topics = g === null ? [] : applyOrder(episodes.filter((e) => e.subject === subject && e.grade === g), plan.order[key], events)
+  const topics =
+    g === null
+      ? []
+      : applyOrder(
+          episodes.filter((e) => e.subject === subject && e.grade === g),
+          plan.order[key],
+          events,
+        )
   const dates = teachingDates(topics.length, plan.days, today)
   const setOrder = (ids: string[]) => update({ ...plan, order: { ...plan.order, [key]: ids } })
   const ids = topics.map((e) => e.id)
@@ -195,13 +202,32 @@ export default function Timetable() {
                       {e.title}
                     </p>
                     <p className="text-sm text-muted-foreground">{t.lessonMeta(e.grade, e.district, e.duration_min)}</p>
-                    <p className={cn('mt-1 inline-block rounded-full px-2.5 py-0.5 text-[0.8125rem] font-semibold', st === 'none' ? 'bg-muted text-muted-foreground' : st === 'reviewed' ? 'bg-ok text-ok-foreground' : 'bg-warn text-warn-foreground')}>{t.recStatus[st]}</p>
+                    <p
+                      className={cn(
+                        'mt-1 inline-block rounded-full px-2.5 py-0.5 text-[0.8125rem] font-semibold',
+                        st === 'none' ? 'bg-muted text-muted-foreground' : st === 'reviewed' ? 'bg-ok text-ok-foreground' : 'bg-warn text-warn-foreground',
+                      )}
+                    >
+                      {t.recStatus[st]}
+                    </p>
                   </div>
                   <div className="flex shrink-0 flex-col gap-1">
-                    <button type="button" aria-label={t.moveUp} disabled={i === 0} onClick={() => setOrder(move(ids, e.id, -1))} className="grid size-10 place-items-center rounded-lg bg-muted outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-30">
+                    <button
+                      type="button"
+                      aria-label={t.moveUp}
+                      disabled={i === 0}
+                      onClick={() => setOrder(move(ids, e.id, -1))}
+                      className="grid size-10 place-items-center rounded-lg bg-muted outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-30"
+                    >
                       <ArrowUpIcon className="size-5" aria-hidden />
                     </button>
-                    <button type="button" aria-label={t.moveDown} disabled={i === topics.length - 1} onClick={() => setOrder(move(ids, e.id, 1))} className="grid size-10 place-items-center rounded-lg bg-muted outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-30">
+                    <button
+                      type="button"
+                      aria-label={t.moveDown}
+                      disabled={i === topics.length - 1}
+                      onClick={() => setOrder(move(ids, e.id, 1))}
+                      className="grid size-10 place-items-center rounded-lg bg-muted outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-30"
+                    >
                       <ArrowDownIcon className="size-5" aria-hidden />
                     </button>
                   </div>
@@ -244,7 +270,10 @@ function Days({ days, onChange }: { days: number[]; onChange: (d: number[]) => v
               type="button"
               aria-pressed={on}
               onClick={() => onChange(on ? days.filter((x) => x !== i) : [...days, i].sort())}
-              className={cn('min-h-11 rounded-xl border text-sm font-semibold outline-none focus-visible:ring-2 focus-visible:ring-ring', on ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card text-muted-foreground')}
+              className={cn(
+                'min-h-11 rounded-xl border text-sm font-semibold outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                on ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card text-muted-foreground',
+              )}
             >
               {d}
             </button>

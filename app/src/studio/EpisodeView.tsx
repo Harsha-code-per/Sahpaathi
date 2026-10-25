@@ -99,7 +99,13 @@ function LineRow({ line, ctx }: { line: Line; ctx: LineCtx }) {
   const gloss = ctx.gloss.get(line.id)
   const english = ctx.view === 'english' && gloss !== undefined
   return (
-    <li id={`line-${line.id}`} className={cn('relative scroll-mt-24 border-t border-border py-4 pl-6 first:border-t-0 before:absolute before:top-[1.4rem] before:left-1 before:size-2.5 before:rounded-full', home ? 'before:bg-primary' : 'before:bg-most')}>
+    <li
+      id={`line-${line.id}`}
+      className={cn(
+        'relative scroll-mt-24 border-t border-border py-4 pl-6 first:border-t-0 before:absolute before:top-[1.4rem] before:left-1 before:size-2.5 before:rounded-full',
+        home ? 'before:bg-primary' : 'before:bg-most',
+      )}
+    >
       <div className="grid gap-x-8 gap-y-2 md:grid-cols-2">
         <div className="min-w-0 space-y-1.5">
           {editing && ctx.onEdit ? (
@@ -253,7 +259,19 @@ function InClass({ part, onRewrite }: { part?: PartTaps; onRewrite?: (note: stri
   )
 }
 
-function Script({ ep, ctx, parts: taps, headings, onRewrite }: { ep: Episode; ctx: LineCtx; parts: PartTaps[]; headings: Headings | null; onRewrite?: (segmentId: string, note: string) => Promise<void> }) {
+function Script({
+  ep,
+  ctx,
+  parts: taps,
+  headings,
+  onRewrite,
+}: {
+  ep: Episode
+  ctx: LineCtx
+  parts: PartTaps[]
+  headings: Headings | null
+  onRewrite?: (segmentId: string, note: string) => Promise<void>
+}) {
   const en = ctx.view === 'english' ? headings : null
   const parts = [
     ...ep.segments.map((s, i) => ({ id: s.id, label: `Part ${i + 1}`, lines: [...s.teach, ...s.easier, ...s.core, ...s.stretch] })),
@@ -293,7 +311,8 @@ function Script({ ep, ctx, parts: taps, headings, onRewrite }: { ep: Episode; ct
           <InClass part={taps.find((t) => t.segment_id === s.id)} onRewrite={onRewrite && ((note) => onRewrite(s.id, note))} />
           <Lines lines={s.teach} ctx={ctx} />
           <p className="rounded-xl bg-sidebar px-4 py-3 text-sidebar-foreground">
-            <span className="font-semibold text-sidebar-primary">Teacher checks:</span> <span lang={en?.segments[s.id] ? 'en' : ep.school_lang}>{en?.segments[s.id]?.checkpoint ?? s.checkpoint}</span>
+            <span className="font-semibold text-sidebar-primary">Teacher checks:</span>{' '}
+            <span lang={en?.segments[s.id] ? 'en' : ep.school_lang}>{en?.segments[s.id]?.checkpoint ?? s.checkpoint}</span>
           </p>
           {BRANCHES.map((b) => (
             <div key={b.part}>
@@ -397,7 +416,11 @@ export default function EpisodeView(props: {
   const hasEpisode = detail?.episode != null
   useEffect(() => {
     // without the translation the headings simply stay in the lesson's own language
-    if (view === 'english' && hasEpisode) api.english(id).then((h) => setEnglish({ id, headings: h }), () => undefined)
+    if (view === 'english' && hasEpisode)
+      api.english(id).then(
+        (h) => setEnglish({ id, headings: h }),
+        () => undefined,
+      )
   }, [id, view, hasEpisode])
 
   const reviewable = detail?.status === 'in_review' || detail?.status === 'approved'
@@ -445,8 +468,8 @@ export default function EpisodeView(props: {
         <div className="min-w-0 space-y-2">
           {ep && (
             <p className="text-[0.8125rem] font-semibold tracking-wider text-muted-foreground uppercase">
-              Grade {ep.grade} · {ep.district} ·{' '}
-              {ep.home_lang === ep.school_lang ? LANG_NAMES[ep.school_lang] : `${LANG_NAMES[ep.home_lang]} → ${LANG_NAMES[ep.school_lang]}`} · {Math.round(minutes(main))} min
+              Grade {ep.grade} · {ep.district} · {ep.home_lang === ep.school_lang ? LANG_NAMES[ep.school_lang] : `${LANG_NAMES[ep.home_lang]} → ${LANG_NAMES[ep.school_lang]}`} ·{' '}
+              {Math.round(minutes(main))} min
             </p>
           )}
           <h1 className="font-heading text-3xl leading-tight font-bold" lang={view === 'english' && headings ? 'en' : ep?.school_lang}>
@@ -475,7 +498,11 @@ export default function EpisodeView(props: {
                 const s = detail.review!.rubric.scores[c.key]
                 if (!s) return null // an older review may lack a criterion
                 return (
-                  <div key={c.key} title={s.reason} className={cn('min-w-0 rounded-xl border px-3 py-2.5 sm:min-w-28 sm:px-3.5', scoreFill(s.score), s.score <= 2 ? 'border-few' : 'border-black/5')}>
+                  <div
+                    key={c.key}
+                    title={s.reason}
+                    className={cn('min-w-0 rounded-xl border px-3 py-2.5 sm:min-w-28 sm:px-3.5', scoreFill(s.score), s.score <= 2 ? 'border-few' : 'border-black/5')}
+                  >
                     <dt className="text-[0.8125rem] text-muted-foreground">{c.label}</dt>
                     <dd className={cn('text-lg font-bold', scoreTone(s.score))}>{s.score} / 5</dd>
                   </div>

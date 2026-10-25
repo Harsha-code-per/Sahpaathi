@@ -45,11 +45,27 @@ const TOUR: { to: string; title: string; look: string; data: Data }[] = [
 ]
 
 const MEASURED: [string, string, string][] = [
-  ['Works with no internet', 'Lab-tested in airplane mode: the lesson plays, a tap is saved, attendance is saved, and the queue sends itself once a signal returns.', 'TESTING_LOG L1 and L2 (L2 failed first, then was fixed)'],
-  ['Small and fast on a slow phone', 'First visit 96 KB and 6.6 s to the lesson list on emulated slow 3G with a 4× slower CPU; 0.5 s on every later visit.', 'TESTING_LOG L3 and L4'],
+  [
+    'Works with no internet',
+    'Lab-tested in airplane mode: the lesson plays, a tap is saved, attendance is saved, and the queue sends itself once a signal returns.',
+    'TESTING_LOG L1 and L2 (L2 failed first, then was fixed)',
+  ],
+  [
+    'Small and fast on a slow phone',
+    'First visit 96 KB and 6.6 s to the lesson list on emulated slow 3G with a 4× slower CPU; 0.5 s on every later visit.',
+    'TESTING_LOG L3 and L4',
+  ],
   ['Accessible', 'Mobile Lighthouse: accessibility 100, best practices 100 (19 Oct).', 'TESTING_LOG L5'],
-  ['Guardrails catch planted defects', '20 of 20 planted defects caught by some tier, 18 of 20 by the strict count (code, or the reviewer pinpointing it). 3 episodes, one run.', 'GUARDRAIL_EVAL.md'],
-  ['A voiced lesson is small', 'Three voiced packs of 1.1 to 1.2 MB and about 10 minutes of audio each; two failed the loudness check at first, the build was fixed, all pass.', 'TESTING_LOG V1 to V3'],
+  [
+    'Guardrails catch planted defects',
+    '20 of 20 planted defects caught by some tier, 18 of 20 by the strict count (code, or the reviewer pinpointing it). 3 episodes, one run.',
+    'GUARDRAIL_EVAL.md',
+  ],
+  [
+    'A voiced lesson is small',
+    'Three voiced packs of 1.1 to 1.2 MB and about 10 minutes of audio each; two failed the loudness check at first, the build was fixed, all pass.',
+    'TESTING_LOG V1 to V3',
+  ],
   ['What a lesson costs to make', 'About $1 (₹84) to write and review; the 19 Oct batch was $12 for 12 lessons.', 'ROADMAP, “What it costs”'],
 ]
 
@@ -60,16 +76,29 @@ const NOT_YET: [string, string][] = [
   ['Santali', '0 of 42 phrases are recorded or consented, so it is not offered.'],
   ['A real catch-up call', 'The calling is built and tested on a keypad simulator; no real call has been made.'],
   ['The AI teacher’s answers through the four guardrails', 'It is checked by its rules and prompt only, and judged by Claude.'],
-  ['The camera and microphone sensing on real faces', 'Rule-based, opt-in and on-device, tested only with synthetic numbers and a fake camera. Needs legal review (DPDP Act) before children use it.'],
+  [
+    'The camera and microphone sensing on real faces',
+    'Rule-based, opt-in and on-device, tested only with synthetic numbers and a fake camera. Needs legal review (DPDP Act) before children use it.',
+  ],
   ['Learner accounts and verifiable parental consent', 'Not built; nothing is saved about the AI teacher’s learners.'],
 ]
 
 const COMPARE: [string, string, string, string][] = [
-  ['One teacher, two or three grades, one room', 'Designed for it: the speaker guides one grade while she teaches another', 'Built for one learner at a screen', 'Built for one viewer at a screen'],
+  [
+    'One teacher, two or three grades, one room',
+    'Designed for it: the speaker guides one grade while she teaches another',
+    'Built for one learner at a screen',
+    'Built for one viewer at a screen',
+  ],
   ['A device for every child', 'No: one phone and one speaker for the room', 'Yes', 'Yes'],
   ['Needs internet while the class is in session', 'No, once the weekly pack is on the phone', 'Yes', 'Yes, unless videos are saved first'],
   ['The teacher’s tap changes the next part', 'Yes: easier, more practice or stretch', 'Not in a classroom', 'No: the video is fixed'],
-  ['Home language bridged to the school language by design', 'Yes, lessons start in the home language and bridge across', 'Can translate when asked; not planned as a lesson', 'Depends on the video'],
+  [
+    'Home language bridged to the school language by design',
+    'Yes, lessons start in the home language and bridge across',
+    'Can translate when asked; not planned as a lesson',
+    'Depends on the video',
+  ],
   ['A native speaker reads it before children hear it', 'Yes: the last of four checks, in the Studio', 'No', 'Varies'],
   ['Reaches a child who was absent, on a basic phone', 'Built: a call plays the recap (not yet tried with a real call)', 'No', 'No'],
 ]
@@ -79,8 +108,16 @@ const DATA_TABLE: [string, string, string][] = [
   ['Who was absent', 'The phone, then the catch-up queue', 'Roll numbers only. No names, no phone numbers.'],
   ['The teacher’s rating of a lesson', 'The phone, then the server', 'Stars and fixed tags. No free text from anyone.'],
   ['“My class” history', 'The teacher’s phone only', 'Kept 120 days, clearable with one tap, never uploaded.'],
-  ['What you say to the AI teacher', 'Sent to Anthropic’s Claude (and Sarvam for the voice) to answer; Sahpaathi stores nothing', 'The conversation lives in the browser tab and is gone when it closes.'],
-  ['Camera and microphone sensing', 'Only on your device, and only if you opt in', 'Never recorded. A few numbers are sent for a moment and not stored. Saved moments are deleted on Stop or after 30 minutes.'],
+  [
+    'What you say to the AI teacher',
+    'Sent to Anthropic’s Claude (and Sarvam for the voice) to answer; Sahpaathi stores nothing',
+    'The conversation lives in the browser tab and is gone when it closes.',
+  ],
+  [
+    'Camera and microphone sensing',
+    'Only on your device, and only if you opt in',
+    'Never recorded. A few numbers are sent for a moment and not stored. Saved moments are deleted on Stop or after 30 minutes.',
+  ],
   ['Children’s names or phone numbers', 'Nowhere', 'Not collected.'],
 ]
 
@@ -108,10 +145,20 @@ function Calculator() {
         {fields.map(([k, label, min]) => (
           <label key={k} className="space-y-1 text-sm font-semibold">
             {label}
-            <input type="number" inputMode="decimal" min={min} step={k === 'ratePerMinute' ? 0.1 : 1} value={i[k]} onChange={set(k)} className="h-11 w-full rounded-xl border border-input bg-background px-3 text-base font-normal outline-none focus-visible:ring-2 focus-visible:ring-ring" />
+            <input
+              type="number"
+              inputMode="decimal"
+              min={min}
+              step={k === 'ratePerMinute' ? 0.1 : 1}
+              value={i[k]}
+              onChange={set(k)}
+              className="h-11 w-full rounded-xl border border-input bg-background px-3 text-base font-normal outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            />
           </label>
         ))}
-        <p className="col-span-2 text-sm text-muted-foreground">Exotel does not publish a per-minute rate. Third-party figures run ₹0.50 to ₹1.50, so this is the line to confirm. Defaults match the roadmap’s district row.</p>
+        <p className="col-span-2 text-sm text-muted-foreground">
+          Exotel does not publish a per-minute rate. Third-party figures run ₹0.50 to ₹1.50, so this is the line to confirm. Defaults match the roadmap’s district row.
+        </p>
       </form>
       <div className="space-y-4" aria-live="polite">
         <div className="grid grid-cols-3 gap-3 text-center">
@@ -140,7 +187,9 @@ function Calculator() {
             </li>
           ))}
         </ul>
-        <p className="text-sm text-muted-foreground">{Math.round(c.callsPerClassroom)} catch-up calls a classroom a year. Calls are the largest cost at scale; playing the recaps on existing state IVR lines would cut it.</p>
+        <p className="text-sm text-muted-foreground">
+          {Math.round(c.callsPerClassroom)} catch-up calls a classroom a year. Calls are the largest cost at scale; playing the recaps on existing state IVR lines would cut it.
+        </p>
       </div>
     </div>
   )
@@ -176,12 +225,15 @@ export default function Evidence() {
         <section className="space-y-4">
           <h1 className="max-w-3xl font-heading text-4xl leading-tight font-extrabold md:text-6xl">Don’t take our word for it. Check it.</h1>
           <p className="max-w-2xl text-lg text-muted-foreground">
-            What we have measured, what we have not, what it costs, and exactly what happens to your data. Every number below comes from a document in the repository, and every gap is listed next to it.
+            What we have measured, what we have not, what it costs, and exactly what happens to your data. Every number below comes from a document in the repository, and every gap
+            is listed next to it.
           </p>
         </section>
 
         <section id="tour" className="scroll-mt-8 space-y-5" aria-labelledby="tour-h">
-          <h2 id="tour-h" className="font-heading text-3xl font-extrabold">If you only have three minutes</h2>
+          <h2 id="tour-h" className="font-heading text-3xl font-extrabold">
+            If you only have three minutes
+          </h2>
           <ol className="grid gap-4 md:grid-cols-2">
             {TOUR.map((s, n) => (
               <li key={s.to} className={`${card} flex gap-4`}>
@@ -203,7 +255,9 @@ export default function Evidence() {
         </section>
 
         <section id="ledger" className="scroll-mt-8 space-y-6" aria-labelledby="ledger-h">
-          <h2 id="ledger-h" className="font-heading text-3xl font-extrabold">What is measured, and what is not</h2>
+          <h2 id="ledger-h" className="font-heading text-3xl font-extrabold">
+            What is measured, and what is not
+          </h2>
           <div className="grid gap-6 lg:grid-cols-2">
             <div className={`${card} space-y-4`}>
               <h3 className="flex items-center gap-2 font-heading text-xl font-bold">
@@ -245,26 +299,40 @@ export default function Evidence() {
         </section>
 
         <section id="cost" className="scroll-mt-8 space-y-5" aria-labelledby="cost-h">
-          <h2 id="cost-h" className="font-heading text-3xl font-extrabold">What it costs: try your own numbers</h2>
+          <h2 id="cost-h" className="font-heading text-3xl font-extrabold">
+            What it costs: try your own numbers
+          </h2>
           <Calculator />
         </section>
 
         <section id="why" className="scroll-mt-8 space-y-5" aria-labelledby="why-h">
-          <h2 id="why-h" className="font-heading text-3xl font-extrabold">Why not just a chatbot or a video?</h2>
+          <h2 id="why-h" className="font-heading text-3xl font-extrabold">
+            Why not just a chatbot or a video?
+          </h2>
           <div className={`${card} overflow-x-auto p-2 sm:p-4`}>
             <table className="w-full min-w-[40rem] border-collapse">
               <thead>
                 <tr className="border-b border-border">
-                  <th className={th} scope="col" />
-                  <th className={`${th} text-foreground`} scope="col">Sahpaathi</th>
-                  <th className={th} scope="col">A chatbot</th>
-                  <th className={th} scope="col">A video library</th>
+                  <th className={th} scope="col">
+                    <span className="sr-only">Feature</span>
+                  </th>
+                  <th className={`${th} text-foreground`} scope="col">
+                    Sahpaathi
+                  </th>
+                  <th className={th} scope="col">
+                    A chatbot
+                  </th>
+                  <th className={th} scope="col">
+                    A video library
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {COMPARE.map(([row, a, b, c]) => (
                   <tr key={row}>
-                    <th scope="row" className={`${td} text-left font-semibold`}>{row}</th>
+                    <th scope="row" className={`${td} text-left font-semibold`}>
+                      {row}
+                    </th>
                     <td className={`${td} font-medium`}>{a}</td>
                     <td className={`${td} text-muted-foreground`}>{b}</td>
                     <td className={`${td} text-muted-foreground`}>{c}</td>
@@ -273,24 +341,37 @@ export default function Evidence() {
               </tbody>
             </table>
           </div>
-          <p className="text-muted-foreground">These are categories, not claims about any one product. National content platforms such as DIKSHA are a library, not a lesson that runs a room; we plan to publish approved lessons into them, not replace them.</p>
+          <p className="text-muted-foreground">
+            These are categories, not claims about any one product. National content platforms such as DIKSHA are a library, not a lesson that runs a room; we plan to publish
+            approved lessons into them, not replace them.
+          </p>
         </section>
 
         <section id="data" className="scroll-mt-8 space-y-5" aria-labelledby="data-h">
-          <h2 id="data-h" className="font-heading text-3xl font-extrabold">What happens to your data</h2>
+          <h2 id="data-h" className="font-heading text-3xl font-extrabold">
+            What happens to your data
+          </h2>
           <div className={`${card} overflow-x-auto p-2 sm:p-4`}>
             <table className="w-full min-w-[40rem] border-collapse">
               <thead>
                 <tr className="border-b border-border">
-                  <th className={th} scope="col">What</th>
-                  <th className={th} scope="col">Where it goes</th>
-                  <th className={th} scope="col">What is kept</th>
+                  <th className={th} scope="col">
+                    What
+                  </th>
+                  <th className={th} scope="col">
+                    Where it goes
+                  </th>
+                  <th className={th} scope="col">
+                    What is kept
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {DATA_TABLE.map(([what, where, kept]) => (
                   <tr key={what}>
-                    <th scope="row" className={`${td} text-left font-semibold`}>{what}</th>
+                    <th scope="row" className={`${td} text-left font-semibold`}>
+                      {what}
+                    </th>
                     <td className={td}>{where}</td>
                     <td className={`${td} text-muted-foreground`}>{kept}</td>
                   </tr>

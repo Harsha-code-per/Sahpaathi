@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     # Online teacher camera/mic perception (docs/SENSE.md): off until legal review and parental
     # consent, as the DPDP Act 2023 restricts behavioural monitoring of children.
     sense_enabled: bool = False
+    # Teacher recordings (app/recordings.py): each costs a speech-to-text call and a Claude review,
+    # so cap how many the server accepts per UTC day. Counted in the database: a restart keeps it.
+    recording_daily_limit: int = 100
     # AI tutor (app/tutor.py) is open to anyone, so cap what it can spend per UTC day: Claude turns
     # (~₹0.1 each on Haiku) and Sarvam spoken replies.
     tutor_daily_turns: int = 600

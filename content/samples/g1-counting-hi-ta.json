@@ -9,10 +9,7 @@
   "school_lang": "ta",
   "district": "Chennai",
   "duration_min": 5,
-  "materials": [
-    "5 pebbles per child",
-    "slate"
-  ],
+  "materials": ["5 pebbles per child", "slate"],
   "chalk_sketch_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 40\"><circle cx=\"20\" cy=\"20\" r=\"12\"/><circle cx=\"60\" cy=\"20\" r=\"12\"/><circle cx=\"100\" cy=\"20\" r=\"12\"/></svg>",
   "segments": [
     {

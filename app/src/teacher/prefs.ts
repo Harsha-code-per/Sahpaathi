@@ -16,7 +16,7 @@ export interface Prefs {
 export const DEFAULT_PREFS: Prefs = { rate: 1, answer: 1, text: 'm', boost: 1 }
 const KEY = 'sahpaathi.player-prefs'
 
-const pick = <T,>(v: unknown, allowed: readonly T[], fallback: T): T => (allowed.includes(v as T) ? (v as T) : fallback)
+const pick = <T>(v: unknown, allowed: readonly T[], fallback: T): T => (allowed.includes(v as T) ? (v as T) : fallback)
 
 export function parsePrefs(raw: string | null): Prefs {
   try {

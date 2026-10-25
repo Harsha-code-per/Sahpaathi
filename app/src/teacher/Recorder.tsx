@@ -155,7 +155,9 @@ export default function Recorder({ episode, onClose }: { episode: Episode; onClo
           <p className="text-sm font-semibold text-muted-foreground">
             {t.recPlay} · {clock(take.seconds)}
           </p>
-          <audio controls src={url} className="w-full" />
+          <audio controls src={url} className="w-full">
+            <track kind="captions" />
+          </audio>
           {!token && (
             <form onSubmit={login} className="slate-card flex flex-col gap-3 rounded-2xl p-4">
               <p className="text-muted-foreground">{t.signInToSend}</p>

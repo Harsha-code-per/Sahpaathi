@@ -15,7 +15,7 @@ interface Recognition {
 }
 type RecognitionCtor = new () => Recognition
 
-const Ctor = (window as unknown as { SpeechRecognition?: RecognitionCtor; webkitSpeechRecognition?: RecognitionCtor })
+const Ctor = window as unknown as { SpeechRecognition?: RecognitionCtor; webkitSpeechRecognition?: RecognitionCtor }
 const Recognizer = Ctor.SpeechRecognition ?? Ctor.webkitSpeechRecognition
 
 /** Whether this browser can listen (Chrome, Edge and Safari can; Firefox cannot). Typing always works. */
@@ -35,7 +35,9 @@ export function listen(lang: Lang, onText: (live: string) => void, onDone: (fina
   let error: string | undefined
   let stopped = false
   rec.onresult = (e) => {
-    heard = Array.from(e.results, (r) => r[0].transcript).join(' ').trim()
+    heard = Array.from(e.results, (r) => r[0].transcript)
+      .join(' ')
+      .trim()
     onText(heard)
   }
   rec.onerror = (e) => {
@@ -106,10 +108,13 @@ export function speak(text: string, lang: Lang, url: string | null, onEnd: () =>
     u.onerror = finish
     // Never wait longer than the sentence could take to say, plus a margin.
     timers.push(
-      setTimeout(() => {
-        synth.cancel()
-        finish()
-      }, Math.max(5000, text.length * 95 + 3000)),
+      setTimeout(
+        () => {
+          synth.cancel()
+          finish()
+        },
+        Math.max(5000, text.length * 95 + 3000),
+      ),
     )
     try {
       synth.cancel()

@@ -13,8 +13,7 @@ const seg = (id: string, parts: Partial<Record<'teach' | 'easier' | 'core' | 'st
   core: (parts.core ?? []).map(line),
   stretch: (parts.stretch ?? []).map(line),
 })
-const episode = (segments: ReturnType<typeof seg>[], analogyIds: string[] = []) =>
-  ({ segments, analogy: analogyIds.map(line) }) as unknown as Episode
+const episode = (segments: ReturnType<typeof seg>[], analogyIds: string[] = []) => ({ segments, analogy: analogyIds.map(line) }) as unknown as Episode
 
 /** Plays to the end, answering every checkpoint with `choose`; returns the line ids heard. */
 function play(ep: Episode, choose: Tap) {
@@ -31,8 +30,7 @@ function play(ep: Episode, choose: Tap) {
   return heard
 }
 
-const expected = (ep: Episode, part: 'easier' | 'core' | 'stretch') =>
-  ep.segments.flatMap((s) => [...s.teach, ...s[part]].map((l) => l.id))
+const expected = (ep: Episode, part: 'easier' | 'core' | 'stretch') => ep.segments.flatMap((s) => [...s.teach, ...s[part]].map((l) => l.id))
 
 describe('branching', () => {
   it.each([

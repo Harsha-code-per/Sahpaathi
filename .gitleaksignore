@@ -1,0 +1,3 @@
+# Reviewed false positives: placeholder examples in old docs, not secrets.
+18ec25e98c0d3f4f66c017782474bad39100bd02:backend/app/seed.py:hashicorp-tf-password:8
+18ec25e98c0d3f4f66c017782474bad39100bd02:docs/API.md:generic-api-key:43

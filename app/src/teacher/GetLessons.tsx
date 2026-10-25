@@ -116,9 +116,7 @@ export default function GetLessons({ have, onImported }: { have: Set<string>; on
               <li key={p.id} className="flex items-center gap-3 rounded-xl border border-border bg-background p-3">
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold">{p.title ?? p.episode_slug}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {t.packMeta(p.grade, p.district_id, kb(p.size_bytes))}
-                  </p>
+                  <p className="text-sm text-muted-foreground">{t.packMeta(p.grade, p.district_id, kb(p.size_bytes))}</p>
                   {pct !== undefined && (
                     <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-border" role="progressbar" aria-valuenow={Math.round(pct * 100)} aria-label={t.get}>
                       <div className="h-full bg-primary transition-[width]" style={{ width: `${pct * 100}%` }} />

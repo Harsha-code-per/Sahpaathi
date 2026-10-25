@@ -19,6 +19,7 @@ import urllib.error
 import urllib.request
 import uuid
 from collections.abc import Callable
+from datetime import UTC, datetime
 from typing import Annotated, Literal
 
 import anthropic
@@ -33,7 +34,7 @@ from fastapi import (
     status,
 )
 from pydantic import BaseModel, Field
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app import db as database
@@ -116,6 +117,16 @@ async def upload(
         if existing.user_id != user.id:
             raise HTTPException(status.HTTP_409_CONFLICT, "That recording id is taken.")
         return _out(existing)  # a retry: already stored, and it keeps its review
+    midnight = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
+    today = db.scalar(
+        select(func.count())
+        .select_from(TeacherRecording)
+        .where(TeacherRecording.created_at >= midnight)
+    )
+    if today >= settings.recording_daily_limit:
+        raise HTTPException(
+            429, "Too many recordings today. Yours is saved on the phone; try tomorrow."
+        )
     if int(request.headers.get("content-length") or 0) > MAX_BYTES:
         raise HTTPException(413, "Recording too long to send.")
     audio = await request.body()

@@ -106,9 +106,7 @@ function EpisodeList(props: { items: Summary[] | null; selected: number | null; 
               <span className="line-clamp-2 font-semibold" lang={showEnglish ? 'en' : undefined}>
                 {showEnglish ? en.title : (e.title ?? `${e.lesson_id}, ${e.district_id}`)}
               </span>
-              {showEnglish && e.title && (
-                <span className={cn('line-clamp-1 text-[0.8125rem]', props.onDark ? 'text-sidebar-muted' : 'text-muted-foreground')}>{e.title}</span>
-              )}
+              {showEnglish && e.title && <span className={cn('line-clamp-1 text-[0.8125rem]', props.onDark ? 'text-sidebar-muted' : 'text-muted-foreground')}>{e.title}</span>}
               <span className={cn('mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.8125rem]', props.onDark ? 'text-sidebar-muted' : 'text-muted-foreground')}>
                 <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${badge(STATUS, e.status).tone}`}>{badge(STATUS, e.status).label}</span>
                 {props.view === 'english' ? en.district : e.district_id} · {new Date(e.created_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
@@ -199,9 +197,13 @@ export default function Studio() {
 
   const current = list.find((e) => e.id === selected)
   const q = query.trim().toLowerCase()
-  const shown = items && items.filter(
-    (e) => FILTERS.find((f) => f.key === filter)!.match(e.status) && (!q || [e.title, e.lesson_id, e.district_id, englishName(catalog, e.lesson_id, e.district_id).title].some((t) => t?.toLowerCase().includes(q))),
-  )
+  const shown =
+    items &&
+    items.filter(
+      (e) =>
+        FILTERS.find((f) => f.key === filter)!.match(e.status) &&
+        (!q || [e.title, e.lesson_id, e.district_id, englishName(catalog, e.lesson_id, e.district_id).title].some((t) => t?.toLowerCase().includes(q))),
+    )
   const count = (f: Filter) => list.filter((e) => FILTERS.find((x) => x.key === f)!.match(e.status)).length
 
   const sidebar = ({ collapsed, expand, close }: SidebarApi) =>
@@ -268,7 +270,10 @@ export default function Studio() {
             key={v}
             aria-pressed={view === v}
             onClick={() => setView(v)}
-            className={cn('min-h-9 rounded-lg px-3 text-sm font-semibold outline-none focus-visible:ring-2 focus-visible:ring-ring', view === v ? 'bg-foreground text-background' : 'text-muted-foreground hover:text-foreground')}
+            className={cn(
+              'min-h-9 rounded-lg px-3 text-sm font-semibold outline-none focus-visible:ring-2 focus-visible:ring-ring',
+              view === v ? 'bg-foreground text-background' : 'text-muted-foreground hover:text-foreground',
+            )}
           >
             {v === 'english' ? 'English' : 'Original language'}
           </button>
@@ -296,7 +301,9 @@ export default function Studio() {
               <span className="size-10 rounded-full bg-[#f4b23e]/70" />
             </span>
             <h1 className="max-w-xl font-heading text-3xl leading-tight font-bold">Pick a lesson to read it line by line.</h1>
-            <p className="mt-3 max-w-xl text-muted-foreground">Each line sits beside its English back-translation and the AI review. Correct what is wrong, then approve or reject.</p>
+            <p className="mt-3 max-w-xl text-muted-foreground">
+              Each line sits beside its English back-translation and the AI review. Correct what is wrong, then approve or reject.
+            </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Button onClick={() => setWritingOpen(true)}>
                 <PlusIcon aria-hidden /> Write a new lesson

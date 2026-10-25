@@ -38,7 +38,9 @@ export function SampleBanner(props: { view: DataView; onView: (v: DataView) => v
     return (
       <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-dashed border-border bg-card/60 p-4">
         <FlaskConicalIcon className="size-5 text-muted-foreground" aria-hidden />
-        <p className="flex-1 text-muted-foreground">Want to see this screen with classrooms in it? Load invented, clearly labelled sample classrooms. Real data is never touched.</p>
+        <p className="flex-1 text-muted-foreground">
+          Want to see this screen with classrooms in it? Load invented, clearly labelled sample classrooms. Real data is never touched.
+        </p>
         <Button variant="outline" disabled={busy} onClick={() => act(insightsApi.loadSample)}>
           Load sample classrooms
         </Button>
@@ -64,7 +66,12 @@ export function SampleBanner(props: { view: DataView; onView: (v: DataView) => v
             {label}
           </button>
         ))}
-        <button type="button" disabled={busy} onClick={() => confirm('Remove all sample classrooms? Real data is not touched.') && act(insightsApi.removeSample)} className="h-11 rounded-full px-3 text-sm font-semibold underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring">
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => confirm('Remove all sample classrooms? Real data is not touched.') && act(insightsApi.removeSample)}
+          className="h-11 rounded-full px-3 text-sm font-semibold underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
+        >
           Remove sample data
         </button>
       </div>

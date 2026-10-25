@@ -25,10 +25,13 @@ function playTestSound(onDone: () => void): () => void {
     osc.start(t0)
     osc.stop(t0 + 0.52)
   })
-  const timer = setTimeout(() => {
-    void ctx.close()
-    onDone()
-  }, notes.length * 550 + 200)
+  const timer = setTimeout(
+    () => {
+      void ctx.close()
+      onDone()
+    },
+    notes.length * 550 + 200,
+  )
   return () => {
     clearTimeout(timer)
     void ctx.close()

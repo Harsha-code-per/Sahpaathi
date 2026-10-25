@@ -111,7 +111,6 @@
   }
 }
 
-
 /* Scene, reduced motion: no pin, no tilt. The phone and chips sit flat beside the copy. */
 @media (prefers-reduced-motion: reduce) {
   [data-bar] {

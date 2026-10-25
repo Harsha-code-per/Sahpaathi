@@ -1,6 +1,6 @@
 import { lazy, type ComponentType } from 'react'
 
-export { cn } from "cn"
+export { cn } from 'cn'
 
 /** A v4 UUID. crypto.randomUUID is missing on older Android WebViews (before Chrome 92), which classroom phones still run. */
 export const uuid = (): string =>
@@ -16,8 +16,11 @@ export function reloadOnce(): boolean {
   if (Date.now() - last < 30_000) return false
   sessionStorage.setItem('sahpaathi.reloaded', String(Date.now()))
   const reload = () => location.reload()
-  if (!navigator.serviceWorker) reload()
-  else navigator.serviceWorker.getRegistration().then((r) => r?.update()).catch(() => {}).finally(reload)
+  // Ask the service worker for the new version, but reload within 3 s even if it never answers.
+  const update = navigator.serviceWorker?.getRegistration().then((r) => r?.update())
+  void Promise.race([update, new Promise((done) => setTimeout(done, 3000))])
+    .catch(() => {})
+    .finally(reload)
   return true
 }
 

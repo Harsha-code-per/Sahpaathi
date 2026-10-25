@@ -1,6 +1,6 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { FEEDBACK_TAGS } from '../storage/db'
-import { STRINGS, UI_LANGS } from './strings'
+import { STRINGS, UI_LANGS, initialLang, saveLang } from './strings'
 
 describe('every teacher language is complete', () => {
   for (const { lang } of UI_LANGS) {
@@ -19,6 +19,27 @@ describe('every teacher language is complete', () => {
       expect(t.yourRating(4.5)).toContain('4.5')
     })
   }
+
+  it('every phrase that is a function returns text in every language', () => {
+    for (const { lang } of UI_LANGS) {
+      for (const [key, value] of Object.entries(STRINGS[lang])) {
+        if (typeof value !== 'function') continue
+        const fn = value as (...a: number[]) => unknown
+        for (const args of [[1], [2, 3], [0, 0, 0]]) expect(String(fn(...args)).length, `${lang}.${key}`).toBeGreaterThan(0)
+      }
+    }
+  })
+
+  it('the saved language is read back, and a bad one is ignored', () => {
+    const m = new Map<string, string>()
+    vi.stubGlobal('localStorage', { getItem: (k: string) => m.get(k) ?? null, setItem: (k: string, v: string) => void m.set(k, v) })
+    expect(initialLang()).toBe('en')
+    saveLang('ta')
+    expect(initialLang()).toBe('ta')
+    m.set('sahpaathi.ui-lang', 'xx')
+    expect(initialLang()).toBe('en')
+    vi.unstubAllGlobals()
+  })
 
   it('the Tamil, Hindi and Odia text is in the right script, not left in English', () => {
     expect(STRINGS.ta.tabClass).toMatch(/[\u0B80-\u0BFF]/)

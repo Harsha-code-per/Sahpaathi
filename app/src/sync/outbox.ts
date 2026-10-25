@@ -23,17 +23,23 @@ export async function recordFeedback(e: { episode_id: string; rating: number; ta
   if (!Number.isInteger(e.rating) || e.rating < 1 || e.rating > 5) throw new Error('A rating is 1 to 5 stars.')
   const tags = [...new Set(e.tags)].filter((t) => FEEDBACK_TAGS.includes(t))
   const classroom_id = await classroomCode()
-  const event: FeedbackEvent = { kind: 'feedback', event_id: uuid(), at: now.toISOString(), episode_id: e.episode_id, rating: e.rating, tags, comment: '', ...(classroom_id && { classroom_id }) }
+  const event: FeedbackEvent = {
+    kind: 'feedback',
+    event_id: uuid(),
+    at: now.toISOString(),
+    episode_id: e.episode_id,
+    rating: e.rating,
+    tags,
+    comment: '',
+    ...(classroom_id && { classroom_id }),
+  }
   await (await getDB()).add('outbox', event)
   await remember(event, now)
   return event
 }
 
 /** Queues one catch-up-call event for the lesson just played. */
-export async function recordAttendance(
-  e: Pick<AttendanceEvent, 'classroom_id' | 'episode_id' | 'absent'>,
-  now = new Date(),
-) {
+export async function recordAttendance(e: Pick<AttendanceEvent, 'classroom_id' | 'episode_id' | 'absent'>, now = new Date()) {
   // A bad code must not sit in the outbox failing /sync on every retry, so check before anything is saved.
   const bad = [e.classroom_id, ...e.absent].find((c) => !isCode(c))
   if (bad) throw new Error(`"${bad}" is not a classroom or roll code: letters, digits and hyphen, starting with a letter or digit, up to 40 characters.`)

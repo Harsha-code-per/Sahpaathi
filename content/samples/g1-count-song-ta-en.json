@@ -9,9 +9,7 @@
   "school_lang": "en",
   "district": "Chennai",
   "duration_min": 5,
-  "materials": [
-    "none: clapping and fingers only"
-  ],
+  "materials": ["none: clapping and fingers only"],
   "chalk_sketch_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 40\" fill=\"none\" stroke=\"black\" stroke-width=\"3\"><path d=\"M16 34V10M34 34V6M52 34V4M70 34V6M88 34V10\"/></svg>",
   "segments": [
     {

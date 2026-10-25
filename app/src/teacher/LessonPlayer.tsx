@@ -1,4 +1,18 @@
-import { ChevronLeftIcon, EyeIcon, LightbulbIcon, MicIcon, PartyPopperIcon, PauseIcon, PlayIcon, BellRingIcon, Repeat2Icon, RotateCcwIcon, SettingsIcon, SkipForwardIcon, Volume2Icon } from 'lucide-react'
+import {
+  ChevronLeftIcon,
+  EyeIcon,
+  LightbulbIcon,
+  MicIcon,
+  PartyPopperIcon,
+  PauseIcon,
+  PlayIcon,
+  BellRingIcon,
+  Repeat2Icon,
+  RotateCcwIcon,
+  SettingsIcon,
+  SkipForwardIcon,
+  Volume2Icon,
+} from 'lucide-react'
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { cn } from 'cn'
 import { Button } from '@/components/ui/button'
@@ -29,10 +43,13 @@ function playLine(line: Line, url: string | undefined, prefs: Prefs, onDone: () 
   const wait = (sec: number) => {
     if (finished) return
     finished = true
-    timer = window.setTimeout(() => {
-      onPause(false)
-      onDone()
-    }, (sec + pauseSeconds(line.pause_after_sec, prefs)) * 1000)
+    timer = window.setTimeout(
+      () => {
+        onPause(false)
+        onDone()
+      },
+      (sec + pauseSeconds(line.pause_after_sec, prefs)) * 1000,
+    )
   }
   const textSec = lineSeconds(line.text.length, prefs)
   if (!url) {
@@ -73,7 +90,6 @@ const TAPS: { tap: Tap; colour: string }[] = [
   { tap: 'some', colour: 'bg-some text-[#172524]' },
   { tap: 'few', colour: 'bg-few text-[#1a0f0b]' },
 ]
-
 
 /** Three big tap buttons; mounted fresh per segment so the 10 s countdown restarts. Answers at most once. */
 function Checkpoint({
@@ -154,7 +170,19 @@ function Checkpoint({
 const TEXT_SIZE = { m: 'text-[2rem]', l: 'text-[2.5rem]', xl: 'text-[3rem]' } as const
 
 /** A row of choices, one pressed; big targets, no sliders, readable at arm's length. */
-function Choice<T extends string | number>({ label, value, options, names, onPick }: { label: string; value: T; options: readonly T[]; names: Record<T, string>; onPick: (v: T) => void }) {
+function Choice<T extends string | number>({
+  label,
+  value,
+  options,
+  names,
+  onPick,
+}: {
+  label: string
+  value: T
+  options: readonly T[]
+  names: Record<T, string>
+  onPick: (v: T) => void
+}) {
   return (
     <div className="space-y-2">
       <p className="text-sm font-semibold text-muted-foreground">{label}</p>
@@ -239,7 +267,11 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
   useEffect(() => {
     if (!playing || !('wakeLock' in navigator)) return
     let lock: WakeLockSentinel | undefined
-    const ask = () => navigator.wakeLock.request('screen').then((l) => (lock = l), () => {})
+    const ask = () =>
+      navigator.wakeLock.request('screen').then(
+        (l) => (lock = l),
+        () => {},
+      )
     ask()
     const again = () => document.visibilityState === 'visible' && ask() // the lock is released when the tab is hidden
     document.addEventListener('visibilitychange', again)
@@ -298,9 +330,7 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
     setPhase((p) => tap(episode, p, t))
     if (!auto) setTapsNow((x) => [...x, t])
     // The lesson never waits on storage: a failed write is logged, not shown mid-class.
-    recordTap({ episode_id: episode.id, segment_id: segmentId, tap: t, auto }).then(onTapRecorded, (e) =>
-      console.error('Could not queue tap', e),
-    )
+    recordTap({ episode_id: episode.id, segment_id: segmentId, tap: t, auto }).then(onTapRecorded, (e) => console.error('Could not queue tap', e))
   }
 
   const KINDS = ['most', 'some', 'few'] as const
@@ -335,7 +365,10 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
                 aria-label={t.settings}
                 aria-expanded={showSettings}
                 onClick={() => setShowSettings((v) => !v)}
-                className={cn('grid size-11 place-items-center rounded-full border border-border outline-none focus-visible:ring-2 focus-visible:ring-ring', showSettings ? 'bg-primary text-primary-foreground' : 'bg-card')}
+                className={cn(
+                  'grid size-11 place-items-center rounded-full border border-border outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                  showSettings ? 'bg-primary text-primary-foreground' : 'bg-card',
+                )}
               >
                 <SettingsIcon className="size-5" aria-hidden />
               </button>
@@ -345,9 +378,7 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
           <h1 className="font-heading text-2xl leading-tight font-bold" lang={episode.school_lang}>
             {episode.title}
           </h1>
-          <p className="text-muted-foreground">
-            {t.lessonMeta(episode.grade, episode.district, episode.duration_min)}
-          </p>
+          <p className="text-muted-foreground">{t.lessonMeta(episode.grade, episode.district, episode.duration_min)}</p>
           {segment && (
             <div className="space-y-2">
               <div className="flex gap-1.5" aria-hidden>
@@ -373,12 +404,7 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
                     <PlayIcon aria-hidden /> {t.continueFrom('seg' in spot ? spot.seg + 1 : 1)}
                   </Button>
                 )}
-                <Button
-                  variant="outline"
-                  size="lg"
-                  disabled={choral.state === 'starting' || choral.state === 'on'}
-                  onClick={choral.enable}
-                >
+                <Button variant="outline" size="lg" disabled={choral.state === 'starting' || choral.state === 'on'} onClick={choral.enable}>
                   <MicIcon aria-hidden />
                   {t.mic[choral.state]}
                 </Button>
@@ -399,9 +425,7 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
         {(phase.kind === 'line' || phase.kind === 'analogy') && line && (
           <section className="flex flex-1 flex-col gap-4">
             <div key={line.id} className="chalk-line animate-in fade-in slide-in-from-bottom-3 space-y-3 rounded-3xl p-5 duration-500">
-              <span className="inline-block rounded-full bg-accent px-3 py-1 text-sm font-semibold">
-                {phase.kind === 'analogy' ? t.analogyPart : t.parts[phase.part]}
-              </span>
+              <span className="inline-block rounded-full bg-accent px-3 py-1 text-sm font-semibold">{phase.kind === 'analogy' ? t.analogyPart : t.parts[phase.part]}</span>
               <p lang={line.lang} className={cn('leading-snug font-semibold', TEXT_SIZE[prefs.text])}>
                 {line.text}
               </p>
@@ -415,12 +439,7 @@ export default function LessonPlayer({ episode, audio, pending, onTapRecorded, o
         )}
 
         {phase.kind === 'checkpoint' && segment && (
-          <Checkpoint
-            key={phase.seg}
-            question={segment.checkpoint}
-            suggested={suggested}
-            onTap={(t, auto) => onTap(segment.id, t, auto)}
-          />
+          <Checkpoint key={phase.seg} question={segment.checkpoint} suggested={suggested} onTap={(t, auto) => onTap(segment.id, t, auto)} />
         )}
 
         {paused && (

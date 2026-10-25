@@ -6,8 +6,10 @@ import { anyBuilding, formatSize, PACK_STATUS, packRows } from './view'
 
 const POLL_MS = 5000
 const card = 'rounded-2xl border border-border bg-card p-5'
-const button = 'inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground outline-none hover:bg-primary/85 focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50'
-const quiet = 'inline-flex min-h-11 items-center justify-center rounded-lg border border-input bg-card px-4 text-sm font-semibold outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50'
+const button =
+  'inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground outline-none hover:bg-primary/85 focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50'
+const quiet =
+  'inline-flex min-h-11 items-center justify-center rounded-lg border border-input bg-card px-4 text-sm font-semibold outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50'
 
 export default function Packs({ onSignedOut }: { onSignedOut: () => void }) {
   const [episodes, setEpisodes] = useState<Summary[]>([])
@@ -70,11 +72,17 @@ export default function Packs({ onSignedOut }: { onSignedOut: () => void }) {
   const rows = packRows(episodes, packs)
   return (
     <section className={`${card} space-y-3`} aria-labelledby="packs">
-      <h2 id="packs" className="font-semibold">Packs for approved episodes</h2>
+      <h2 id="packs" className="font-semibold">
+        Packs for approved episodes
+      </h2>
       <p className="text-sm text-muted-foreground">
         A pack is the episode with its voices, signed so the app can check it. Building takes a few minutes and uses text-to-speech credits, so build once per approved episode.
       </p>
-      {error && <p role="alert" className="text-bad-foreground">{error}</p>}
+      {error && (
+        <p role="alert" className="text-bad-foreground">
+          {error}
+        </p>
+      )}
       {!loaded ? (
         <div className="space-y-2">
           <p className="text-muted-foreground">Loading…</p>
@@ -96,20 +104,14 @@ export default function Packs({ onSignedOut }: { onSignedOut: () => void }) {
               </div>
               <div className="flex items-center gap-2">
                 {latest && (
-                  <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${badge(PACK_STATUS, latest.status).tone}`}>
-                    {badge(PACK_STATUS, latest.status).label}
-                  </span>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${badge(PACK_STATUS, latest.status).tone}`}>{badge(PACK_STATUS, latest.status).label}</span>
                 )}
                 {ready && (
                   <button className={quiet} disabled={busyId === episode.id} onClick={() => download(ready)}>
                     Download
                   </button>
                 )}
-                <button
-                  className={button}
-                  disabled={busyId === episode.id || latest?.status === 'building'}
-                  onClick={() => build(episode.id)}
-                >
+                <button className={button} disabled={busyId === episode.id || latest?.status === 'building'} onClick={() => build(episode.id)}>
                   {latest?.status === 'building' ? 'Building…' : ready ? 'Build again' : 'Build pack'}
                 </button>
               </div>

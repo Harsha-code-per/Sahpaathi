@@ -28,7 +28,17 @@ type Store = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>
 export const localDay = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 
 export function newRecord(plan: Plan, language: Lang, now = new Date()): LearningRecord {
-  return { id: `${now.getTime()}`, title: plan.title, language, day: localDay(now), partTitles: plan.parts.map((p) => p.title), partsDone: 0, correct: 0, revise: [], finished: false }
+  return {
+    id: `${now.getTime()}`,
+    title: plan.title,
+    language,
+    day: localDay(now),
+    partTitles: plan.parts.map((p) => p.title),
+    partsDone: 0,
+    correct: 0,
+    revise: [],
+    finished: false,
+  }
 }
 
 /** The record after the lesson moved: parts passed so far, questions right, what to practise again. */
@@ -58,9 +68,7 @@ export function streak(records: LearningRecord[], today = new Date()): number {
 
 /** What to practise: the newest lessons' open questions, each tagged with its lesson. */
 export function toRevise(records: LearningRecord[], limit = 5): { title: string; item: string }[] {
-  return records
-    .flatMap((r) => r.revise.map((item) => ({ title: r.title, item })))
-    .slice(0, limit)
+  return records.flatMap((r) => r.revise.map((item) => ({ title: r.title, item }))).slice(0, limit)
 }
 
 export function isEnabled(store: Store): boolean {

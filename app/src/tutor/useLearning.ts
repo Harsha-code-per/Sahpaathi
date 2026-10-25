@@ -47,11 +47,15 @@ export function useLearning() {
       const s = store()
       const id = current.current
       if (!enabled || !s || !id) return
-      setRecords((prev) => save(s, prev.map((r) => (r.id === id ? advance(r, progress) : r))))
+      setRecords((prev) =>
+        save(
+          s,
+          prev.map((r) => (r.id === id ? advance(r, progress) : r)),
+        ),
+      )
     },
     [enabled],
   )
 
   return { enabled, records, turn, begin, update }
 }
-

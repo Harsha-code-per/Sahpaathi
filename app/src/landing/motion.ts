@@ -31,7 +31,13 @@ export function setupMotion(root: HTMLElement): () => void {
       const fmt = new Intl.NumberFormat('en-IN', { minimumFractionDigits: dec, maximumFractionDigits: dec, useGrouping: m[1].includes(',') })
       const n = { v: 0 }
       el.textContent = fmt.format(0) + m[2]
-      gsap.to(n, { v: to, duration: 1.8, ease: 'power2.out', onUpdate: () => void (el.textContent = fmt.format(n.v) + m[2]), scrollTrigger: { trigger: el, start: 'top 88%', once: true } })
+      gsap.to(n, {
+        v: to,
+        duration: 1.8,
+        ease: 'power2.out',
+        onUpdate: () => void (el.textContent = fmt.format(n.v) + m[2]),
+        scrollTrigger: { trigger: el, start: 'top 88%', once: true },
+      })
     })
     // Headline assembles word by word.
     gsap.from('[data-hero-word]', { opacity: 0, y: 48, filter: 'blur(14px)', duration: 0.9, ease: 'expo.out', stagger: 0.06 })
@@ -62,7 +68,9 @@ export function setupMotion(root: HTMLElement): () => void {
     const score = { v: 0 }
     const dialNum = root.querySelector<HTMLElement>('[data-dialnum]')!
     gsap.set('[data-dial]', { strokeDashoffset: 276.5 })
-    scene.to('[data-dial]', { strokeDashoffset: 36, duration: 1.2 }, 0.3).to(score, { v: 87, duration: 1.2, onUpdate: () => void (dialNum.textContent = String(Math.round(score.v))) }, 0.3)
+    scene
+      .to('[data-dial]', { strokeDashoffset: 36, duration: 1.2 }, 0.3)
+      .to(score, { v: 87, duration: 1.2, onUpdate: () => void (dialNum.textContent = String(Math.round(score.v))) }, 0.3)
     // How it works: a line draws across the four steps as you scroll, and each step lights up as the line reaches it.
     const list = root.querySelector<HTMLElement>('[data-steps-list]')!
     const steps = gsap.utils.toArray<HTMLElement>('[data-step]')

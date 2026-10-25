@@ -1,24 +1,28 @@
 name: auto-merge
 
-# Every PR into main merges by itself once the required checks (backend, app) pass.
-# Opt out: open it as a draft, or add the "hold" label. Stacked PRs wait until GitHub
-# retargets them to main (it does when the PR below them merges).
+# Every PR into main merges by itself once the required checks (backend, app, e2e, security) pass.
+# Opt out: open it as a draft, or add the "hold" label. Stacked PRs go when GitHub retargets them to
+# main; that retarget sends no event, so the sweep after each push to main picks them up.
 on:
   pull_request:
     types: [opened, reopened, ready_for_review, edited, labeled, unlabeled]
+  push:
+    branches: [main]
 
 permissions:
   contents: write
   pull-requests: write
 
+env:
+  # A personal token, so the merge's push to main still triggers deploy-app;
+  # merges made with GITHUB_TOKEN never trigger other workflows.
+  GH_TOKEN: ${{ secrets.AUTOMERGE_TOKEN || secrets.GITHUB_TOKEN }}
+
 jobs:
   auto-merge:
-    if: github.event.pull_request.base.ref == 'main'
+    if: github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main'
     runs-on: ubuntu-latest
     env:
-      # A personal token, so the merge's push to main still triggers deploy-app;
-      # merges made with GITHUB_TOKEN never trigger other workflows.
-      GH_TOKEN: ${{ secrets.AUTOMERGE_TOKEN || secrets.GITHUB_TOKEN }}
       PR: ${{ github.event.pull_request.html_url }}
     steps:
       - name: Hold
@@ -27,3 +31,15 @@ jobs:
       - name: Merge when green
         if: ${{ !github.event.pull_request.draft && !contains(github.event.pull_request.labels.*.name, 'hold') }}
         run: gh pr merge --auto --rebase "$PR"
+
+  sweep:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Arm every open PR into main that is not a draft, on hold, or already armed
+        run: |
+          gh pr list --repo "$GITHUB_REPOSITORY" --base main --state open \
+            --json number,isDraft,labels,autoMergeRequest \
+            --jq '.[] | select(.isDraft | not) | select(.autoMergeRequest == null)
+                  | select([.labels[].name] | index("hold") | not) | .number' |
+          while read -r n; do gh pr merge "$n" --repo "$GITHUB_REPOSITORY" --auto --rebase || true; done

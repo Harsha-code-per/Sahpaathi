@@ -1,5 +1,5 @@
 # Owner: M1 (backend core). Ask before adding; add in a tiny separate PR.
-fastapi==0.143.3
+fastapi==0.144.0
 uvicorn[standard]==0.54.0
 pydantic-settings==2.16.0
 sqlalchemy==2.1.5

@@ -6,11 +6,11 @@ from sqlalchemy.pool import StaticPool
 
 from app.config import settings
 
-# SQLite is for tests and a local walkthrough. An in-memory database needs one shared connection
-# so every session sees the same data; a file database gets a normal pool, so parallel requests
-# do not share (and break) one connection.
+# SQLite is for tests and local runs. In memory: one shared connection, so every session sees the
+# same data. A SQLite file (browser smoke test, local dev) gets a connection per thread, as Postgres
+# does: sharing one across the server's threads gave wrong rows and crashed on concurrent requests.
 _sqlite = settings.database_url.startswith("sqlite")
-_memory = _sqlite and (":memory:" in settings.database_url or settings.database_url.endswith("://"))
+_memory = _sqlite and ":memory:" in settings.database_url
 engine = create_engine(
     settings.database_url,
     pool_pre_ping=not _sqlite,

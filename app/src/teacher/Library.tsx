@@ -41,7 +41,16 @@ export function SyncBadge({ pending }: { pending: number | null }) {
   )
 }
 
-function LessonCard(props: { episode: Episode; badge?: string; note?: string; ready?: string; featured?: boolean; onOpen: () => void; onShare?: () => void; onRemove?: () => void }) {
+function LessonCard(props: {
+  episode: Episode
+  badge?: string
+  note?: string
+  ready?: string
+  featured?: boolean
+  onOpen: () => void
+  onShare?: () => void
+  onRemove?: () => void
+}) {
   const { episode: e } = props
   const { t } = useT()
   const meta = t.lessonMeta(e.grade, e.district, e.duration_min)
@@ -167,9 +176,7 @@ export default function Library({ onOpen, pending }: { onOpen: (lesson: OpenLess
 
   async function open(p: StoredPack) {
     const files = await loadPackFiles(p.id)
-    const audio = Object.fromEntries(
-      Object.entries(files?.audio ?? {}).map(([id, bytes]) => [id, URL.createObjectURL(new Blob([bytes], { type: 'audio/ogg; codecs=opus' }))]),
-    )
+    const audio = Object.fromEntries(Object.entries(files?.audio ?? {}).map(([id, bytes]) => [id, URL.createObjectURL(new Blob([bytes], { type: 'audio/ogg; codecs=opus' }))]))
     onOpen({ episode: p.episode, audio })
   }
 
@@ -224,9 +231,7 @@ export default function Library({ onOpen, pending }: { onOpen: (lesson: OpenLess
         </header>
 
         <div className="space-y-1">
-          <p className="text-sm font-semibold tracking-wide text-primary uppercase">
-            {now.toLocaleDateString(lang, { weekday: 'long', day: 'numeric', month: 'long' })}
-          </p>
+          <p className="text-sm font-semibold tracking-wide text-primary uppercase">{now.toLocaleDateString(lang, { weekday: 'long', day: 'numeric', month: 'long' })}</p>
           <h2 className="font-heading text-[2.25rem] leading-[1.05] font-bold">{t.greet[now.getHours() < 12 ? 'morning' : now.getHours() < 17 ? 'afternoon' : 'evening']}</h2>
         </div>
 

@@ -103,7 +103,10 @@ export async function call<T>(path: string, init: RequestInit = {}): Promise<T> 
   if (!res.headers.get('content-type')?.includes('application/json'))
     throw new ApiError(res.ok ? 'The server sent an unexpected answer. Try again.' : `The server answered ${res.status}.`, res.ok ? 502 : res.status)
   if (!res.ok) {
-    const detail = await res.json().then((b) => b.detail, () => null)
+    const detail = await res.json().then(
+      (b) => b.detail,
+      () => null,
+    )
     throw new ApiError(typeof detail === 'string' ? detail : `The server answered ${res.status}.`, res.status)
   }
   return res.json() as Promise<T>
@@ -129,16 +132,13 @@ export interface Headings {
 }
 
 export const api = {
-  login: (email: string, password: string) =>
-    call<{ token: string; role: string; name: string }>('/auth/login', post({ email, password })),
+  login: (email: string, password: string) => call<{ token: string; role: string; name: string }>('/auth/login', post({ email, password })),
   catalog: () => call<Catalog>('/catalog'),
   episodes: () => call<Summary[]>('/episodes'),
   episode: (id: number) => call<Detail>(`/episodes/${id}`),
   generate: (lesson_id: string, district_id: string) => call<Summary>('/episodes', post({ lesson_id, district_id })),
-  decide: (id: number, decision: 'approve' | 'reject', notes: string) =>
-    call<Detail>(`/episodes/${id}/review`, post({ decision, notes })),
-  editLine: (id: number, lineId: string, text: string) =>
-    call<Detail>(`/episodes/${id}/lines/${lineId}`, { method: 'PATCH', body: JSON.stringify({ text }) }),
+  decide: (id: number, decision: 'approve' | 'reject', notes: string) => call<Detail>(`/episodes/${id}/review`, post({ decision, notes })),
+  editLine: (id: number, lineId: string, text: string) => call<Detail>(`/episodes/${id}/lines/${lineId}`, { method: 'PATCH', body: JSON.stringify({ text }) }),
   english: (id: number) => call<Headings>(`/episodes/${id}/english`),
   classroom: (id: number) => call<PartTaps[]>(`/episodes/${id}/classroom`),
   /** Claude rewrites one part as a new version, which then goes through review like any lesson. */

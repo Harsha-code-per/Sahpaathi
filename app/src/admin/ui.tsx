@@ -2,7 +2,6 @@ import type { ReactNode } from 'react'
 import { CountUp } from '@/components/CountUp'
 import { card } from './theme'
 
-
 const TINT = {
   mint: ['bg-[var(--tint-mint)]!', 'text-[var(--lagoon)]'],
   sun: ['bg-[var(--tint-sun)]!', 'text-[#8a5a00]'],
@@ -48,4 +47,3 @@ export const Empty = ({ children }: { children: ReactNode }) => (
     <p className="max-w-xs">{children}</p>
   </div>
 )
-
