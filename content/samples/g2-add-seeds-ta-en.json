@@ -1,0 +1,264 @@
+{
+  "schema_version": 1,
+  "id": "g2-add-seeds-ta-en",
+  "title": "Adding with seeds",
+  "grade": 2,
+  "subject": "numeracy",
+  "nipun_lo": "N2.3",
+  "home_lang": "ta",
+  "school_lang": "en",
+  "district": "Chennai",
+  "duration_min": 6,
+  "materials": ["10 seeds or pebbles per pair", "slate"],
+  "chalk_sketch_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 40\" fill=\"none\" stroke=\"black\" stroke-width=\"3\"><circle cx=\"14\" cy=\"20\" r=\"7\"/><circle cx=\"34\" cy=\"20\" r=\"7\"/><path d=\"M52 20h14M59 13v14\"/><circle cx=\"80\" cy=\"20\" r=\"7\"/><circle cx=\"100\" cy=\"20\" r=\"7\"/></svg>",
+  "segments": [
+    {
+      "id": "s1",
+      "title": "Two seeds and three seeds",
+      "activity": "pebble_task",
+      "teach": [
+        {
+          "id": "s1-t-1",
+          "speaker": "guide",
+          "lang": "ta",
+          "text": "இரண்டு விதைகளை எடுங்கள்.",
+          "pause_after_sec": 4,
+          "cue": "Children take 2 seeds"
+        },
+        {
+          "id": "s1-t-2",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Take two seeds. Now take three more seeds.",
+          "pause_after_sec": 5,
+          "cue": "Children take 3 more"
+        },
+        {
+          "id": "s1-t-3",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "How many seeds do you have altogether? Count them with me.",
+          "pause_after_sec": 5,
+          "cue": "Children count aloud"
+        }
+      ],
+      "checkpoint": "Did most children get five?",
+      "easier": [
+        {
+          "id": "s1-e-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Let us count slowly. One, two, three, four, five.",
+          "pause_after_sec": 6,
+          "cue": "Point to each seed"
+        },
+        {
+          "id": "s1-e-2",
+          "speaker": "guide",
+          "lang": "ta",
+          "text": "ஒன்று, இரண்டு, மூன்று, நான்கு, ஐந்து.",
+          "pause_after_sec": 5,
+          "cue": null
+        }
+      ],
+      "core": [
+        {
+          "id": "s1-c-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Two plus three makes five. Say it with me: two plus three is five.",
+          "pause_after_sec": 5,
+          "cue": null
+        }
+      ],
+      "stretch": [
+        {
+          "id": "s1-x-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Now swap them: three plus two. Is it still five?",
+          "pause_after_sec": 6,
+          "cue": "Children try it with seeds"
+        }
+      ],
+      "math_checks": [
+        {
+          "expr": "2 + 3",
+          "answer": 5
+        },
+        {
+          "expr": "3 + 2",
+          "answer": 5
+        }
+      ]
+    },
+    {
+      "id": "s2",
+      "title": "Write it on the slate",
+      "activity": "slate",
+      "teach": [
+        {
+          "id": "s2-t-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Write four plus one on your slate.",
+          "pause_after_sec": 8,
+          "cue": "Children write 4 + 1"
+        },
+        {
+          "id": "s2-t-2",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Count on from four. Five. So four plus one is five.",
+          "pause_after_sec": 4,
+          "cue": null
+        }
+      ],
+      "checkpoint": "Did most children write five?",
+      "easier": [
+        {
+          "id": "s2-e-1",
+          "speaker": "guide",
+          "lang": "ta",
+          "text": "நான்கு. அடுத்த எண் என்ன? ஐந்து.",
+          "pause_after_sec": 5,
+          "cue": null
+        },
+        {
+          "id": "s2-e-2",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Four, then one more is five.",
+          "pause_after_sec": 4,
+          "cue": null
+        }
+      ],
+      "core": [
+        {
+          "id": "s2-c-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Write six plus two on your slate.",
+          "pause_after_sec": 10,
+          "cue": "Children write 6 + 2"
+        }
+      ],
+      "stretch": [
+        {
+          "id": "s2-x-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Write seven plus three. Hold up your slate when you are done.",
+          "pause_after_sec": 12,
+          "cue": "Teacher checks slates"
+        }
+      ],
+      "math_checks": [
+        {
+          "expr": "4 + 1",
+          "answer": 5
+        },
+        {
+          "expr": "6 + 2",
+          "answer": 8
+        },
+        {
+          "expr": "7 + 3",
+          "answer": 10
+        }
+      ]
+    },
+    {
+      "id": "s3",
+      "title": "Make a sum with your partner",
+      "activity": "pair_work",
+      "teach": [
+        {
+          "id": "s3-t-1",
+          "speaker": "guide",
+          "lang": "ta",
+          "text": "உங்கள் நண்பருடன் ஒரு கூட்டல் கணக்கு உருவாக்குங்கள்.",
+          "pause_after_sec": 4,
+          "cue": null
+        },
+        {
+          "id": "s3-t-2",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Make your own adding story with your partner. Use seeds. Tell each other the answer.",
+          "pause_after_sec": 20,
+          "cue": "Pairs make a sum"
+        }
+      ],
+      "checkpoint": "Did most pairs make a sum and say the answer?",
+      "easier": [
+        {
+          "id": "s3-e-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Start small. One seed plus one seed. How many?",
+          "pause_after_sec": 8,
+          "cue": null
+        }
+      ],
+      "core": [
+        {
+          "id": "s3-c-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Well done. Share one sum with the class.",
+          "pause_after_sec": 8,
+          "cue": null
+        }
+      ],
+      "stretch": [
+        {
+          "id": "s3-x-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Now make a sum with a total of ten.",
+          "pause_after_sec": 15,
+          "cue": "Pairs try total ten"
+        }
+      ],
+      "math_checks": [
+        {
+          "expr": "1 + 1",
+          "answer": 2
+        },
+        {
+          "expr": "5 + 5",
+          "answer": 10
+        }
+      ]
+    }
+  ],
+  "analogy": [
+    {
+      "id": "a-1",
+      "speaker": "guide",
+      "lang": "en",
+      "text": "Think of mangoes in a basket. Two mangoes, then three more mangoes. Count them all.",
+      "pause_after_sec": 6,
+      "cue": null
+    }
+  ],
+  "ivr_recap": [
+    {
+      "id": "r-1",
+      "speaker": "guide",
+      "lang": "ta",
+      "text": "இன்று நாம் விதைகளைக் கூட்டினோம்.",
+      "pause_after_sec": 3,
+      "cue": null
+    },
+    {
+      "id": "r-2",
+      "speaker": "guide",
+      "lang": "en",
+      "text": "Two plus three is five. Tomorrow, practise one more sum at home.",
+      "pause_after_sec": 4,
+      "cue": null
+    }
+  ]
+}

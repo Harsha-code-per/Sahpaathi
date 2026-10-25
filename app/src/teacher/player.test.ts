@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Episode, Line, Tap } from '../lib/types'
-import { advance, analogy, currentLine, start, tap, type Phase } from './player'
+import { advance, analogy, currentLine, start, tap, upcoming, type Phase } from './player'
 import { samplePack } from './samplePack'
 
 const sample = samplePack.episode
@@ -98,5 +98,16 @@ describe('analogy', () => {
     const none = episode([seg('s1', { teach: ['t1'] })])
     const p = start(none)
     expect(analogy(none, p)).toBe(p)
+  })
+})
+
+describe('upcoming', () => {
+  const ep = episode([seg('s1', { teach: ['t1', 't2'], easier: ['e1'], core: ['c1'], stretch: ['x1'] })])
+
+  it('is the next line while teaching, and all three branches at a checkpoint', () => {
+    const ids = (p: Phase) => upcoming(ep, p).map((l) => l.id)
+    expect(ids(start(ep))).toEqual(['t2'])
+    expect(ids(advance(ep, start(ep)))).toEqual([])
+    expect(ids(advance(ep, advance(ep, start(ep))))).toEqual(['e1', 'c1', 'x1'])
   })
 })

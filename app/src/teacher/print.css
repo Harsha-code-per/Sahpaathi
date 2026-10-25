@@ -1,0 +1,77 @@
+/* The lesson card is on the page but invisible; printing swaps the app for it. */
+.lesson-card {
+  display: none;
+}
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+  #root {
+    display: none !important;
+  }
+  body {
+    background: #fff !important;
+  }
+  .lesson-card {
+    display: block;
+    color: #111;
+    font:
+      11pt/1.35 system-ui,
+      sans-serif;
+  }
+  .lesson-card h1 {
+    font-size: 20pt;
+    margin: 0 0 2mm;
+  }
+  .lesson-card header p {
+    margin: 0 0 5mm;
+    color: #444;
+  }
+  .lesson-card h2 {
+    font-size: 10pt;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin: 4mm 0 1.5mm;
+    border-bottom: 1px solid #999;
+  }
+  .lc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 8mm;
+  }
+  .lesson-card img {
+    width: 100%;
+    max-height: 60mm;
+    object-fit: contain;
+    border: 1px solid #ccc;
+    padding: 2mm;
+  }
+  .lesson-card ul,
+  .lesson-card ol {
+    margin: 0;
+    padding-left: 5mm;
+  }
+  .lesson-card li {
+    margin-bottom: 2mm;
+    break-inside: avoid;
+  }
+  .lesson-card .q,
+  .lesson-card .then {
+    display: block;
+  }
+  .lesson-card .then {
+    color: #444;
+    font-size: 9pt;
+  }
+  .lesson-card .steps li {
+    margin-bottom: 1mm;
+  }
+  .lesson-card footer {
+    margin-top: 5mm;
+    padding-top: 2mm;
+    border-top: 1px solid #999;
+    color: #555;
+    font-size: 9pt;
+  }
+}

@@ -196,6 +196,30 @@ def get_episode(episode_id: int, _: Reviewer, db: DB) -> Detail:
     )
 
 
+_english_headings: dict[
+    tuple[int, str], judge.Headings
+] = {}  # a lesson's headings, translated once per wording
+
+
+@router.get("/episodes/{episode_id}/english")
+def english_headings(episode_id: int, _: Reviewer, db: DB) -> judge.Headings:
+    """Title, part titles, teacher questions and materials in English, for reviewers."""
+    rec = _get(db, episode_id)
+    if rec.episode is None:
+        raise HTTPException(status.HTTP_409_CONFLICT, "This lesson is still being written")
+    episode = Episode.model_validate(rec.episode)
+    key = (episode_id, episode.model_dump_json())
+    if key not in _english_headings:
+        try:
+            _english_headings[key] = judge.headings_in_english(episode)
+        except Exception as e:  # the page works without it; say so instead of failing
+            log.warning("english headings failed: %s", e)
+            raise HTTPException(
+                status.HTTP_503_SERVICE_UNAVAILABLE, "English headings are not available right now"
+            ) from e
+    return _english_headings[key]
+
+
 class LineEditIn(BaseModel):
     text: str = Field(max_length=2000)
 

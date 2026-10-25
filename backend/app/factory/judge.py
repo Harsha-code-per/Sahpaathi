@@ -39,6 +39,20 @@ class Gloss(BaseModel):
     lines: list[GlossLine]
 
 
+class SegmentHeading(BaseModel):
+    id: str
+    title: str
+    checkpoint: str
+
+
+class Headings(BaseModel):
+    """The lesson's title, part titles, teacher questions and materials, in plain English."""
+
+    title: str
+    materials: list[str]
+    segments: list[SegmentHeading]
+
+
 class Score(BaseModel):
     score: int = Field(ge=1, le=5)
     reason: str
@@ -151,6 +165,25 @@ def _ask[T: BaseModel](client: anthropic.Anthropic, system: str, prompt: str, fm
     if message.stop_reason in ("refusal", "max_tokens"):
         raise JudgeError(f"review stopped: {message.stop_reason}")
     return message.parsed_output
+
+
+HEADINGS_SYSTEM = """You translate the headings of a children's audio lesson into plain, literal
+English for a reviewer who does not read the lesson language. Translate exactly; do not improve or
+explain. Return the title, every material in order, and for each segment id its title and its
+teacher question."""
+
+
+def headings_in_english(episode: Episode, client: anthropic.Anthropic | None = None) -> Headings:
+    """English for the parts of the Studio page that the line-by-line gloss does not cover."""
+    client = client or anthropic.Anthropic(api_key=settings.anthropic_api_key or None)
+    source = {
+        "title": episode.title,
+        "materials": episode.materials,
+        "segments": [
+            {"id": s.id, "title": s.title, "checkpoint": s.checkpoint} for s in episode.segments
+        ],
+    }
+    return _ask(client, HEADINGS_SYSTEM, json.dumps(source, ensure_ascii=False), Headings)
 
 
 def review(

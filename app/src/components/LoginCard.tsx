@@ -35,8 +35,8 @@ function useDemoPassword(enabled: boolean) {
 export type DemoAccount = { role: string; email: string }
 
 /** Sign-in for the desk tools. `login` throws an ApiError whose message is shown as is. `demo` lists test accounts that one tap fills in. */
-/** Two classroom scenes, each a seamless slow loop (re-edited with dissolves, no hard cuts). */
-const SCENES = ['signin-a', 'signin-b']
+/** Three classroom scenes, each a seamless slow loop (re-edited with dissolves, no hard cuts), crossfading in turn. */
+const SCENES = ['signin-1', 'signin-2', 'signin-3']
 // Reduced motion or a data-saver connection: the still posters instead of video.
 const still =
   typeof window !== 'undefined' && (matchMedia('(prefers-reduced-motion: reduce)').matches || Boolean((navigator as { connection?: { saveData?: boolean } }).connection?.saveData))

@@ -124,6 +124,21 @@ class TurnOut(BaseModel):
     intent: Intent | None = None
 
 
+class SummaryIn(BaseModel):
+    """What a learner studied, for a short note they can say aloud to a parent."""
+
+    title: str = Field(min_length=1, max_length=160)
+    parts: list[str] = Field(default_factory=list, max_length=6)
+    revise: list[str] = Field(
+        default_factory=list, max_length=5
+    )  # what they got wrong or were told
+    language: Lang = "en"
+
+
+class SummaryOut(BaseModel):
+    text: str
+
+
 class SpeakIn(BaseModel):
     text: str = Field(min_length=1, max_length=600)
     language: Lang = "en"

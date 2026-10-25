@@ -38,7 +38,7 @@ export default defineConfig({
           '**/noto-sans-*-latin-*',
           '**/apple-touch-icon.png',
           '**/icon-512*.png',
-          '**/assets/{Admin,Studio,Landing,Speaker3D,Tutor,vision_bundle}-*', // online-only: the AI teacher, its on-device camera models, the 3D landing speaker
+          '**/assets/{Admin,Studio,Landing,Speaker3D,Tutor,Evidence,vision_bundle}-*', // online-only: the AI teacher, its on-device camera models, the 3D landing speaker
         ],
       },
     }),

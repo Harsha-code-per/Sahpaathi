@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { api, ApiError, session, SIGNED_OUT, type Catalog, type Status, type Summary } from './api'
 import EpisodeView from './EpisodeView'
-import { badge, LANG_NAMES, STATUS } from './view'
+import { badge, englishName, LANG_NAMES, STATUS, storedView, storeView, type View } from './view'
 import type { Lang } from '../lib/types'
 
 const POLL_MS = 5000
@@ -76,7 +76,7 @@ const FILTERS: { key: Filter; label: string; match: (s: Status) => boolean }[] =
   { key: 'all', label: 'All', match: () => true },
 ]
 
-function EpisodeList(props: { items: Summary[] | null; selected: number | null; onSelect: (id: number) => void; onDark?: boolean }) {
+function EpisodeList(props: { items: Summary[] | null; selected: number | null; onSelect: (id: number) => void; catalog: Catalog | null; view: View; onDark?: boolean }) {
   const muted = props.onDark ? 'text-sidebar-muted' : 'text-muted-foreground'
   if (!props.items)
     return (
@@ -90,6 +90,8 @@ function EpisodeList(props: { items: Summary[] | null; selected: number | null; 
     <ul className="space-y-1">
       {props.items.map((e) => {
         const on = e.id === props.selected
+        const en = englishName(props.catalog, e.lesson_id, e.district_id)
+        const showEnglish = props.view === 'english' && en.title !== null
         return (
           <li key={e.id}>
             <button
@@ -101,10 +103,13 @@ function EpisodeList(props: { items: Summary[] | null; selected: number | null; 
                 on && (props.onDark ? 'bg-sidebar-accent' : 'ring-2 ring-ring'),
               )}
             >
-              <span className="line-clamp-2 font-semibold">{e.title ?? `${e.lesson_id}, ${e.district_id}`}</span>
+              <span className="line-clamp-2 font-semibold" lang={showEnglish ? 'en' : undefined}>
+                {showEnglish ? en.title : (e.title ?? `${e.lesson_id}, ${e.district_id}`)}
+              </span>
+              {showEnglish && e.title && <span className={cn('line-clamp-1 text-[0.8125rem]', props.onDark ? 'text-sidebar-muted' : 'text-muted-foreground')}>{e.title}</span>}
               <span className={cn('mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.8125rem]', props.onDark ? 'text-sidebar-muted' : 'text-muted-foreground')}>
                 <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${badge(STATUS, e.status).tone}`}>{badge(STATUS, e.status).label}</span>
-                {e.district_id} · {new Date(e.created_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
+                {props.view === 'english' ? en.district : e.district_id} · {new Date(e.created_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
               </span>
             </button>
           </li>
@@ -128,6 +133,8 @@ export default function Studio() {
   const [filter, setFilter] = useState<Filter>('review')
   const [query, setQuery] = useState('')
   const [writingOpen, setWritingOpen] = useState(false)
+  const [view, setViewState] = useState<View>(storedView)
+  const setView = (v: View) => (setViewState(v), storeView(v))
 
   const logout = useCallback(() => {
     session.clear()
@@ -191,7 +198,12 @@ export default function Studio() {
   const current = list.find((e) => e.id === selected)
   const q = query.trim().toLowerCase()
   const shown =
-    items && items.filter((e) => FILTERS.find((f) => f.key === filter)!.match(e.status) && (!q || [e.title, e.lesson_id, e.district_id].some((t) => t?.toLowerCase().includes(q))))
+    items &&
+    items.filter(
+      (e) =>
+        FILTERS.find((f) => f.key === filter)!.match(e.status) &&
+        (!q || [e.title, e.lesson_id, e.district_id, englishName(catalog, e.lesson_id, e.district_id).title].some((t) => t?.toLowerCase().includes(q))),
+    )
   const count = (f: Filter) => list.filter((e) => FILTERS.find((x) => x.key === f)!.match(e.status)).length
 
   const sidebar = ({ collapsed, expand, close }: SidebarApi) =>
@@ -241,7 +253,7 @@ export default function Studio() {
             </button>
           ))}
         </div>
-        <EpisodeList items={shown} selected={selected} onSelect={(id) => (setSelected(id), close())} onDark />
+        <EpisodeList items={shown} selected={selected} onSelect={(id) => (setSelected(id), close())} catalog={catalog} view={view} onDark />
       </>
     )
 
@@ -252,6 +264,21 @@ export default function Studio() {
         <input className="w-full bg-transparent outline-none" placeholder="Search lessons" aria-label="Search lessons" value={query} onChange={(e) => setQuery(e.target.value)} />
       </label>
       <div className="flex-1 max-md:hidden" />
+      <div role="group" aria-label="Language of the Studio" className="flex items-center gap-1 rounded-xl border border-input bg-card p-1">
+        {(['english', 'original'] as const).map((v) => (
+          <button
+            key={v}
+            aria-pressed={view === v}
+            onClick={() => setView(v)}
+            className={cn(
+              'min-h-9 rounded-lg px-3 text-sm font-semibold outline-none focus-visible:ring-2 focus-visible:ring-ring',
+              view === v ? 'bg-foreground text-background' : 'text-muted-foreground hover:text-foreground',
+            )}
+          >
+            {v === 'english' ? 'English' : 'Original language'}
+          </button>
+        ))}
+      </div>
       <Button variant="ghost" onClick={logout}>
         <LogOutIcon aria-hidden /> <span className="max-sm:sr-only">Log out</span>
       </Button>
@@ -283,14 +310,14 @@ export default function Studio() {
               </Button>
               {shown?.[0] && (
                 <Button variant="outline" onClick={() => setSelected(shown[0].id)}>
-                  Open {shown[0].title ?? 'the first lesson'}
+                  Open {(view === 'english' && englishName(catalog, shown[0].lesson_id, shown[0].district_id).title) || shown[0].title || 'the first lesson'}
                 </Button>
               )}
             </div>
           </section>
           {/* Phones have no sidebar: the list is the first screen. */}
           <div className="md:hidden">
-            <EpisodeList items={shown} selected={selected} onSelect={setSelected} />
+            <EpisodeList items={shown} selected={selected} onSelect={setSelected} catalog={catalog} view={view} />
           </div>
         </>
       ) : (
@@ -298,6 +325,7 @@ export default function Studio() {
           key={selected}
           id={selected}
           status={current?.status}
+          view={view}
           onBack={() => setSelected(null)}
           onChanged={refresh}
           onError={handle}

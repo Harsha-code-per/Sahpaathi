@@ -22,7 +22,7 @@ The site white-screened on clicks and felt unstable. Found and fixed:
 | 2 | **Four guardrails** | ✅ Done | Tier 1 code (every sum, language handover); tier 2 Haiku rubric; tier 3 blind back-translation beside every line (no numeric "drift score" was added); tier 4 a human edits lines and approves. **Measured: 18/20 strict, 20/20 any tier** ([GUARDRAIL_EVAL.md](GUARDRAIL_EVAL.md)) |
 | 3 | **Voice** | 🟡 Mostly | Real Sarvam voices for Tamil, Hindi, Odia with loudness QA. **Santali: splicer built, 0 of 42 phrases recorded or consented** |
 | 4 | **Packs** (signed zip; import, share, download) | 🟡 Built, blocked live | Ed25519-signed and verified; import from file, Web Share, in-app download that resumes on 2G. **The live site refuses packs: `VITE_PACK_PUBLIC_KEY` is not set on Vercel** |
-| 5 | **Offline teacher player** | ✅ Done | One-tap start, checkpoints, 10 s fallback, analogy, chalk sketch, materials, attendance, sync queue with retry; airplane mode lab-tested ([TESTING_LOG.md](TESTING_LOG.md) L1–L5); in Tamil, Hindi and Odia. The planned "<200 ms switching with pre-decoded audio" was not built: lines play one by one, which feels instant but is unmeasured |
+| 5 | **Offline teacher player** | ✅ Done | One-tap start, checkpoints, 10 s fallback, analogy, chalk sketch, materials, attendance, sync queue with retry; airplane mode lab-tested ([TESTING_LOG.md](TESTING_LOG.md) L1–L5); in Tamil, Hindi and Odia. The next line, and all three branches at a checkpoint, are now preloaded so a tap starts at once (`upcoming()` in `player.ts`); switch time is still unmeasured on a real phone |
 | 6 | **Choral mic sensing** | ✅ Done | Suggests a branch; the teacher decides |
 | 7 | **Absentee catch-up calls** | 🟡 Built, not live | Queue, keypad simulator, real Exotel calling ([EXOTEL.md](EXOTEL.md)). **Not configured on Render; no real call made yet** |
 | 8 | **Studio + dashboard** | ✅ Done, beyond plan | Line editing, collapsible sidebar, charts, lesson-pipeline Kanban, **classroom feedback loop** |
@@ -32,6 +32,32 @@ The site white-screened on clicks and felt unstable. Found and fixed:
 **Built beyond the plan:** the Chalk & Marigold redesign with logo and favicon, the landing page, the teacher app in three languages, in-app lesson download, the classroom feedback loop (Claude rewrites the part classes struggled with), the guardrail evaluation, the cost model ([ROADMAP.md](ROADMAP.md#what-it-costs)), a daily cap on lesson generation, and keep-warm for the judging week (an uptime monitor on `/health`; the GitHub cron ran too rarely to rely on).
 
 **Deliberately cut, on the roadmap:** RAG over the curriculum, a job queue, mesh pods and micro-capsules. (Online Mode was cut too, then prototyped early: section 2.)
+
+## 1b. The pitch deck (Sahpaathi_A1pha.pdf), claim by claim
+The deck is the reason we were selected, so its core loop comes first. Checked against the code on 25 Oct.
+
+| Deck claim | In the product | Gap |
+|---|---|---|
+| Teacher taps once; the episode is already on the phone | Library, one-tap start, zero prep screen | none |
+| 15-min home-language episode: call-and-response, slate tasks, songs | Episode schema, Claude scriptwriter, 3 districts, 8 chapters | deck says 20 Grade 1-3 episodes; we have 8 chapters |
+| Most / Some / Few tap picks an easier / core / stretch branch, offline | `player.ts`, airplane-mode tested, 10 s fallback, preloaded audio | not measured on the ₹7k phone |
+| Home language bridges to school language | Lines carry `lang`; handover checked by guardrail tier 1 | Santali: 0 of 42 phrases recorded |
+| Absent children get a free call-back | Queue, IVR flow, keypad simulator, Exotel client | not configured, no real call |
+| Packs move phone-to-phone, SD, weekly | Signed packs, Web Share, resumable download | live site refuses packs until `VITE_PACK_PUBLIC_KEY` is set; Nearby Share/SD are the OS file picker, not custom code |
+| Guardrails: rules, rubric, back-translation, native review | All four, 18/20 strict | native-speaker sign-off needs people |
+| Attendance, sync queue, CRP dashboard | Done | none |
+| "Plans the week around each grade's progress"; packs "re-tuned to the class" | Feedback loop rewrites weak parts; Today's plan card | Partly built: a **Today's plan** card on the lesson list suggests a new lesson, one the class struggled with, or the one played longest ago, with what to keep ready (`teacher/plan.ts`, from the phone's own taps, offline). Packs are not re-tuned automatically: say "re-tuned from feedback" |
+| Bhashini / IndicTrans2 / RAG pgvector / Kotlin app | Sarvam TTS, PWA | the deck's stack slide differs from what shipped; update it |
+
+**Teacher app, 25 Oct (all phone-tested on a moto g34):** five built-in practice lessons in different activity types (pebble task, slate, pair work, song, story: `content/samples/`), a **class-settings panel** (speech speed, longer time to answer, voice boost up to 2x, large text), a **room-noise check** that sets the boost for you (honest limit: it makes the voice louder and slower, it cannot remove noise), replay and skip a line, an **attention bell**, **continue from where you left off**, an end-of-lesson **class summary**, and a restyled lit-blackboard look (hero card, slate cards, floating tab bar). The room check and voice boost need a real microphone/audio permission and were not exercised on the phone.
+
+**Plan and record (25 Oct):** a **Plan** tab. The teacher picks a subject folder (Maths, Language), then a grade box, and that grade's topics line up in teaching order on the days she teaches (she can move any topic, or press *Arrange for me*: new topics first, then ones her class found hard). Each topic has a **Record** button: she reads the lines in her own voice (the phone's noise suppression and echo cancellation are on), listens back, saves it on the phone, and sends it. The server stores it and an AI reviews it (Sarvam speech-to-text, then Claude Haiku: clarity, accuracy, pace, child-friendliness, safety, tips); the review comes back into the app. Recordings queue on the phone until she is signed in and online. Backend: `app/recordings.py`, 6 tests; app: `Timetable.tsx`, `Recorder.tsx`, `schedule.ts`, `recordings.ts`. Tested end to end against a local backend with a synthetic microphone (upload, storage, and the real Sarvam speech-to-text call worked). **Not yet tested:** a real human voice on a phone, and the Claude review step (needs `ANTHROPIC_API_KEY`, which Render has). The recording is for the teacher's own use and review; playing it back as the lesson audio is not built.
+
+Also added after phone testing (moto g34, driven over Chrome's debug port): Pause/Resume, screen kept awake during a lesson, and a confirm before leaving a lesson mid-way. Phone-tested: Most and Few taps switch branches, the Hindi bridge plays, the lesson finishes.
+
+The Vercel project is not visible to the `loktrishal` account, so `VITE_PACK_PUBLIC_KEY` must be set by Harsha.
+
+What blocks the rest is config and people, not code: Vercel key, Exotel, Santali speaker, native reviewers, a real-phone test.
 
 ## 2. Online Mode: built early as a prototype, live with the camera off
 Planned on 18 Oct as a 1-on-1 AI tutor for connected learners, to be prototyped only in the Top 10 stage on a separate branch. **A working prototype was built on 21 Oct** and is in `main`. Plan and feature-by-feature status: [MODES.md](MODES.md); the camera part: [SENSE.md](SENSE.md).

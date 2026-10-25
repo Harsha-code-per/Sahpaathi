@@ -124,6 +124,13 @@ export interface PartTaps {
   auto: number
 }
 
+/** The lesson's headings in English (the line-by-line English is already in the review). */
+export interface Headings {
+  title: string
+  materials: string[]
+  segments: Record<string, { title: string; checkpoint: string }>
+}
+
 export const api = {
   login: (email: string, password: string) => call<{ token: string; role: string; name: string }>('/auth/login', post({ email, password })),
   catalog: () => call<Catalog>('/catalog'),
@@ -132,6 +139,7 @@ export const api = {
   generate: (lesson_id: string, district_id: string) => call<Summary>('/episodes', post({ lesson_id, district_id })),
   decide: (id: number, decision: 'approve' | 'reject', notes: string) => call<Detail>(`/episodes/${id}/review`, post({ decision, notes })),
   editLine: (id: number, lineId: string, text: string) => call<Detail>(`/episodes/${id}/lines/${lineId}`, { method: 'PATCH', body: JSON.stringify({ text }) }),
+  english: (id: number) => call<Headings>(`/episodes/${id}/english`),
   classroom: (id: number) => call<PartTaps[]>(`/episodes/${id}/classroom`),
   /** Claude rewrites one part as a new version, which then goes through review like any lesson. */
   rewrite: (id: number, segmentId: string, note: string) => call<Summary>(`/episodes/${id}/segments/${segmentId}/rewrite`, post({ note })),

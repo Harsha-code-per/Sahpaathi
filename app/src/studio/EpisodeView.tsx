@@ -5,8 +5,8 @@ import { cn } from 'cn'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import type { Episode, Line } from '../lib/types'
-import { api, ApiError, type Detail, type Edit, type Issue, type PartTaps, type Status } from './api'
-import { badge, CRITERIA, LANG_NAMES, STATUS, glossById, issuesByLine, minutes, schoolShare, svgDataUrl } from './view'
+import { api, ApiError, type Detail, type Edit, type Headings, type Issue, type PartTaps, type Status } from './api'
+import { badge, CRITERIA, LANG_NAMES, STATUS, glossById, issuesByLine, minutes, schoolShare, svgDataUrl, type View } from './view'
 
 const POLL_MS = 5000
 const SPEAKER: Record<Line['speaker'], string | null> = { guide: null, child: 'Child voice', song: 'Sung' }
@@ -34,6 +34,7 @@ function IssueNote({ issue }: { issue: Issue }) {
 }
 
 interface LineCtx {
+  view: View
   ep: Episode
   gloss: Map<string, string>
   issues: Map<string, Issue[]>
@@ -96,6 +97,7 @@ function LineRow({ line, ctx }: { line: Line; ctx: LineCtx }) {
   const notes = ctx.issues.get(line.id) ?? []
   const edit = ctx.edits[line.id]
   const gloss = ctx.gloss.get(line.id)
+  const english = ctx.view === 'english' && gloss !== undefined
   return (
     <li
       id={`line-${line.id}`}
@@ -109,12 +111,12 @@ function LineRow({ line, ctx }: { line: Line; ctx: LineCtx }) {
           {editing && ctx.onEdit ? (
             <LineEditor line={line} onSave={(text) => ctx.onEdit!(line.id, text)} onDone={() => setEditing(false)} />
           ) : (
-            <p lang={line.lang} className="text-lg leading-relaxed">
-              {line.text}
+            <p lang={english ? 'en' : line.lang} className="text-lg leading-relaxed">
+              {english ? gloss : line.text}
             </p>
           )}
           <p className="text-[0.8125rem] text-muted-foreground">
-            {LANG_NAMES[line.lang]}
+            {english ? 'English (translated by the AI reviewer)' : LANG_NAMES[line.lang]}
             {SPEAKER[line.speaker] && ` · ${SPEAKER[line.speaker]}`}
             {line.pause_after_sec > 0 && ` · then a ${line.pause_after_sec} s pause`}
             <span> · {line.id}</span>
@@ -128,8 +130,19 @@ function LineRow({ line, ctx }: { line: Line; ctx: LineCtx }) {
         </div>
         <div className="flex items-start justify-between gap-3">
           <p className="leading-relaxed text-muted-foreground">
-            {edit && gloss && <span className="text-xs font-semibold">English of the original line: </span>}
-            {gloss ?? 'No English translation.'}
+            {english ? (
+              <>
+                <span className="block text-xs font-semibold">What the children hear ({LANG_NAMES[line.lang]})</span>
+                <span lang={line.lang} className="text-base">
+                  {line.text}
+                </span>
+              </>
+            ) : (
+              <>
+                {edit && gloss && <span className="text-xs font-semibold">English of the original line: </span>}
+                {gloss ?? 'No English translation.'}
+              </>
+            )}
           </p>
           {ctx.onEdit && !editing && (
             <Button size="icon" variant="ghost" aria-label={`Edit line ${line.id}`} title="Edit line" onClick={() => setEditing(true)}>
@@ -246,7 +259,20 @@ function InClass({ part, onRewrite }: { part?: PartTaps; onRewrite?: (note: stri
   )
 }
 
-function Script({ ep, ctx, parts: taps, onRewrite }: { ep: Episode; ctx: LineCtx; parts: PartTaps[]; onRewrite?: (segmentId: string, note: string) => Promise<void> }) {
+function Script({
+  ep,
+  ctx,
+  parts: taps,
+  headings,
+  onRewrite,
+}: {
+  ep: Episode
+  ctx: LineCtx
+  parts: PartTaps[]
+  headings: Headings | null
+  onRewrite?: (segmentId: string, note: string) => Promise<void>
+}) {
+  const en = ctx.view === 'english' ? headings : null
   const parts = [
     ...ep.segments.map((s, i) => ({ id: s.id, label: `Part ${i + 1}`, lines: [...s.teach, ...s.easier, ...s.core, ...s.stretch] })),
     { id: 'analogy', label: 'Analogy', lines: ep.analogy },
@@ -272,13 +298,21 @@ function Script({ ep, ctx, parts: taps, onRewrite }: { ep: Episode; ctx: LineCtx
       {ep.segments.map((s, i) => (
         <TabsContent key={s.id} value={s.id} keepMounted className={cn(card, 'space-y-4 text-base')}>
           <div className="space-y-2">
-            <h3 className="font-heading text-xl font-bold">{s.title}</h3>
+            <h3 className="font-heading text-xl font-bold" lang={en?.segments[s.id] ? 'en' : ep.school_lang}>
+              {en?.segments[s.id]?.title ?? s.title}
+            </h3>
+            {en?.segments[s.id] && (
+              <p className="text-sm text-muted-foreground">
+                Original title: <span lang={ep.school_lang}>{s.title}</span>
+              </p>
+            )}
             <Handover ep={ep} index={i} />
           </div>
           <InClass part={taps.find((t) => t.segment_id === s.id)} onRewrite={onRewrite && ((note) => onRewrite(s.id, note))} />
           <Lines lines={s.teach} ctx={ctx} />
           <p className="rounded-xl bg-sidebar px-4 py-3 text-sidebar-foreground">
-            <span className="font-semibold text-sidebar-primary">Teacher checks:</span> <span lang={ep.school_lang}>{s.checkpoint}</span>
+            <span className="font-semibold text-sidebar-primary">Teacher checks:</span>{' '}
+            <span lang={en?.segments[s.id] ? 'en' : ep.school_lang}>{en?.segments[s.id]?.checkpoint ?? s.checkpoint}</span>
           </p>
           {BRANCHES.map((b) => (
             <div key={b.part}>
@@ -364,17 +398,30 @@ export default function EpisodeView(props: {
   onBack: () => void
   onChanged: () => void
   onError: (e: unknown) => void
+  view: View
   /** Opens another version, e.g. the rewrite just started. */
   onOpen: (id: number) => void
 }) {
-  const { id, status, onChanged, onError, onOpen } = props
+  const { id, status, view, onChanged, onError, onOpen } = props
   const [detail, setDetail] = useState<Detail | null>(null)
   const [taps, setTaps] = useState<PartTaps[]>([])
+  const [english, setEnglish] = useState<{ id: number; headings: Headings } | null>(null)
+  const headings = english?.id === id ? english.headings : null
 
   const load = useCallback(() => api.episode(id).then(setDetail, onError), [id, onError])
   useEffect(() => {
     load()
   }, [load, status]) // reload when the list sees the status change (e.g. writing → needs review)
+
+  const hasEpisode = detail?.episode != null
+  useEffect(() => {
+    // without the translation the headings simply stay in the lesson's own language
+    if (view === 'english' && hasEpisode)
+      api.english(id).then(
+        (h) => setEnglish({ id, headings: h }),
+        () => undefined,
+      )
+  }, [id, view, hasEpisode])
 
   const reviewable = detail?.status === 'in_review' || detail?.status === 'approved'
   useEffect(() => {
@@ -407,7 +454,7 @@ export default function EpisodeView(props: {
           }
         }
       : undefined
-  const ctx: LineCtx | null = ep ? { ep, gloss: glossById(detail.review), issues: issuesByLine(ep, detail.review), edits, onEdit } : null
+  const ctx: LineCtx | null = ep ? { view, ep, gloss: glossById(detail.review), issues: issuesByLine(ep, detail.review), edits, onEdit } : null
   const edited = Object.keys(edits).length
   const general = ctx?.issues.get('episode') ?? []
   const main = ep ? ep.segments.flatMap((s) => [...s.teach, ...s.core]) : []
@@ -425,9 +472,14 @@ export default function EpisodeView(props: {
               {Math.round(minutes(main))} min
             </p>
           )}
-          <h1 className="font-heading text-3xl leading-tight font-bold" lang={ep?.school_lang}>
-            {ep?.title ?? 'Writing this lesson…'}
+          <h1 className="font-heading text-3xl leading-tight font-bold" lang={view === 'english' && headings ? 'en' : ep?.school_lang}>
+            {(view === 'english' && headings?.title) || ep?.title || 'Writing this lesson…'}
           </h1>
+          {view === 'english' && headings && ep && (
+            <p className="text-muted-foreground">
+              Original title: <span lang={ep.school_lang}>{ep.title}</span>
+            </p>
+          )}
           {detail.status === 'generating' && (
             <p className="text-muted-foreground" aria-live="polite">
               Claude is writing and reviewing it. This page updates by itself.
@@ -476,8 +528,8 @@ export default function EpisodeView(props: {
           <section className={cn(card, 'flex flex-wrap gap-6')}>
             <div className="min-w-48 flex-1">
               <h2 className="font-semibold">Before class</h2>
-              <ul className="mt-1 list-disc pl-5 text-muted-foreground" lang={ep.school_lang}>
-                {ep.materials.map((m) => (
+              <ul className="mt-1 list-disc pl-5 text-muted-foreground" lang={view === 'english' && headings?.materials.length === ep.materials.length ? 'en' : ep.school_lang}>
+                {(view === 'english' && headings?.materials.length === ep.materials.length ? headings.materials : ep.materials).map((m) => (
                   <li key={m}>{m}</li>
                 ))}
               </ul>
@@ -488,7 +540,13 @@ export default function EpisodeView(props: {
             </figure>
           </section>
 
-          <Script ep={ep} ctx={ctx} parts={taps} onRewrite={reviewable ? async (segmentId, note) => onOpen((await api.rewrite(id, segmentId, note)).id) : undefined} />
+          <Script
+            ep={ep}
+            ctx={ctx}
+            parts={taps}
+            headings={headings}
+            onRewrite={reviewable ? async (segmentId, note) => onOpen((await api.rewrite(id, segmentId, note)).id) : undefined}
+          />
           <Decision detail={detail} onDecided={(d) => (setDetail(d), onChanged())} onError={onError} />
         </>
       )}
