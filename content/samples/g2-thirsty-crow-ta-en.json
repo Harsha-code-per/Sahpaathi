@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "id": "g2-thirsty-crow-ta-en",
+  "title": "The thirsty crow",
+  "grade": 2,
+  "subject": "literacy",
+  "nipun_lo": "L2.4",
+  "home_lang": "ta",
+  "school_lang": "en",
+  "district": "Chennai",
+  "duration_min": 6,
+  "materials": [
+    "a small pot and a few pebbles if you have them"
+  ],
+  "chalk_sketch_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 40\" fill=\"none\" stroke=\"black\" stroke-width=\"3\"><path d=\"M60 34V16c0-6 12-6 12 0v18z\"/><circle cx=\"30\" cy=\"30\" r=\"3\"/><circle cx=\"40\" cy=\"31\" r=\"3\"/><circle cx=\"20\" cy=\"31\" r=\"3\"/></svg>",
+  "segments": [
+    {
+      "id": "s1",
+      "title": "The crow finds a pot",
+      "activity": "story",
+      "teach": [
+        {
+          "id": "s1-t-1",
+          "speaker": "guide",
+          "lang": "ta",
+          "text": "ஒரு காகம் தாகமாக இருந்தது.",
+          "pause_after_sec": 4,
+          "cue": null
+        },
+        {
+          "id": "s1-t-2",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "A crow was very thirsty. It flew and flew. It found a pot with a little water at the bottom.",
+          "pause_after_sec": 6,
+          "cue": null
+        },
+        {
+          "id": "s1-t-3",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "The crow could not reach the water. What should the crow do? Think.",
+          "pause_after_sec": 8,
+          "cue": "Children think and whisper ideas"
+        }
+      ],
+      "checkpoint": "Did most children have an idea?",
+      "easier": [
+        {
+          "id": "s1-e-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Its beak is short. The water is low. What could make the water come up?",
+          "pause_after_sec": 8,
+          "cue": null
+        }
+      ],
+      "core": [
+        {
+          "id": "s1-c-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Good ideas. Let us listen to what the crow did.",
+          "pause_after_sec": 4,
+          "cue": null
+        }
+      ],
+      "stretch": [
+        {
+          "id": "s1-x-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Tell your partner your idea, and why it could work.",
+          "pause_after_sec": 12,
+          "cue": "Pairs share ideas"
+        }
+      ],
+      "math_checks": []
+    },
+    {
+      "id": "s2",
+      "title": "The crow drops stones",
+      "activity": "story",
+      "teach": [
+        {
+          "id": "s2-t-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "The crow saw some pebbles. It dropped them into the pot, one by one.",
+          "pause_after_sec": 6,
+          "cue": "Drop a pebble in a pot if you have one"
+        },
+        {
+          "id": "s2-t-2",
+          "speaker": "guide",
+          "lang": "ta",
+          "text": "தண்ணீர் மேலே வந்தது. காகம் தண்ணீர் குடித்தது.",
+          "pause_after_sec": 5,
+          "cue": null
+        },
+        {
+          "id": "s2-t-3",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "The water came up. The crow drank and flew away happy.",
+          "pause_after_sec": 5,
+          "cue": null
+        }
+      ],
+      "checkpoint": "Did most children say the crow dropped stones?",
+      "easier": [
+        {
+          "id": "s2-e-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "What did the crow drop in the pot? Stones. Say stones.",
+          "pause_after_sec": 6,
+          "cue": null
+        }
+      ],
+      "core": [
+        {
+          "id": "s2-c-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Why did the water come up? Because the stones took up space.",
+          "pause_after_sec": 6,
+          "cue": null
+        }
+      ],
+      "stretch": [
+        {
+          "id": "s2-x-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "What is the lesson of the story? Think and tell your partner.",
+          "pause_after_sec": 12,
+          "cue": "Pairs discuss the lesson"
+        }
+      ],
+      "math_checks": []
+    },
+    {
+      "id": "s3",
+      "title": "Tell it back",
+      "activity": "pair_work",
+      "teach": [
+        {
+          "id": "s3-t-1",
+          "speaker": "guide",
+          "lang": "ta",
+          "text": "கதையை உங்கள் நண்பரிடம் சொல்லுங்கள்.",
+          "pause_after_sec": 4,
+          "cue": null
+        },
+        {
+          "id": "s3-t-2",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Tell the story to your partner. First, next, last.",
+          "pause_after_sec": 20,
+          "cue": "Pairs retell the story"
+        }
+      ],
+      "checkpoint": "Did most pairs retell the story?",
+      "easier": [
+        {
+          "id": "s3-e-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Start together. First, the crow was thirsty. Next?",
+          "pause_after_sec": 10,
+          "cue": null
+        }
+      ],
+      "core": [
+        {
+          "id": "s3-c-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Well done. One pair can tell it to the class.",
+          "pause_after_sec": 10,
+          "cue": "Invite one pair"
+        }
+      ],
+      "stretch": [
+        {
+          "id": "s3-x-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Now change the story. What if the pot had no pebbles near it?",
+          "pause_after_sec": 14,
+          "cue": "Pairs invent a new ending"
+        }
+      ],
+      "math_checks": []
+    }
+  ],
+  "analogy": [
+    {
+      "id": "a-1",
+      "speaker": "guide",
+      "lang": "en",
+      "text": "It is like drinking juice with a straw. If the juice is low, you cannot reach it. Add something and it rises.",
+      "pause_after_sec": 7,
+      "cue": null
+    }
+  ],
+  "ivr_recap": [
+    {
+      "id": "r-1",
+      "speaker": "guide",
+      "lang": "ta",
+      "text": "காகம் கற்களைப் போட்டுத் தண்ணீர் குடித்தது.",
+      "pause_after_sec": 3,
+      "cue": null
+    },
+    {
+      "id": "r-2",
+      "speaker": "guide",
+      "lang": "en",
+      "text": "Ask your family: what did the crow do when it was thirsty?",
+      "pause_after_sec": 5,
+      "cue": null
+    }
+  ]
+}

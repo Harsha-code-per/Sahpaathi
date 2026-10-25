@@ -7,7 +7,7 @@ import { listPacks } from '../packs/store'
 import type { ClassroomRecord, OutboxEvent } from '../storage/db'
 import { absences, attendanceLog, clearHistory, lessonResults, listHistory } from '../storage/history'
 import { useT } from './i18n'
-import { samplePack } from './samplePack'
+import { samplePacks } from './samplePack'
 
 const bar = { most: '#3fb8a0', some: '#f4b23e', few: '#e8704a' }
 const day = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
@@ -26,7 +26,7 @@ export default function MyClass() {
   const load = useCallback(async () => {
     const [history, packs, room] = await Promise.all([listHistory(), listPacks(), getClassroom()])
     setEvents(history)
-    setTitles(new Map([[samplePack.episode.id, samplePack.episode.title], ...packs.map((p) => [p.episode.id, p.episode.title] as const)]))
+    setTitles(new Map([...samplePacks.map((s) => [s.episode.id, s.episode.title] as const), ...packs.map((p) => [p.episode.id, p.episode.title] as const)]))
     setClassroom(room)
   }, [])
   useEffect(() => {

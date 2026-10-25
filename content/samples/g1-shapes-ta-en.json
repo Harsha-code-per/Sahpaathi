@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "id": "g1-shapes-ta-en",
+  "title": "Shapes around us",
+  "grade": 1,
+  "subject": "numeracy",
+  "nipun_lo": "N1.5",
+  "home_lang": "ta",
+  "school_lang": "en",
+  "district": "Chennai",
+  "duration_min": 5,
+  "materials": [
+    "chalk or a stick to draw in the dust",
+    "slate"
+  ],
+  "chalk_sketch_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 40\" fill=\"none\" stroke=\"black\" stroke-width=\"3\"><circle cx=\"22\" cy=\"20\" r=\"14\"/><rect x=\"46\" y=\"6\" width=\"28\" height=\"28\"/><path d=\"M82 34l16-28 16 28z\"/></svg>",
+  "segments": [
+    {
+      "id": "s1",
+      "title": "Round things",
+      "activity": "call_response",
+      "teach": [
+        {
+          "id": "s1-t-1",
+          "speaker": "guide",
+          "lang": "ta",
+          "text": "இது வட்டம். வட்டம் உருண்டையாக இருக்கும்.",
+          "pause_after_sec": 4,
+          "cue": null
+        },
+        {
+          "id": "s1-t-2",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "This is a circle. Say it: circle.",
+          "pause_after_sec": 4,
+          "cue": "Children repeat: circle"
+        },
+        {
+          "id": "s1-t-3",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Find something round in the room. Point to it.",
+          "pause_after_sec": 8,
+          "cue": "Children point to round things"
+        }
+      ],
+      "checkpoint": "Did most children point to something round?",
+      "easier": [
+        {
+          "id": "s1-e-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Look at the sun and a coin. They are round. Circle.",
+          "pause_after_sec": 6,
+          "cue": "Show a coin or draw the sun"
+        }
+      ],
+      "core": [
+        {
+          "id": "s1-c-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "A plate is a circle. A wheel is a circle. Say circle.",
+          "pause_after_sec": 5,
+          "cue": null
+        }
+      ],
+      "stretch": [
+        {
+          "id": "s1-x-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Draw a circle on your slate. Draw a smaller circle inside it.",
+          "pause_after_sec": 12,
+          "cue": "Children draw circles"
+        }
+      ],
+      "math_checks": []
+    },
+    {
+      "id": "s2",
+      "title": "Square and triangle",
+      "activity": "slate",
+      "teach": [
+        {
+          "id": "s2-t-1",
+          "speaker": "guide",
+          "lang": "ta",
+          "text": "இது சதுரம். இது முக்கோணம்.",
+          "pause_after_sec": 4,
+          "cue": null
+        },
+        {
+          "id": "s2-t-2",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "A square has four equal sides. A triangle has three sides.",
+          "pause_after_sec": 6,
+          "cue": "Draw both on the board"
+        },
+        {
+          "id": "s2-t-3",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Draw a triangle on your slate.",
+          "pause_after_sec": 12,
+          "cue": "Children draw a triangle"
+        }
+      ],
+      "checkpoint": "Did most children draw a triangle?",
+      "easier": [
+        {
+          "id": "s2-e-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Three lines. One, two, three. That makes a triangle.",
+          "pause_after_sec": 8,
+          "cue": "Draw it slowly, line by line"
+        }
+      ],
+      "core": [
+        {
+          "id": "s2-c-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Now draw a square. Count the four sides.",
+          "pause_after_sec": 12,
+          "cue": "Children draw a square"
+        }
+      ],
+      "stretch": [
+        {
+          "id": "s2-x-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Look around. Find a square and a triangle. Tell your partner.",
+          "pause_after_sec": 14,
+          "cue": "Pairs find shapes"
+        }
+      ],
+      "math_checks": []
+    }
+  ],
+  "analogy": [
+    {
+      "id": "a-1",
+      "speaker": "guide",
+      "lang": "en",
+      "text": "A roti is round like a circle. A window is a square. Look for them at home.",
+      "pause_after_sec": 6,
+      "cue": null
+    }
+  ],
+  "ivr_recap": [
+    {
+      "id": "r-1",
+      "speaker": "guide",
+      "lang": "ta",
+      "text": "வட்டம், சதுரம், முக்கோணம்.",
+      "pause_after_sec": 3,
+      "cue": null
+    },
+    {
+      "id": "r-2",
+      "speaker": "guide",
+      "lang": "en",
+      "text": "Find one circle at home and tell your family.",
+      "pause_after_sec": 4,
+      "cue": null
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+/* The classroom look: a lit blackboard (marigold lamp top right, teal chalk-dust bottom left), fine chalk grain,
+   cards that sit on it like slate with a lit edge, and one warm hero card. Motion is a short rise on arrival and a
+   press squeeze: nothing loops, and prefers-reduced-motion switches it all off (index.css). */
+
+.board-bg {
+  position: relative;
+  background:
+    radial-gradient(120% 55% at 92% -8%, rgb(244 178 62 / 0.2), transparent 60%),
+    radial-gradient(90% 50% at -12% 104%, rgb(63 184 160 / 0.16), transparent 60%),
+    var(--background);
+}
+.board-bg::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.07;
+  mix-blend-mode: screen;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 .9  0 0 0 .7 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.board-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
+.slate-card {
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.055), rgb(255 255 255 / 0.015)), var(--card);
+  border: 1px solid rgb(255 255 255 / 0.09);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.07),
+    0 14px 30px -16px rgb(0 0 0 / 0.65);
+}
+
+/* The one warm card: today's lesson. Sound rings radiate from the corner, as in the logo. */
+.hero-card {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: linear-gradient(140deg, #f8c963 0%, #f4b23e 48%, #e9913a 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.5),
+    0 24px 44px -20px rgb(244 178 62 / 0.55);
+}
+.hero-card::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  right: -90px;
+  top: -90px;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle, transparent 0 22px, rgb(23 37 36 / 0.1) 22px 24px);
+}
+
+.press {
+  transition:
+    transform 0.12s ease-out,
+    filter 0.12s;
+}
+.press:active {
+  transform: scale(0.975);
+  filter: brightness(1.06);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise > * {
+  animation: rise 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.rise > *:nth-child(2) { animation-delay: 60ms; }
+.rise > *:nth-child(3) { animation-delay: 120ms; }
+.rise > *:nth-child(4) { animation-delay: 180ms; }
+.rise > *:nth-child(5) { animation-delay: 240ms; }
+.rise > *:nth-child(n + 6) { animation-delay: 300ms; }
+
+/* Floating tab bar: glass, with the active tab lit by a marigold pill. */
+.dock {
+  background: rgb(23 37 36 / 0.78);
+  backdrop-filter: blur(16px) saturate(1.4);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  box-shadow: 0 18px 40px -14px rgb(0 0 0 / 0.7);
+}
+
+/* Lesson text card in the player: a lit top edge and a faint ruled-slate texture. */
+.chalk-line {
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.06), rgb(255 255 255 / 0.015)),
+    repeating-linear-gradient(0deg, transparent 0 46px, rgb(255 255 255 / 0.035) 46px 47px),
+    var(--card);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.09),
+    0 22px 40px -20px rgb(0 0 0 / 0.7);
+}

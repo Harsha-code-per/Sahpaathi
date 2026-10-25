@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "id": "g1-count-song-ta-en",
+  "title": "The counting song",
+  "grade": 1,
+  "subject": "numeracy",
+  "nipun_lo": "N1.2",
+  "home_lang": "ta",
+  "school_lang": "en",
+  "district": "Chennai",
+  "duration_min": 5,
+  "materials": [
+    "none: clapping and fingers only"
+  ],
+  "chalk_sketch_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 40\" fill=\"none\" stroke=\"black\" stroke-width=\"3\"><path d=\"M16 34V10M34 34V6M52 34V4M70 34V6M88 34V10\"/></svg>",
+  "segments": [
+    {
+      "id": "s1",
+      "title": "Clap and count",
+      "activity": "song",
+      "teach": [
+        {
+          "id": "s1-t-1",
+          "speaker": "guide",
+          "lang": "ta",
+          "text": "கை தட்டி எண்ணுவோம்!",
+          "pause_after_sec": 3,
+          "cue": "Children get ready to clap"
+        },
+        {
+          "id": "s1-t-2",
+          "speaker": "song",
+          "lang": "en",
+          "text": "One, two, clap clap. Three, four, stamp stamp.",
+          "pause_after_sec": 6,
+          "cue": "Children clap and stamp"
+        },
+        {
+          "id": "s1-t-3",
+          "speaker": "song",
+          "lang": "en",
+          "text": "Five, six, jump jump. Seven, eight, wave wave.",
+          "pause_after_sec": 6,
+          "cue": "Children jump and wave"
+        }
+      ],
+      "checkpoint": "Did most children keep the beat?",
+      "easier": [
+        {
+          "id": "s1-e-1",
+          "speaker": "song",
+          "lang": "en",
+          "text": "Slower now. One, two, clap clap.",
+          "pause_after_sec": 5,
+          "cue": "Clap slowly"
+        }
+      ],
+      "core": [
+        {
+          "id": "s1-c-1",
+          "speaker": "song",
+          "lang": "en",
+          "text": "Again from the start! One, two, clap clap. Three, four, stamp stamp.",
+          "pause_after_sec": 6,
+          "cue": null
+        }
+      ],
+      "stretch": [
+        {
+          "id": "s1-x-1",
+          "speaker": "song",
+          "lang": "en",
+          "text": "Faster this time! Can you sing it to ten?",
+          "pause_after_sec": 8,
+          "cue": "Children sing to ten"
+        }
+      ],
+      "math_checks": []
+    },
+    {
+      "id": "s2",
+      "title": "Ten fingers",
+      "activity": "call_response",
+      "teach": [
+        {
+          "id": "s2-t-1",
+          "speaker": "guide",
+          "lang": "ta",
+          "text": "பத்து விரல்கள் காட்டுங்கள்.",
+          "pause_after_sec": 4,
+          "cue": "Children show ten fingers"
+        },
+        {
+          "id": "s2-t-2",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Show me ten fingers. Fold one down. How many are left?",
+          "pause_after_sec": 6,
+          "cue": "Children fold one finger"
+        },
+        {
+          "id": "s2-t-3",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Nine! Say it: nine.",
+          "pause_after_sec": 4,
+          "cue": null
+        }
+      ],
+      "checkpoint": "Did most children say nine?",
+      "easier": [
+        {
+          "id": "s2-e-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Count your fingers with me. One, two, three... all the way to ten.",
+          "pause_after_sec": 10,
+          "cue": "Touch each finger"
+        }
+      ],
+      "core": [
+        {
+          "id": "s2-c-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Fold another. Eight left. Say eight.",
+          "pause_after_sec": 5,
+          "cue": null
+        }
+      ],
+      "stretch": [
+        {
+          "id": "s2-x-1",
+          "speaker": "guide",
+          "lang": "en",
+          "text": "Fold three fingers. How many are left? Tell your partner.",
+          "pause_after_sec": 8,
+          "cue": "Pairs answer"
+        }
+      ],
+      "math_checks": [
+        {
+          "expr": "10 - 1",
+          "answer": 9
+        },
+        {
+          "expr": "10 - 2",
+          "answer": 8
+        },
+        {
+          "expr": "10 - 3",
+          "answer": 7
+        }
+      ]
+    }
+  ],
+  "analogy": [
+    {
+      "id": "a-1",
+      "speaker": "guide",
+      "lang": "en",
+      "text": "Count like drum beats. One beat, two beats, three beats.",
+      "pause_after_sec": 5,
+      "cue": null
+    }
+  ],
+  "ivr_recap": [
+    {
+      "id": "r-1",
+      "speaker": "guide",
+      "lang": "ta",
+      "text": "ஒன்று முதல் பத்து வரை எண்ணினோம்.",
+      "pause_after_sec": 3,
+      "cue": null
+    },
+    {
+      "id": "r-2",
+      "speaker": "guide",
+      "lang": "en",
+      "text": "Sing the counting song for your family tonight.",
+      "pause_after_sec": 4,
+      "cue": null
+    }
+  ]
+}

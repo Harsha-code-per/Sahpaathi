@@ -2,6 +2,7 @@ import { BookOpenIcon, CircleHelpIcon, UsersIcon } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from 'cn'
 import { useSync } from '../sync/useSync'
+import './teacher.css'
 import Help from './Help'
 import Library, { type OpenLesson } from './Library'
 import LessonPlayer from './LessonPlayer'
@@ -24,12 +25,12 @@ function Home({ onOpen, pending }: { onOpen: (lesson: OpenLesson) => void; pendi
     <>
       {tab === 'lessons' && <Library onOpen={onOpen} pending={pending} />}
       {tab !== 'lessons' && (
-        <main className="theme-board min-h-dvh bg-background text-foreground">
-          <div className="mx-auto max-w-xl px-5 pt-6 pb-28">{tab === 'class' ? <MyClass /> : <Help />}</div>
+        <main className="theme-board board-bg min-h-dvh text-foreground">
+          <div className="rise mx-auto max-w-xl px-5 pt-6 pb-32">{tab === 'class' ? <MyClass /> : <Help />}</div>
         </main>
       )}
-      <nav aria-label={t.tabsLabel} className="theme-board fixed inset-x-0 bottom-0 z-20 border-t border-border bg-background/95 backdrop-blur">
-        <ul className="mx-auto grid max-w-xl grid-cols-3">
+      <nav aria-label={t.tabsLabel} className="theme-board dock fixed inset-x-3 bottom-3 z-20 mx-auto max-w-md rounded-3xl">
+        <ul className="grid grid-cols-3 gap-1 p-1.5">
           {tabs.map(({ id, label, icon: Icon }) => (
             <li key={id}>
               <button
@@ -37,11 +38,11 @@ function Home({ onOpen, pending }: { onOpen: (lesson: OpenLesson) => void; pendi
                 onClick={() => setTab(id)}
                 aria-current={tab === id ? 'page' : undefined}
                 className={cn(
-                  'flex min-h-16 w-full flex-col items-center justify-center gap-1 text-sm font-semibold outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset',
-                  tab === id ? 'text-primary' : 'text-muted-foreground',
+                  'press flex min-h-14 w-full flex-col items-center justify-center gap-0.5 rounded-2xl text-xs font-semibold outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                  tab === id ? 'bg-primary text-primary-foreground shadow-[0_8px_18px_-8px_rgb(244_178_62/0.8)]' : 'text-muted-foreground',
                 )}
               >
-                <Icon className="size-6" aria-hidden />
+                <Icon className="size-5" aria-hidden />
                 {label}
               </button>
             </li>
