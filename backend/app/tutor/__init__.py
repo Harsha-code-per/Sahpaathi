@@ -104,9 +104,9 @@ def turn(body: TurnIn, brain: Brain, request: Request, db: DB) -> TurnOut:
 
 
 @router.post("/summary")
-def parent_summary(body: SummaryIn, brain: Brain) -> SummaryOut:
+def parent_summary(body: SummaryIn, brain: Brain, request: Request, db: DB) -> SummaryOut:
     """A short note in the learner's language to say aloud to a parent. Nothing about the learner is stored."""
-    _spend("chat", settings.tutor_daily_turns)
+    _spend(db, request, "chat", settings.tutor_daily_turns, settings.tutor_ip_daily_turns)
     try:
         return SummaryOut(
             text=brain.parent_summary(body.title, body.parts, body.revise, body.language)
