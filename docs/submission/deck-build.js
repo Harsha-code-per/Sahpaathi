@@ -54,7 +54,7 @@ const REPO = "https://github.com/Harsha-code-per/Sahpaathi";
       ["Bhashini, IndicTrans2, Indic TTS", "Sarvam Bulbul v3 voices", "Tamil, Hindi, Odia and English from one API"],
       ["RAG over textbooks (pgvector)", "Curated chapters + NIPUN outcomes", "8 chapters needed accuracy, not search"],
       ["22 languages, Santali to Odia showcase", "Lessons in Tamil, Hindi, English; Odia app text and voice ready", "No Odia lesson yet: it waits on Santali, with 0 of 42 phrases recorded"],
-      ["Free call-back on real phones", "Full IVR flow + keypad simulator", "Exotel code is ready; not yet connected to a live number"],
+      ["Free call-back on real phones", "Full IVR flow, tested in code", "Not live: needs a voiced pack (voice credits ran out) and an Exotel number"],
     ].map((r, i) => r.map((t) => ({ text: t, options: { bold: i === 0, color: i === 0 ? WHITE : INK, fill: { color: i === 0 ? SLATE : i % 2 ? WHITE : LIGHT } } })));
     s.addTable(rows, { x: 0.6, y: 4.27, w: 12.13, colW: [3.5, 3.9, 4.73], fontFace: "Calibri", fontSize: 11, border: { type: "none" }, rowH: 0.36, valign: "middle", margin: [3, 8, 3, 8] });
   }
@@ -238,9 +238,9 @@ const REPO = "https://github.com/Harsha-code-per/Sahpaathi";
     T(s, "Five sample inputs", { x: 0.6, y: 3.53, w: 8, h: 0.3, fontSize: 14, bold: true });
     const sample = [
       ["Teacher", "Open “Counting to three with pebbles”, read Set up the room, Start. Listen, tap Few got it, then Most got it at the next check. Let one check run out: it continues after 10 s."],
-      ["Teacher", "Under Lessons > Get new lessons, sign in and download “Numbers to 999” (Grade 3, Tamil). Turn on airplane mode and play the voiced lesson."],
-      ["Reviewer", "In /studio open the Grade 3 Madurai lesson. Read each Tamil line beside its back-translation and AI scores, correct a line with the pencil, then approve or reject."],
-      ["Admin", "In /admin load the labelled sample data to see the class-health board, then open Catch-up calls, queue roll number R-07, and press 1, 2 or 3 on the keypad simulator."],
+      ["Teacher", "Play “The thirsty crow” (Grade 2 story, Tamil and English). After the first page loads, turn on airplane mode: the voice still plays, and the end screen asks who was absent."],
+      ["Reviewer", "In /studio open Approved, then the Grade 3 Madurai lesson. Read each Tamil line beside its English back-translation and the six AI scores. “Write a new lesson” starts Claude (slow on the free server)."],
+      ["Admin", "In /admin open Overview and Classes: the class-health board, marked SAMPLE. Lesson packs and Catch-up calls need a voiced pack, which is not built on this demo (voice credits ran out)."],
       ["Parent helper", "In /tutor turn on Study and type “place value of two-digit numbers”. Answer one question wrongly, then say “explain in Hindi” and “I am tired”."],
     ];
     sample.forEach(([r, t], i) => {
