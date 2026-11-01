@@ -139,7 +139,7 @@ export default function Landing() {
           <div className="landing-reveal max-w-3xl space-y-4">
             <h2 className="font-heading text-4xl leading-tight font-extrabold md:text-5xl">Two modes. One curriculum.</h2>
             <p className="text-lg text-muted-foreground">
-              The classroom has no signal, so the classroom mode never needs one. A child with a phone and a connection gets a teacher of their own. Each works on its own.
+              The classroom has no signal, so the classroom mode never needs one. A parent at home with a phone and a connection gets a prototype helper. Each works on its own.
             </p>
           </div>
           <div className="grid gap-6 lg:grid-cols-2">
