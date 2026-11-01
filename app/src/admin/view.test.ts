@@ -9,6 +9,7 @@ import {
   endMessage,
   formatSize,
   KEYPAD,
+  keysOpen,
   lessonTitles,
   mixBar,
   packFilename,
@@ -153,4 +154,9 @@ test('weekSummary describes the first and last weeks with taps, and says when th
   ]
   expect(weekSummary(weeks)).toContain('went from 40% (8 Sep) to 55% (15 Sep)')
   expect(weekSummary([{ label: '1 Sep', Most: null, Few: null }])).toMatch(/no taps/)
+})
+
+test('the keypad works while the recap plays, not before dialling or after hanging up', () => {
+  expect(['playing', 'waiting'].map(keysOpen)).toEqual([true, true])
+  expect(['idle', 'sending', 'ended'].map(keysOpen)).toEqual([false, false, false])
 })
