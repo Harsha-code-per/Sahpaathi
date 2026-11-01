@@ -3,22 +3,22 @@
 Due **Sun 1 Nov 2026, 23:59 IST** on Hack2Skill. Target: **Sat 31 Oct, 18:00 IST**. Owner of this list: M1; each item has an owner.
 
 ## 1. Demo version
-- [ ] Hosted web link (app) works on desktop and Android Chrome, and stays up through 2–9 Nov (backend kept warm) (M4)
+- [x] Hosted web link (app) works on desktop and Android Chrome, and stays up through 2–9 Nov (backend kept warm) (M4)
 - [ ] Frozen: tag `v1.0-build`, no deploys after submitting (M4)
-- [ ] Test credentials for every role, in README: **teacher**, **reviewer** (native speaker / DIET), **admin** (CRP) (M4)
-- [ ] 3–5 sample inputs that show it at its best, in README (M1), e.g.:
+- [x] Test credentials for every role, in README: **teacher**, **reviewer** (native speaker / DIET), **admin** (CRP) (M4)
+- [x] 3–5 sample inputs that show it at its best, in README (M1), e.g.:
   - Grade 1 · counting to 20 · Chennai · Hindi → Tamil (migrant children)
   - Grade 2 · place value (tens and ones) · Madurai · Tamil (Santali → Odia once the phrase bank is recorded)
   - Grade 3 · subtraction with borrowing · Madurai · Tamil
   - "Need a simpler analogy" mid-episode, then airplane mode
   - Mark a child absent → catch-up call in the IVR simulator
-- [ ] Offline instructions for evaluators: install the PWA, turn on airplane mode, play (M2)
+- [x] Offline instructions for evaluators: install the PWA, turn on airplane mode, play (M2)
 
 ## 2. Source code
-- [ ] Repo public (open source = +$250 credits) or read access for the Tech4Dev evaluator IDs (M1)
-- [ ] README: setup, run locally, `backend/.env.example` + `app/.env.example`, **list of every external AI service/model and where keys are needed** (M1)
+- [x] Repo public (open source = +$250 credits) or read access for the Tech4Dev evaluator IDs (M1)
+- [x] README: setup, run locally, `backend/.env.example` + `app/.env.example`, **list of every external AI service/model and where keys are needed** (M1)
 - [ ] No secrets in git history (`git log -p | grep -iE "sk-ant|api_key="` is clean) (M4)
-- [ ] No real users' personal data (names, phones, photos, voices without consent) (all)
+- [x] No real users' personal data (names, phones, photos, voices without consent) (all)
 - [ ] No commits after the deadline (all)
 
 ## 3. Three-minute demo video (public YouTube)
