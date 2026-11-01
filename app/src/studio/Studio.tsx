@@ -69,10 +69,11 @@ function NewEpisode({ catalog, onStarted }: { catalog: Catalog; onStarted: (s: S
   )
 }
 
-type Filter = 'review' | 'approved' | 'all'
+type Filter = 'review' | 'approved' | 'failed' | 'all'
 const FILTERS: { key: Filter; label: string; match: (s: Status) => boolean }[] = [
-  { key: 'review', label: 'To review', match: (s) => s === 'in_review' || s === 'generating' || s === 'failed' },
+  { key: 'review', label: 'To review', match: (s) => s === 'in_review' || s === 'generating' },
   { key: 'approved', label: 'Approved', match: (s) => s === 'approved' },
+  { key: 'failed', label: 'Failed', match: (s) => s === 'failed' },
   { key: 'all', label: 'All', match: () => true },
 ]
 
@@ -238,7 +239,7 @@ export default function Studio() {
         <Button onClick={() => (setWritingOpen(true), close())}>
           <PlusIcon aria-hidden /> Write a new lesson
         </Button>
-        <div role="group" aria-label="Show" className="flex gap-1">
+        <div role="group" aria-label="Show" className="flex flex-wrap gap-1">
           {FILTERS.map((f) => (
             <button
               key={f.key}
