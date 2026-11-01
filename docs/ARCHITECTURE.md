@@ -42,6 +42,6 @@ flowchart LR
 | Generating / reviewing episodes (Studio) | Yes (cloud) | Not on the classroom path |
 
 ## Stack
-- **App:** Vite + React + TypeScript + Tailwind + vite-plugin-pwa. Packs stored in IndexedDB/Cache API; branch audio pre-decoded with Web Audio for instant switching. Hosted on Vercel / Cloudflare Pages.
+- **App:** Vite + React + TypeScript + Tailwind + vite-plugin-pwa. Packs stored in IndexedDB/Cache API; the next line and all three branches are preloaded so a tap starts at once. Hosted on Vercel / Cloudflare Pages.
 - **Backend:** FastAPI + SQLAlchemy + Alembic + Postgres (Neon). ffmpeg for audio. Docker on Render. Packs on Cloudflare R2.
 - **Hardware:** any ₹7k Android (Chrome) + ₹500 Bluetooth speaker (3.5 mm AUX fallback); any keypad phone for the call.
