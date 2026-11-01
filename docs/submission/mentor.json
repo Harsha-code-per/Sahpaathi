@@ -1,0 +1,11 @@
+{"title":"An education mentor's review reset our positioning",
+"subtitle":"40-minute live demo with an education mentor from Central Square Foundation, 21 Oct. Findings logged in docs/TESTING_LOG.md.",
+"rows":[
+["“Second teacher” overclaims: in a noisy room a speaker alone may not solve active learning","Now a classroom companion: it helps the teacher manage groups, and does not replace her","Landing page, README, deck, video"],
+["You can claim engagement at this stage, not that learning happened","We claim engagement only. No learning gain is claimed","README, Evidence page"],
+["How does it look in action? The direction must reach the teacher","“Set up the room” before every lesson: teacher with those who need her most, one child as helper, in 4 languages","Teacher app, lesson prep"],
+["Grade 1–3 children cannot run the study mode alone; it can serve parents","/tutor is now a labelled prototype parent helper, off the home hero, with a short spoken note for parents","/tutor, landing page"],
+["Few features that work beat many. Is the script engaging for a Grade 2 child?","Effort moved back to the classroom loop: five activity types (pebble, slate, pair work, song, story) and teacher controls","Built-in lessons, class settings"],
+["Indic models err at scale; launch with a data caveat. Use state teacher guides as input","Not done yet: on the roadmap. Native-speaker sign-off stays a required guardrail","Roadmap"]],
+"status":"This is one expert review, plus the team's own device tests. No teacher or child has used it yet in a real classroom, and no learning outcome has been measured. Teacher sessions with written consent are the first roadmap item.",
+"auditFix":"New voice key; packs rebuilt; the five built-in lessons now speak offline; recordings allowed through the body limit"}

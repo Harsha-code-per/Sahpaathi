@@ -212,6 +212,9 @@ Live: app **https://sahpaathi.vercel.app** (teacher player at `/teacher`, `/stud
 - **App: Vercel.** Import the repo with root directory `app/`, and set `VITE_API_URL` (the Render URL) and `VITE_PACK_PUBLIC_KEY`. The Studio and Admin sign-in pages fetch the demo accounts' password from the API (`GET /api/v1/auth/demo`), so no Vercel setting is needed for it. Every merge to `main` deploys through `.github/workflows/deploy-app.yml`. `app/vercel.json` serves `index.html` for `/studio` and `/admin`. From a laptop instead of a Git import: `npx vercel deploy --prod` at the repo root; `.vercelignore` uploads only `app/` and `content/`. Then put the Vercel URL in Render's `CORS_ORIGINS`, e.g. `https://sahpaathi.vercel.app`; without it the browser blocks every API call, including the player's sync.
 - **One signing key for the team.** `PACK_SIGNING_KEY` (private) lives only in Render and in the `backend/.env` of whoever builds packs locally; `VITE_PACK_PUBLIC_KEY` is its public half. A pack signed with any other key is refused by the app.
 
+## Build-stage deck
+[docs/submission/Sahpaathi_A1pha_Build_Deck.pdf](docs/submission/Sahpaathi_A1pha_Build_Deck.pdf) (also `.pptx`; rebuilt by `deck-build.js` with pptxgenjs). It covers AI use and guardrails, low-connectivity behaviour, the education mentor's review, our tests, the roadmap, and these test accounts.
+
 ## Test credentials and sample inputs
 Live app: **https://sahpaathi.vercel.app**. All three accounts share one demo password: **`sahpaathi#01`** (it opens only the sample data on this demo, and the sign-in pages show it too).
 
