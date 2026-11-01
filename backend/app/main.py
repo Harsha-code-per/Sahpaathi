@@ -49,6 +49,7 @@ class BodyLimit:
     ponytail: trusts Content-Length; a chunked upload without one is not counted."""
 
     PLAN_PATH, PLAN_MAX, DEFAULT_MAX = "/api/v1/tutor/plan", 8_000_000, 1_000_000
+    RECORDINGS, RECORDING_MAX = "/api/v1/recordings/", 5_000_000  # the route's own limit is 4 MB
 
     def __init__(self, app: ASGIApp) -> None:
         self.app = app
@@ -56,7 +57,12 @@ class BodyLimit:
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         if scope["type"] == "http":
             length = dict(scope["headers"]).get(b"content-length", b"0")
-            limit = self.PLAN_MAX if scope["path"] == self.PLAN_PATH else self.DEFAULT_MAX
+            path = scope["path"]
+            limit = self.DEFAULT_MAX
+            if path == self.PLAN_PATH:
+                limit = self.PLAN_MAX
+            elif path.startswith(self.RECORDINGS):
+                limit = self.RECORDING_MAX
             if not length.isdigit() or int(length) > limit:
                 too_big = JSONResponse({"detail": "That is too large to send."}, status_code=413)
                 await too_big(scope, receive, send)

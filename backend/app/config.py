@@ -41,7 +41,9 @@ class Settings(BaseSettings):
     tutor_ip_daily_file_plans: int = 6
     # The demo admin account is public for evaluators, so the costly admin actions are capped too.
     pack_daily_builds: int = 10  # Sarvam voice for a whole lesson + ffmpeg
-    login_attempts_per_10_min: int = 10  # per IP; each check is a deliberately slow scrypt
+    login_attempts_per_10_min: int = (
+        40  # per IP (a whole evaluation team may share one); scrypt is slow
+    )
     # Lessons, district profiles, samples, voice clips. Repo layout locally; /srv/content in Docker.
     content_dir: Path = Path(__file__).parents[2] / "content"
     # Real catch-up calls (app/ivr/exotel.py). Empty: only the Admin keypad simulator works.
