@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { adminApi, ApiError, fetchAudio, type CallStep, type CallSummary } from './api'
-import { endMessage, KEY_WAIT_SEC, KEYPAD } from './view'
+import { endMessage, KEY_WAIT_SEC, KEYPAD, keysOpen } from './view'
 
 type Phase = 'idle' | 'playing' | 'waiting' | 'sending' | 'ended'
 
 const HINT: Record<Phase, string> = {
   idle: 'Press Dial to ring the family.',
-  playing: 'The family hears the recap…',
+  playing: 'The family hears the recap. A key can be pressed any time: 1 hear again, 2 child understood, 3 need help.',
   waiting: 'Waiting for a key. 1 hear again, 2 child understood, 3 need help.',
   sending: '…',
   ended: '',
@@ -17,6 +17,7 @@ function playUrl(el: { current: HTMLAudioElement | null }, url: string) {
     const audio = new Audio(url)
     el.current = audio
     audio.onended = () => resolve()
+    audio.onpause = () => resolve() // a key pressed mid-clip stops it
     audio.onerror = () => resolve()
     audio.play().catch(() => resolve()) // a blocked or broken clip must not stall the call
   })
@@ -33,6 +34,7 @@ export default function Phone({ call, onClose, onSignedOut }: { call: CallSummar
   const [secondsLeft, setSecondsLeft] = useState(KEY_WAIT_SEC)
   const audio = useRef<HTMLAudioElement | null>(null)
   const alive = useRef(true)
+  const turn = useRef(0) // which step is current; a key pressed mid-recap starts a new one
 
   useEffect(() => {
     alive.current = true
@@ -55,16 +57,17 @@ export default function Phone({ call, onClose, onSignedOut }: { call: CallSummar
 
   const run = useCallback(
     async (next: CallStep) => {
+      const mine = ++turn.current
       setStep(next)
       if (next.hangup) return setPhase('ended')
       setPhase('playing')
       try {
         for (const clip of next.play) {
           const url = await fetchAudio(clip.url)
-          if (!alive.current) return
+          if (!alive.current || mine !== turn.current) return
           await playUrl(audio, url)
           URL.revokeObjectURL(url)
-          if (!alive.current) return
+          if (!alive.current || mine !== turn.current) return
         }
       } catch (err) {
         return fail(err)
@@ -77,6 +80,8 @@ export default function Phone({ call, onClose, onSignedOut }: { call: CallSummar
 
   const send = useCallback(
     async (digit: string | null) => {
+      turn.current++ // the clip still playing belongs to the old step
+      audio.current?.pause()
       setPhase('sending')
       try {
         await run(await adminApi.press(call.id, digit))
@@ -128,7 +133,7 @@ export default function Phone({ call, onClose, onSignedOut }: { call: CallSummar
         {KEYPAD.flat().map((key) => (
           <button
             key={key}
-            disabled={phase !== 'waiting'}
+            disabled={!keysOpen(phase)}
             onClick={() => send(key)}
             className="min-h-14 rounded-xl bg-white/15 text-2xl font-bold hover:bg-white/25 disabled:opacity-40 focus-visible:ring-2 focus-visible:ring-sidebar-ring focus-visible:outline-none"
           >

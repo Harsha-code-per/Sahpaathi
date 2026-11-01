@@ -161,3 +161,8 @@ export const partName = (segmentId: string) => (/^s(\d+)$/.exec(segmentId) ? `Pa
 export function lessonTitles(episodes: Summary[]): Map<string, string> {
   return new Map(episodes.filter((e) => e.title).map((e) => [`${e.lesson_id}-${e.district_id}`, e.title!]))
 }
+
+/** The keypad works while the recap plays too ("barge-in", as on a real phone menu): a recap can run
+ * several minutes, and a parent who has heard enough presses a key. Only dialling, sending and a
+ * finished call have no keys. */
+export const keysOpen = (phase: string) => phase === 'playing' || phase === 'waiting'
