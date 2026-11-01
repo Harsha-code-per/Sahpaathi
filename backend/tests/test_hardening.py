@@ -63,3 +63,12 @@ def test_the_default_signing_secret_is_refused_outside_a_dev_machine():
     with pytest.raises(ValidationError, match="JWT_SECRET"):
         Settings(database_url="postgresql://u:p@ep-cool-1.neon.tech/prod", jwt_secret=DEV_SECRET)
     assert Settings(database_url="sqlite:///x.db", jwt_secret=DEV_SECRET)  # fine locally
+
+
+def test_the_body_limit_leaves_room_for_a_teachers_recording(api):
+    """A recording may be 4 MB (its route checks that); every other plain route stops at 1 MB."""
+    two_mb = b"x" * 2_000_000
+    put = api.put("/api/v1/recordings/some-recording", content=two_mb)
+    assert put.status_code == 401  # reached the route, which asks for a login
+    assert api.put("/api/v1/recordings/big", content=b"x" * 5_000_001).status_code == 413
+    assert api.post("/api/v1/sync", content=two_mb).status_code == 413
