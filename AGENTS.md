@@ -2,7 +2,7 @@
 
 Read this before you change anything, whether you are a teammate or an AI assistant. It is the bar every pull request is held to. Process (branches, commits, ownership) is in [CONTRIBUTING.md](CONTRIBUTING.md).
 
-**What we are building:** an offline audio co-teacher for India's one-teacher, many-grade classrooms. A phone plays a lively lesson in the children's home language through a ₹500 speaker; the teacher taps how the class did and the lesson adapts, with no internet in the room. Studio (reviewers), Admin (block officers) and the online AI teacher serve that classroom. When a choice is unclear, pick what helps that teacher, on that phone, with no signal.
+**What we are building:** an offline audio learning companion for the teachers of India's one-teacher, many-grade classrooms. A phone plays a lively lesson in the children's home language through a ₹500 speaker; the teacher taps how the class did and the lesson adapts, with no internet in the room. Studio (reviewers), Admin (block officers) and the online AI teacher serve that classroom. When a choice is unclear, pick what helps that teacher, on that phone, with no signal.
 
 ## How a change reaches the live site
 A PR into `main` **merges itself** once CI is green (`.github/workflows/auto-merge.yml`), and every merge **deploys** the app (Vercel) and the API (Render). There is no human gate, so CI is the gate. Open the PR as a **draft**, or add the **`hold`** label, if it must not merge yet (a migration, a risky change, anything needing a decision).

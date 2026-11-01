@@ -1,6 +1,6 @@
-# Sahpaathi — an offline AI co-teacher in a ₹500 speaker
+# Sahpaathi — an offline audio learning companion for the teacher, in a ₹500 speaker
 
-> While the teacher teaches one grade, a Bluetooth speaker paired to her phone runs a 15-minute interactive audio episode for another grade, in the children's home language, with **no internet in the classroom**.
+> While the teacher works closely with one group, a Bluetooth speaker paired to her phone runs a structured, interactive audio activity for another group, in the children's home language, with **no internet in the classroom**. It supports the teacher; it does not replace her, and it aims at meaningful engagement, not a proven learning gain yet.
 
 **AI for Foundational Learning Hackathon 2026 · Challenge 01: Classroom Complexity · Team A1pha**
 
@@ -9,7 +9,7 @@ Sahpaathi brings back Interactive Radio Instruction (IRI) using frontier AI:
 - **It adapts offline.** After each segment the teacher taps *Most / Some / Few got it*, and the episode switches branch on the device.
 - **It starts in the home language.** Lessons begin in the child's home language (e.g. Hindi for migrant children in Tamil Nadu) and bridge into the school language (Tamil, Odia). Santali is next: its splicer is built, and the community phrase bank is waiting for consented recordings.
 - **It reaches absent children.** A free call-back plays the missed lesson's recap on any basic phone.
-- **It also has an online AI teacher** for one learner at a time: you talk to it like a person, ask it to teach a topic (or a photo of a textbook page), and it splits the topic into parts, teaches each, quizzes it and teaches it again until it lands. See *Two modes* below.
+- **It also has a prototype parent helper** (the online AI teacher at `/tutor`): a parent and child at home talk to it, ask about a topic or a photo of a textbook page, and it splits the topic into parts, explains each, asks questions and explains again. Young children cannot use it alone. See *Two modes* below.
 
 | Problem in the challenge | How Sahpaathi answers it |
 |---|---|
@@ -20,9 +20,9 @@ Sahpaathi brings back Interactive Radio Instruction (IRI) using frontier AI:
 ## Two modes
 Sahpaathi has two modes that share one curriculum and are kept separate on purpose. Each works on its own.
 
-| | **Offline classroom** | **Online AI teacher** |
+| | **Offline classroom** | **Parent helper (online AI teacher, prototype)** |
 |---|---|---|
-| For | A group in one room, one teacher phone and a ₹500 speaker | One learner on a phone with a signal |
+| For | A group in one room, one teacher phone and a ₹500 speaker | A parent and child at home, on a phone with a signal |
 | Internet | **None needed** | Needed |
 | Does | Plays signed lesson packs through the speaker, branches on the teacher's *Most / Some / Few* taps, takes attendance, calls absent children's parents | Talks like a teacher: chats first, then plans a topic or a textbook page into parts, teaches each, quizzes it, teaches it again until it lands, answers doubts, and takes breaks with riddles and games |
 | Languages | Tamil, Hindi, Odia, English (Santali next) | English, Hindi, Tamil, Odia, switchable mid-lesson |

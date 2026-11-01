@@ -51,7 +51,7 @@ async function goTo(page: Page, section: string) {
 test('landing page, with its scroll motion', async ({ page }) => {
   const errors = watch(page)
   await page.goto('/')
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('second teacher')
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('classroom companion')
   await page.getByRole('button', { name: 'Few got it' }).click()
   await page.mouse.wheel(0, 4000)
   await expect(page.locator('#root')).not.toBeEmpty()
@@ -65,7 +65,7 @@ test.describe('landing page, settled', () => {
   test('is accessible', async ({ page }) => {
     const errors = watch(page)
     await page.goto('/')
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('second teacher')
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('classroom companion')
     await healthy(page, errors)
   })
 })

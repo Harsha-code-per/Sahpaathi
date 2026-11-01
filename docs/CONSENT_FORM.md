@@ -4,7 +4,7 @@
 
 ---
 
-**What this is.** Sahpaathi is a student project for the AI for Foundational Learning Hackathon. It is an audio "co-teacher" that plays a lesson to one grade on a phone and a speaker while you teach another grade. We are testing an early version and would like your honest opinion. It is not a government programme and nothing is being sold.
+**What this is.** Sahpaathi is a student project for the AI for Foundational Learning Hackathon. It is an audio learning companion that plays a lesson to one grade on a phone and a speaker while you teach another grade. We are testing an early version and would like your honest opinion. It is not a government programme and nothing is being sold.
 
 **What we will do.** You try the app for about 20 minutes, and we ask you about your classroom and the app. The session takes about 45 minutes.
 

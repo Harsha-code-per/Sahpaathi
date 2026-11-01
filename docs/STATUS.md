@@ -1,4 +1,6 @@
-# Sahpaathi status (21 Oct 2026)
+# Sahpaathi status (21 Oct 2026, updated 1 Nov)
+
+**1 Nov, submission day:** the education mentor's review of 21 Oct is logged in [TESTING_LOG.md](TESTING_LOG.md), and the product now follows it: a classroom companion rather than a second teacher, engagement rather than learning claims, a "Set up the room" card, and `/tutor` as a prototype parent helper. The hardening PR is merged (#112 replaced #94). Tables below keep their 21 to 25 Oct wording.
 
 **Short answer:** the **offline classroom product is complete**, and everything in the original build plan works. The plan agreed on 18 Oct left **Online Mode** for the Top 10 stage; **a prototype of it was built early on 21 Oct and is now in `main` and live**, with its camera sensing switched off (section 2). What stands between us and a winning submission is mostly **evidence and people**, not code.
 

@@ -1,7 +1,7 @@
 /**
  * Sahpaathi has two modes that share one curriculum. They are separate on purpose: the classroom
- * mode must work with no network at all, the online mode needs one. A hybrid (the AI teacher
- * helping a child at home with what the class just learned, using the same taps) is a third entry
+ * mode must work with no network at all, the parent helper needs one. A hybrid (the helper
+ * supporting a child at home with what the class just learned, using the same taps) is a third entry
  * here when it is built; see docs/MODES.md.
  */
 export type ModeId = 'offline' | 'online'
@@ -39,18 +39,18 @@ export const MODES: Record<ModeId, Mode> = {
   },
   online: {
     id: 'online',
-    label: 'Online AI teacher',
-    short: 'AI teacher',
+    label: 'Parent helper',
+    short: 'Parents',
     path: '/tutor',
     internet: true,
-    tagline: 'One learner, one AI teacher, talking. Needs a phone and a signal.',
+    tagline: 'A prototype for a parent and child at home. Needs a phone and a signal. Not for use by young children alone.',
     features: [
-      'Talk like to a person: chat first, then ask it to teach you',
-      'Study mode splits any topic, PDF or photo of a textbook page into parts, teaches each one, quizzes it, and teaches it again until you get it',
+      'Talk like to a person: ask it to explain what the class is learning',
+      'Study mode splits any topic, PDF or photo of a textbook page into parts, explains each, asks questions, and explains again when needed',
       'Interrupt any time: explain again, like I’m 5, in Hindi, Tamil or Odia',
-      'Friendly breaks with riddles, quick maths and a memory game, so learning never gets boring',
+      'Friendly breaks with riddles, quick maths and a memory game',
     ],
-    cta: 'Talk to the AI teacher',
+    cta: 'Try the parent helper',
   },
 }
 
