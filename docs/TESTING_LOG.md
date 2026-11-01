@@ -30,6 +30,9 @@ Production build (`vite preview`) in Chrome at 390 px, phone emulation. These ro
 
 | L6 | 2026-11-01 | Offline, phone emulation, production build | Audit before submission: the live site played no sound (packs failing on a rejected voice key, built-in lessons were text only) | **Failed**, then fixed: voice key replaced, 77 lines of the five built-in lessons voiced (550 KB). Offline, the first lines load from the service worker and play | Built-in lessons now speak with no login and no signal |
 
+| L7 | 2026-11-01 | Live site, teacher sign-in, phone emulation | Download a voiced pack and play it | **Failed**, then fixed: Render's free instance took over an hour per pack, and the app trusted a different public key from the one packs are signed with, so every pack would have been refused. Two packs built off-server into the live database; Vercel's `VITE_PACK_PUBLIC_KEY` set to the matching half | The Grade 1 Hindi-to-Tamil pack downloads, passes the signature check and plays |
+| L8 | 2026-11-01 | Live Admin call simulator | Queue a call, Dial, press 2 | **Failed**: the 211 s recap locked the keypad until it ended | Keys work during the recap (barge-in, #116); press 2 ends the call as "child understood" |
+
 ## Voice pack QA (M3, `python -m app.voice.build qa`)
 
 Real Sarvam voices, Ed25519-signed, built locally on 2026-10-19. QA checks size (under 2 MB), every line within 1.5 LU of -16 LUFS, and no line over 45 s. This is an engineering check only; **no native speaker has listened to these voices yet**.

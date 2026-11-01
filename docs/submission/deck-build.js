@@ -54,7 +54,7 @@ const REPO = "https://github.com/Harsha-code-per/Sahpaathi";
       ["Bhashini, IndicTrans2, Indic TTS", "Sarvam Bulbul v3 voices", "Tamil, Hindi, Odia and English from one API"],
       ["RAG over textbooks (pgvector)", "Curated chapters + NIPUN outcomes", "8 chapters needed accuracy, not search"],
       ["22 languages, Santali to Odia showcase", "Lessons in Tamil, Hindi, English; Odia app text and voice ready", "No Odia lesson yet: it waits on Santali, with 0 of 42 phrases recorded"],
-      ["Free call-back on real phones", "Full IVR flow, tested in code", "Not live: needs a voiced pack (voice credits ran out) and an Exotel number"],
+      ["Free call-back on real phones", "Full IVR flow, live on a keypad simulator", "Exotel code is ready; not yet connected to a real phone number"],
     ].map((r, i) => r.map((t) => ({ text: t, options: { bold: i === 0, color: i === 0 ? WHITE : INK, fill: { color: i === 0 ? SLATE : i % 2 ? WHITE : LIGHT } } })));
     s.addTable(rows, { x: 0.6, y: 4.27, w: 12.13, colW: [3.5, 3.9, 4.73], fontFace: "Calibri", fontSize: 11, border: { type: "none" }, rowH: 0.36, valign: "middle", margin: [3, 8, 3, 8] });
   }
@@ -164,13 +164,13 @@ const REPO = "https://github.com/Harsha-code-per/Sahpaathi";
       ["19 Oct", "Voice QA on 3 real packs", "2 of 3 failed on one quiet line (-18.8 and -17.6 LUFS)", "Gain re-measured on the encoded line; all 3 now pass"],
       ["21 Oct", "Clicking through the live site", "White screens after deploys, and a crash on sending a tutor message", "Fixed; every PR now runs a browser test of each page, plus accessibility"],
       ["25 Oct", "moto g34: full lesson", "A lesson needs pause, a screen that stays on, and protection from a mistaken back press", "Pause and resume, screen wake lock, confirm before leaving"],
-      ["1 Nov", "Pre-submission audit of live flows", "The live site played no sound: packs failed on a rejected voice key, and built-in lessons were text only", mentor.auditFix],
+      ["1 Nov", "Pre-submission audit of live flows", "No sound on the live site; packs failed on the voice key and were signed with a key the app did not trust; the call keypad locked for a 3.5-minute recap", mentor.auditFix],
     ].map((r, i) => r.map((t, j) => ({ text: t, options: { bold: i === 0 || j === 0, color: i === 0 ? WHITE : INK, fill: { color: i === 0 ? SLATE : i % 2 ? LIGHT : WHITE } } })));
     s.addTable(rows, { x: 0.6, y: 1.6, w: 12.13, colW: [0.9, 2.9, 4.25, 4.08], fontFace: "Calibri", fontSize: 12, border: { type: "none" }, valign: "middle", margin: [3, 8, 3, 8] });
     card(s, 0.6, 5.2, 12.13, 1.05, SLATE);
     T(s, [{ text: "Metrics promised in the Ideate deck  ", options: { bold: true, color: MARI } },
       { text: "0 MB in the classroom: shown. +20 guided minutes, 80% Most got it, 60% catch-up calls completed: not measured yet, because the school pilot has not happened. They move to the pilot.", options: { color: WHITE } }], { x: 0.85, y: 5.26, w: 11.65, h: 0.93, fontSize: 13, valign: "middle" });
-    T(s, "These are team and device tests, not classroom results. Automated: 272 backend and 229 app tests, plus browser smoke tests on desktop and phone, on every pull request.", { x: 0.6, y: 6.38, w: 12.13, h: 0.5, fontSize: 12.5, italic: true, color: MUTED });
+    T(s, "These are team and device tests, not classroom results. Automated: 273 backend and 230 app tests, plus browser smoke tests on desktop and phone, on every pull request.", { x: 0.6, y: 6.38, w: 12.13, h: 0.5, fontSize: 12.5, italic: true, color: MUTED });
   }
 
   // Roadmap 1
@@ -238,9 +238,9 @@ const REPO = "https://github.com/Harsha-code-per/Sahpaathi";
     T(s, "Five sample inputs", { x: 0.6, y: 3.53, w: 8, h: 0.3, fontSize: 14, bold: true });
     const sample = [
       ["Teacher", "Open “Counting to three with pebbles”, read Set up the room, Start. Listen, tap Few got it, then Most got it at the next check. Let one check run out: it continues after 10 s."],
-      ["Teacher", "Play “The thirsty crow” (Grade 2 story, Tamil and English). After the first page loads, turn on airplane mode: the voice still plays, and the end screen asks who was absent."],
+      ["Teacher", "Under New lessons sign in as the teacher and download “கூழாங்கல் எண்ணுவோம்” (Grade 1, Hindi to Tamil, 15 min). It is signature-checked. Turn on airplane mode and play it."],
       ["Reviewer", "In /studio open Approved, then the Grade 3 Madurai lesson. Read each Tamil line beside its English back-translation and the six AI scores. “Write a new lesson” starts Claude (slow on the free server)."],
-      ["Admin", "In /admin open Overview and Classes: the class-health board, marked SAMPLE. Lesson packs and Catch-up calls need a voiced pack, which is not built on this demo (voice credits ran out)."],
+      ["Admin", "In /admin open Classes (labelled SAMPLE data), then Catch-up calls: queue roll R-07, press Simulate, Dial, and press 1, 2 or 3 at any time during the recap."],
       ["Parent helper", "In /tutor turn on Study and type “place value of two-digit numbers”. Answer one question wrongly, then say “explain in Hindi” and “I am tired”."],
     ];
     sample.forEach(([r, t], i) => {
