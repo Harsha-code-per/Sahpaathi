@@ -217,7 +217,7 @@ Live app: **https://sahpaathi.vercel.app**. All three accounts share one demo pa
 
 | Role | Email | Where to start | Try this |
 |---|---|---|---|
-| Teacher | `teacher@sahpaathi.test` | [/teacher](https://sahpaathi.vercel.app/teacher) | No login needed to play the built-in lesson, even in airplane mode: tap a checkpoint, let the 10 s fallback play, take attendance. Sign in under **Get new lessons** to download a voiced Tamil lesson. Switch the language at the top (English, தமிழ், हिन्दी, ଓଡ଼ିଆ) |
+| Teacher | `teacher@sahpaathi.test` | [/teacher](https://sahpaathi.vercel.app/teacher) | No login needed to play the five built-in voiced lessons, even in airplane mode: tap a checkpoint, let the 10 s fallback play, take attendance. Sign in under **Get new lessons** to download a voiced Tamil lesson. Switch the language at the top (English, தமிழ், हिन्दी, ଓଡ଼ିଆ) |
 | Reviewer | `reviewer@sahpaathi.test` | [/studio](https://sahpaathi.vercel.app/studio) | Open a lesson, read each line beside its English back-translation and the AI review, correct a line with the pencil, then approve or reject |
 | Admin | `admin@sahpaathi.test` | [/admin](https://sahpaathi.vercel.app/admin) | Overview charts and the lesson pipeline; **Lesson packs** to build and download a signed pack; **Catch-up calls** to queue a call for an absent roll number and press 1, 2 or 3 on the keypad simulator |
 

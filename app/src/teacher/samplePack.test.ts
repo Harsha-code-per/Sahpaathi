@@ -8,6 +8,17 @@ describe('built-in sample lessons', () => {
     expect(new Set(samplePacks.map((s) => s.episode.id)).size).toBe(samplePacks.length)
   })
 
+  it('every line a class can hear has its voice file', () => {
+    const files = import.meta.glob('/public/audio/**/*.opus')
+    for (const { episode, audio } of samplePacks) {
+      const lines = [...episode.segments.flatMap((s) => [...s.teach, ...s.easier, ...s.core, ...s.stretch]), ...episode.analogy]
+      for (const l of lines) {
+        expect(audio[l.id], `${episode.id} ${l.id}`).toBeTruthy()
+        expect(`/public${audio[l.id]}` in files, audio[l.id]).toBe(true)
+      }
+    }
+  })
+
   it('every sum in math_checks is right', () => {
     for (const { episode } of samplePacks)
       for (const s of episode.segments)

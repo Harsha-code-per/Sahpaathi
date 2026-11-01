@@ -28,6 +28,8 @@ Production build (`vite preview`) in Chrome at 390 px, phone emulation. These ro
 | L4 | 2026-10-19 | Slow 3G, CPU 4× slower, repeat visit | Time to the lesson list (service worker cache) | 0.5 s | none needed |
 | L5 | 2026-10-19 | Mobile Lighthouse | Accessibility, best practices | 100 and 100 | none needed |
 
+| L6 | 2026-11-01 | Offline, phone emulation, production build | Audit before submission: the live site played no sound (packs failing on a rejected voice key, built-in lessons were text only) | **Failed**, then fixed: voice key replaced, 77 lines of the five built-in lessons voiced (550 KB). Offline, the first lines load from the service worker and play | Built-in lessons now speak with no login and no signal |
+
 ## Voice pack QA (M3, `python -m app.voice.build qa`)
 
 Real Sarvam voices, Ed25519-signed, built locally on 2026-10-19. QA checks size (under 2 MB), every line within 1.5 LU of -16 LUFS, and no line over 45 s. This is an engineering check only; **no native speaker has listened to these voices yet**.

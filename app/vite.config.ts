@@ -30,7 +30,7 @@ export default defineConfig({
       workbox: {
         navigateFallback: '/index.html',
         // Fonts too, so every script renders offline (about 370 KB, fetched in the background after the first visit).
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2,opus}'],
         // Only the subsets we show: Latin for Figtree/Bricolage, one script file per Noto family.
         // The desk tools, the landing page and the AI teacher load online only: a classroom phone never downloads them (recharts alone is ~120 KB gz).
         globIgnores: [
