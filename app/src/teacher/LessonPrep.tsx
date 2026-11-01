@@ -23,6 +23,15 @@ export default function LessonPrep({
   return (
     <section className="flex flex-1 flex-col gap-5">
       <div className="space-y-2">
+        <h2 className="text-[0.8125rem] font-bold tracking-[0.08em] text-primary uppercase">{t.setUpRoom}</h2>
+        <ol className="flex list-inside list-decimal flex-col gap-1 rounded-2xl border border-border bg-card px-4 py-3 text-lg">
+          {t.roomSteps.map((s) => (
+            <li key={s}>{s}</li>
+          ))}
+        </ol>
+      </div>
+
+      <div className="space-y-2">
         <h2 className="text-[0.8125rem] font-bold tracking-[0.08em] text-primary uppercase">{t.drawOnBoard}</h2>
         <img src={sketch} alt={t.sketchAlt} className="max-h-48 w-full rounded-2xl bg-[#f2efe6] p-4" />
       </div>

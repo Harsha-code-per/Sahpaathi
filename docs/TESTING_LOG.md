@@ -8,7 +8,13 @@ Evidence for "proof of testing and refinement based on user input" (part of the 
 
 | # | Date | Who (role, setting) | Hyp. | What we tested | What we observed | Priority, owner | What we changed (PR) |
 |---|---|---|---|---|---|---|---|
-| 1 | | e.g. T1, Grade 1–3 teacher, Tamil-medium govt school, Madurai | | | | | |
+| 1 | 2026-10-21 | M1, education mentor (project lead in school education, Central Square Foundation), 40-minute virtual session with a live demo | | Positioning and classroom fit of the offline product | Calling it a "second teacher" jumps the gun: in a noisy room a speaker alone may not solve active learning. Better positioned as a structured audio-guided learning companion that helps a teacher manage groups | submission, M1 | 25 Oct: lesson activities and teacher controls. 1 Nov: the landing page, README, deck and video say "classroom companion", not "second teacher" |
+| 2 | 2026-10-21 | M1 | | Claims | We can claim engagement at this stage, not that learning happened or a competency was mastered | submission, M1 | 1 Nov: README, deck and video claim engagement only; the Evidence page says nothing here shows children learn more |
+| 3 | 2026-10-21 | M1 | | How it looks in action | Show how it runs: the teacher sits with those who need her most, the other group follows the audio, a strong child acts as facilitator. That direction must reach the teacher | submission, M1 | 1 Nov: a "Set up the room" card before every lesson, in four languages |
+| 4 | 2026-10-21 | M1 | | Online study mode | Grade 1–3 children cannot navigate or use it alone. It suits older children, or parents at home | submission, M1 | 1 Nov: `/tutor` is labelled a prototype parent helper and removed from the landing hero. 25 Oct: a short spoken note for parents (`/tutor/summary`) |
+| 5 | 2026-10-21 | M1 | | Focus | Few features that work beat many. Narrow to one priority: one teacher, two groups, in foundational maths | submission, M1 | 25 Oct onward: work moved back to the classroom loop. Lessons stay Grades 1–3 maths, tagged to NIPUN outcomes. The camera sensing stays off |
+| 6 | 2026-10-21 | M1 | | Script engagement | Are instructions clear enough for a Grade 2 child, and engaging enough to act on? Check against strong audio such as Pratham's, and feed state teacher guides into generation | roadmap, M1 | 25 Oct: five practice lessons with different activities (pebble task, slate, pair work, song, story). **Not yet done:** state teacher guides as model input; testing with children |
+| 7 | 2026-10-21 | M1 | | Indic language accuracy | Indic language models err in deployment. Launch with a caveat: data from real users, and a rubric, are needed | roadmap, M1 | Native-speaker sign-off stays a required guardrail; Santali waits for consented recordings; the deck states the caveat |
 
 ## Low-connectivity checks (team, no users)
 

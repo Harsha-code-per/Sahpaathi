@@ -17,7 +17,7 @@ const DATA: Record<Data, string> = {
 }
 
 const TOUR: { to: string; title: string; look: string; data: Data }[] = [
-  { to: '/#modes', title: 'See the two modes', look: 'One classroom mode that needs no internet and one AI-teacher mode that does, side by side.', data: 'none' },
+  { to: '/#modes', title: 'See the two modes', look: 'The offline classroom, and a prototype parent helper that needs internet, side by side.', data: 'none' },
   {
     to: '/teacher',
     title: 'Be the teacher, offline',
@@ -26,7 +26,7 @@ const TOUR: { to: string; title: string; look: string; data: Data }[] = [
   },
   {
     to: '/tutor',
-    title: 'Talk to the AI teacher',
+    title: 'Try the parent helper (prototype)',
     look: 'Say hello, then “teach me place value of two digit numbers”. Answer one question wrongly, say “I’m tired”, then “explain in Hindi”. It plans, teaches, checks, takes a break and switches language.',
     data: 'none',
   },
@@ -70,23 +70,23 @@ const MEASURED: [string, string, string][] = [
 ]
 
 const NOT_YET: [string, string][] = [
-  ['Real teacher interviews', 'The user-testing log is empty. Nothing here is evidence that teachers or children learn more.'],
+  ['Real teacher interviews', 'One education-mentor review so far (TESTING_LOG), no teacher or classroom sessions. Nothing here is evidence that children learn more.'],
   ['The speaker at 3 metres', 'The listening test with a ₹500 speaker has not been run; no real phone and speaker test either.'],
-  ['Native-speaker review of the app and the voices', 'The Tamil, Hindi and Odia words, including the AI teacher’s, are drafted with Claude and unreviewed.'],
+  ['Native-speaker review of the app and the voices', 'The Tamil, Hindi and Odia words, including the parent helper’s, are drafted with Claude and unreviewed.'],
   ['Santali', '0 of 42 phrases are recorded or consented, so it is not offered.'],
   ['A real catch-up call', 'The calling is built and tested on a keypad simulator; no real call has been made.'],
-  ['The AI teacher’s answers through the four guardrails', 'It is checked by its rules and prompt only, and judged by Claude.'],
+  ['The parent helper’s answers through the four guardrails', 'It is checked by its rules and prompt only, and judged by Claude.'],
   [
     'The camera and microphone sensing on real faces',
     'Rule-based, opt-in and on-device, tested only with synthetic numbers and a fake camera. Needs legal review (DPDP Act) before children use it.',
   ],
-  ['Learner accounts and verifiable parental consent', 'Not built; nothing is saved about the AI teacher’s learners.'],
+  ['Learner accounts and verifiable parental consent', 'Not built; nothing is saved about the parent helper’s learners.'],
 ]
 
 const COMPARE: [string, string, string, string][] = [
   [
     'One teacher, two or three grades, one room',
-    'Designed for it: the speaker guides one grade while she teaches another',
+    'Designed for it: the speaker engages one group while she works with another',
     'Built for one learner at a screen',
     'Built for one viewer at a screen',
   ],
@@ -109,7 +109,7 @@ const DATA_TABLE: [string, string, string][] = [
   ['The teacher’s rating of a lesson', 'The phone, then the server', 'Stars and fixed tags. No free text from anyone.'],
   ['“My class” history', 'The teacher’s phone only', 'Kept 120 days, clearable with one tap, never uploaded.'],
   [
-    'What you say to the AI teacher',
+    'What you say to the parent helper',
     'Sent to Anthropic’s Claude (and Sarvam for the voice) to answer; Sahpaathi stores nothing',
     'The conversation lives in the browser tab and is gone when it closes.',
   ],

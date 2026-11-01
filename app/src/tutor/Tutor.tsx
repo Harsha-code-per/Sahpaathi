@@ -236,7 +236,7 @@ export default function Tutor() {
     }
     if (!navigator.onLine) {
       stop()
-      return setError('You are offline. The AI teacher needs the internet. The offline classroom works without it.')
+      return setError('You are offline. The parent helper needs the internet. The offline classroom works without it.')
     }
     const { study, attached } = settings.current
     if (!planRef.current && (study || attached)) return startStudy(text, attached)
@@ -385,7 +385,7 @@ export default function Tutor() {
           <span className="grid size-10 place-items-center rounded-xl bg-primary text-primary-foreground">
             <LogoMark className="size-6" />
           </span>
-          <span className="font-heading text-xl font-bold max-sm:sr-only">Ask the teacher</span>
+          <span className="font-heading text-xl font-bold max-sm:sr-only">Parent helper</span>
         </a>
         <div className="ml-auto">
           <ModeSwitch current="online" tone="dark" />
@@ -454,8 +454,8 @@ export default function Tutor() {
         <div className="flex-1 space-y-3 overflow-y-auto py-2" aria-live="polite">
           {shown.length === 0 && (
             <p className="py-10 text-center text-lg text-[#a9b8b3]">
-              Just talk, like to a person. To learn something, turn on <b>Study</b> and say the topic, or attach a chapter, a PDF or a photo of a page. I will split it into parts,
-              teach each one, ask you questions, and teach it again until you get it.
+              A prototype for parents helping a child at home. Just talk, like to a person. To learn something, turn on <b>Study</b> and say the topic, or attach a chapter, a PDF
+              or a photo of a page. I will split it into parts, teach each one, ask you questions, and teach it again until you get it.
             </p>
           )}
           {shown.map((t, i) => (
@@ -474,7 +474,7 @@ export default function Tutor() {
 
         {!online && (
           <p role="status" className="rounded-xl bg-[#3a2f12] px-3 py-2 text-[#f4d58a]">
-            You are offline, so the AI teacher cannot answer. Open the{' '}
+            You are offline, so the parent helper cannot answer. Open the{' '}
             <a href="/teacher" className="font-semibold underline underline-offset-4">
               offline classroom
             </a>

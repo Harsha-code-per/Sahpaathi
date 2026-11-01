@@ -94,17 +94,15 @@ export default function Landing() {
         <section className="relative z-20 mx-auto grid max-w-7xl items-center gap-12 px-5 pt-10 pb-28 md:px-8 lg:min-h-[calc(100dvh-5rem)] lg:grid-cols-[1.05fr_1fr] lg:pt-12">
           <div data-hero-copy className="space-y-7">
             <h1 className="font-heading text-display font-extrabold tracking-tight">
-              <Words text="A second teacher, in a ₹500 speaker." cls="" />
+              <Words text="A classroom companion, in a ₹500 speaker." cls="" />
             </h1>
             <p className="landing-rise max-w-xl text-xl leading-relaxed text-[#a9b8b3]" style={{ animationDelay: '160ms' }}>
-              While she teaches Grade 3, Sahpaathi teaches Grade 1: a lively audio lesson in the children’s home language that adapts with every tap, with no internet in the room.
+              While the teacher works closely with one group, Sahpaathi keeps another engaged: a structured audio activity in the children’s home language that adapts with every
+              tap, with no internet in the room.
             </p>
             <div className="landing-rise flex flex-wrap gap-3" style={{ animationDelay: '240ms' }}>
               <a href="/teacher" className="inline-flex h-14 items-center gap-2 rounded-2xl bg-primary px-6 text-lg font-bold text-primary-foreground hover:bg-primary/85">
                 <PlayIcon className="size-5" aria-hidden /> Open the teacher app
-              </a>
-              <a href="/tutor" className="inline-flex h-14 items-center gap-2 rounded-2xl border border-white/25 px-6 text-lg font-semibold hover:bg-white/10">
-                <MessagesSquareIcon className="size-5" aria-hidden /> Talk to the AI teacher
               </a>
             </div>
             <div className="landing-rise space-y-2" style={{ animationDelay: '320ms' }}>
@@ -179,7 +177,7 @@ export default function Landing() {
               )
             })}
           </div>
-          <p className="landing-reveal text-muted-foreground">Next: a hybrid, where the AI teacher helps a child at home with what the class just learned, using the same taps.</p>
+          <p className="landing-reveal text-muted-foreground">Next: the parent helper picks up what the class just did, using the same taps.</p>
         </section>
 
         <Scene />
@@ -242,7 +240,12 @@ export default function Landing() {
               [
                 ['/teacher', PlayIcon, 'Teacher app', 'Play a lesson, tap the checkpoints, take attendance. Works offline.'],
                 ['/studio', BookOpenCheckIcon, 'Studio', 'Read a Claude-written lesson line by line with its review, then approve it.'],
-                ['/tutor', MessagesSquareIcon, 'AI teacher', 'Talk to a teacher of your own: study a topic, ask doubts, take a break with a puzzle. Needs internet.'],
+                [
+                  '/tutor',
+                  MessagesSquareIcon,
+                  'Parent helper',
+                  'A prototype for parents at home: study a topic with a child, ask doubts, take a break with a puzzle. Needs internet.',
+                ],
                 ['/admin', LayoutDashboardIcon, 'Admin', 'Lesson pipeline, how classrooms are doing, and the catch-up call simulator.'],
               ] as const
             ).map(([href, Icon, title, text]) => (
