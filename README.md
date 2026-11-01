@@ -7,7 +7,7 @@
 Sahpaathi brings back Interactive Radio Instruction (IRI) using frontier AI:
 - **Claude writes the episodes.** It turns an NCERT/state textbook chapter and a NIPUN learning outcome into an IRI script localised to the district: names, crops, festivals, free props like pebbles and seeds. Every segment comes with pre-generated *easier / core / stretch* branches.
 - **It adapts offline.** After each segment the teacher taps *Most / Some / Few got it*, and the episode switches branch on the device.
-- **It starts in the home language.** Lessons begin in the child's home language (e.g. Hindi for migrant children in Tamil Nadu) and bridge into the school language (Tamil, Odia). Santali is next: its splicer is built, and the community phrase bank is waiting for consented recordings.
+- **It starts in the home language.** Lessons begin in the child's home language (e.g. Hindi for migrant children in Tamil Nadu) and bridge into the school language (Tamil today; Odia is supported by the app and voices, but no Odia lesson is written yet). Santali to Odia is next: its splicer is built, and the community phrase bank is waiting for consented recordings.
 - **It reaches absent children.** A free call-back plays the missed lesson's recap on any basic phone.
 - **It also has a prototype parent helper** (the online AI teacher at `/tutor`): a parent and child at home talk to it, ask about a topic or a photo of a textbook page, and it splits the topic into parts, explains each, asks questions and explains again. Young children cannot use it alone. See *Two modes* below.
 
@@ -25,7 +25,7 @@ Sahpaathi has two modes that share one curriculum and are kept separate on purpo
 | For | A group in one room, one teacher phone and a ₹500 speaker | A parent and child at home, on a phone with a signal |
 | Internet | **None needed** | Needed |
 | Does | Plays signed lesson packs through the speaker, branches on the teacher's *Most / Some / Few* taps, takes attendance, calls absent children's parents | Talks like a teacher: chats first, then plans a topic or a textbook page into parts, teaches each, quizzes it, teaches it again until it lands, answers doubts, and takes breaks with riddles and games |
-| Languages | Tamil, Hindi, Odia, English (Santali next) | English, Hindi, Tamil, Odia, switchable mid-lesson |
+| Languages | Lessons in Tamil, Hindi and English; the app also in Odia (no Odia lesson yet; Santali next) | English, Hindi, Tamil, Odia, switchable mid-lesson |
 | Open | [`/teacher`](https://sahpaathi.vercel.app/teacher) | [`/tutor`](https://sahpaathi.vercel.app/tutor) |
 | Status | Complete, tested in airplane mode | **Prototype**, built early; see below |
 
